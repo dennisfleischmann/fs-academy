@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denkmalschutz Block 2 - Interaktives Lernen</title>
+<style>
+  :root {
+    --primary: #035357;
+    --accent: #50D2CA;
+    --gold: #C59B00;
+    --warn: #c00;
+    --success: #2e7d32;
+    --bg: #f5f5f0;
+    --card: #fff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0e0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+  header p { font-size: 0.9rem; opacity: 0.85; }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav button {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--accent); color: var(--primary); }
+  .nav button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* Main */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .q-type {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .q-type.sc { background: #e3f2fd; color: #1565c0; }
+  .q-type.mc { background: #f3e5f5; color: #7b1fa2; }
+  .q-type.ft { background: #fff3e0; color: #e65100; }
+  .q-num { font-size: 0.85rem; color: var(--muted); }
+  .q-topic { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.5rem; }
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); background: #f8fffe; }
+  .option.selected { border-color: var(--primary); background: #e8f5f5; }
+  .option.correct { border-color: var(--success); background: #e8f5e9; }
+  .option.wrong { border-color: var(--warn); background: #ffebee; }
+  .option .marker {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .option.mc-option .marker { border-radius: 4px; }
+  .option.selected .marker { border-color: var(--primary); background: var(--primary); color: white; }
+  .option.correct .marker { border-color: var(--success); background: var(--success); color: white; }
+  .option.wrong .marker { border-color: var(--warn); background: var(--warn); color: white; }
+  .option-text { font-size: 0.95rem; }
+
+  .ft-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .ft-input:focus { outline: none; border-color: var(--accent); }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { background: #e8f5e9; border-left: 4px solid var(--success); }
+  .feedback.wrong-fb { background: #ffebee; border-left: 4px solid var(--warn); }
+  .feedback.info-fb { background: #e3f2fd; border-left: 4px solid #1565c0; }
+  .feedback strong { display: block; margin-bottom: 0.3rem; }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: #046a6f; }
+  .btn-accent { background: var(--accent); color: var(--primary); }
+  .btn-accent:hover { background: #3fc4bc; }
+  .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: var(--primary); color: white; }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a88200; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .flashcard-container { perspective: 1000px; margin: 1rem 0; }
+  .flashcard {
+    width: 100%;
+    min-height: 250px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    width: 100%;
+    min-height: 250px;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .flashcard-front {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+  }
+  .flashcard-front h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .flashcard-front .hint { font-size: 0.85rem; opacity: 0.7; margin-top: 1rem; }
+  .flashcard-back {
+    background: white;
+    border: 2px solid var(--accent);
+    transform: rotateY(180deg);
+    text-align: left;
+  }
+  .flashcard-back h4 { color: var(--primary); margin-bottom: 0.75rem; }
+  .flashcard-back ul { padding-left: 1.2rem; }
+  .flashcard-back li { margin-bottom: 0.3rem; font-size: 0.95rem; }
+
+  .fc-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  .fc-counter { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+  .topic-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .topic-btn {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .topic-btn:hover { border-color: var(--accent); }
+  .topic-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .exam-timer {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 0.5rem;
+  }
+  .exam-timer.warning { color: var(--warn); }
+
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto;
+    font-weight: 800;
+    font-size: 2rem;
+    border: 6px solid;
+  }
+  .result-circle.pass { border-color: var(--success); color: var(--success); }
+  .result-circle.fail { border-color: var(--warn); color: var(--warn); }
+  .result-circle small { font-size: 0.8rem; font-weight: 600; }
+
+  .merksatz {
+    background: linear-gradient(135deg, #fff9e6, #fff3cc);
+    border-left: 4px solid var(--gold);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .merksatz::before { content: "Merksatz: "; font-weight: 700; color: var(--gold); }
+
+  .trap {
+    background: #ffebee;
+    border-left: 4px solid var(--warn);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .trap::before { content: "Prüfungsfalle: "; font-weight: 700; color: var(--warn); }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .checklist li::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  @media (max-width: 768px) {
+    main { padding: 1rem; }
+    .card { padding: 1.2rem 1.2rem; }
+    .topic-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+    .flashcard, .flashcard-face { min-height: 220px; }
+    .flashcard-face { padding: 1.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    header { padding: 1rem 1rem; }
+    header h1 { font-size: 1.15rem; }
+    header p { font-size: 0.8rem; }
+    .nav {
+      justify-content: flex-start;
+      gap: 0.4rem;
+      padding: 0.6rem 0.75rem;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav button {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-width: 1.5px;
+    }
+    main { padding: 0.75rem; }
+    .card { padding: 1rem; border-radius: 10px; margin-bottom: 0.75rem; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+    .stat { min-width: 0; padding: 0.75rem 0.5rem; border-radius: 8px; }
+    .stat .num { font-size: 1.4rem; }
+    .stat .label { font-size: 0.7rem; }
+    .topic-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+    .topic-card { padding: 0.6rem 0.4rem; border-radius: 8px; }
+    .topic-card .icon { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .topic-card h4 { font-size: 0.7rem; line-height: 1.3; }
+    .topic-card .score { font-size: 0.65rem; }
+    .topic-filter { gap: 0.3rem; margin-bottom: 1rem; }
+    .topic-btn { padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .question-text { font-size: 1rem; margin-bottom: 1rem; }
+    .q-type { font-size: 0.68rem; padding: 0.15rem 0.5rem; }
+    .q-num { font-size: 0.78rem; }
+    .q-topic { font-size: 0.7rem; }
+    .options { gap: 0.4rem; }
+    .option { padding: 0.7rem 0.8rem; gap: 0.6rem; border-radius: 8px; border-width: 1.5px; -webkit-tap-highlight-color: transparent; }
+    .option .marker { width: 24px; height: 24px; font-size: 0.72rem; }
+    .option-text { font-size: 0.88rem; }
+    .ft-input { min-height: 80px; font-size: 16px; padding: 0.7rem 0.8rem; }
+    .feedback { padding: 0.8rem 1rem; font-size: 0.85rem; }
+    .btn { padding: 0.65rem 1rem; font-size: 0.88rem; }
+    .btn-row { gap: 0.5rem; margin-top: 1rem; }
+    .btn-row .btn { flex: 1; min-width: 0; text-align: center; }
+    .flashcard-container { margin: 0.75rem 0; }
+    .flashcard, .flashcard-face { min-height: 200px; }
+    .flashcard-face { padding: 1.2rem; }
+    .flashcard-front h3 { font-size: 1.1rem; }
+    .flashcard-front .hint { font-size: 0.78rem; }
+    .flashcard-back h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .flashcard-back ul { padding-left: 1rem; }
+    .flashcard-back li { font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .fc-nav { margin-top: 0.75rem; }
+    .fc-nav .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    .fc-counter { font-size: 0.8rem; }
+    .exam-timer { font-size: 1.3rem; padding: 0.3rem; }
+    .result-circle { width: 110px; height: 110px; font-size: 1.6rem; border-width: 5px; }
+    .result-circle small { font-size: 0.7rem; }
+    .merksatz, .trap { padding: 0.7rem 0.8rem; font-size: 0.83rem; margin: 0.5rem 0; }
+    .card ol { padding-left: 1.2rem; font-size: 0.83rem; line-height: 1.8; }
+    .progress-bar { height: 6px; margin: 0.75rem 0; }
+  }
+
+  @media (max-width: 360px) {
+    .topic-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats { gap: 0.4rem; }
+    .stat .num { font-size: 1.2rem; }
+    .nav button { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .flashcard, .flashcard-face { min-height: 180px; }
+    .flashcard-face { padding: 1rem; }
+    .flashcard-front h3 { font-size: 1rem; }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .option:hover { border-color: var(--border); background: transparent; }
+    .option.selected:hover { border-color: var(--primary); background: #e8f5f5; }
+    .topic-card:hover { transform: none; box-shadow: none; }
+    .topic-card:active { transform: scale(0.97); }
+    .option:active { background: #f0f0f0; }
+    .btn:active { transform: scale(0.97); }
+  }
+
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    .nav { padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right)); }
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .card { animation: slideIn 0.3s ease; }
+
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .topic-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .topic-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .topic-card .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+  .topic-card h4 { font-size: 0.85rem; color: var(--primary); margin-bottom: 0.2rem; }
+  .topic-card .score { font-size: 0.75rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Denkmalschutz Block 2</h1>
+  <p>Materialien und energetische Planung - Interaktives Lernen</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p>
+      <div class="topic-grid" id="topic-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Schnellstart</h3>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button>
+        <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+        <button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card">
+      <h3 style="margin-bottom: 0.75rem;">Thema wählen</h3>
+      <div class="topic-filter" id="quiz-topic-filter"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button>
+      </div>
+    </div>
+    <div id="quiz-area" style="display:none;">
+      <div class="progress-bar"><div class="fill" id="quiz-progress"></div></div>
+      <div class="card" id="quiz-card"></div>
+      <div class="btn-row" id="quiz-buttons"></div>
+    </div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 0.5rem;">Karteikarten</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen. Wische oder nutze die Pfeile.</p>
+      <div class="topic-filter" id="fc-topic-filter"></div>
+    </div>
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-face flashcard-front" id="fc-front">
+          <h3 id="fc-question">Lade...</h3>
+          <div class="hint">Klicken zum Umdrehen</div>
+        </div>
+        <div class="flashcard-face flashcard-back" id="fc-back">
+          <h4 id="fc-answer-title">Antwort</h4>
+          <div id="fc-answer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-outline" onclick="prevCard()">Zurück</button>
+      <span class="fc-counter" id="fc-counter">1 / 1</span>
+      <button class="btn btn-outline" onclick="nextCard()">Weiter</button>
+    </div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;">
+      <button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button>
+      <button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup">
+      <h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">15 Fragen, 30 Minuten, gemischte Formate. Bestanden ab 70%.</p>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="startExam()">Prüfung starten</button>
+      </div>
+    </div>
+    <div id="exam-area" style="display:none;">
+      <div class="card" style="text-align:center;">
+        <div class="exam-timer" id="exam-timer">30:00</div>
+        <div class="progress-bar"><div class="fill" id="exam-progress"></div></div>
+      </div>
+      <div class="card" id="exam-card"></div>
+      <div class="btn-row" id="exam-buttons"></div>
+    </div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <!-- TRAPS -->
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen</h3>
+      <div class="trap">„§ 105 GEG gilt nur für Baudenkmäler" — FALSCH! Gilt auch für <strong>besonders erhaltenswerte Bausubstanz</strong>.</div>
+      <div class="trap">„Je mehr Dämmung, desto besser" — FALSCH beim Denkmal! Richtig ist: <strong>gebäudeangepasst, substanzschonend, insgesamt stimmige Gesamtbilanz</strong>.</div>
+      <div class="trap">„Ungedämmte Holzbalkendecke = schlechter Wärmeschutz" — FALSCH! Schüttung + Luftschicht können den <strong>Mindestwärmeschutz bereits erfüllen</strong> (bis ~1920er).</div>
+      <div class="trap">„Mindestwärmeschutz richtet sich nach heutigen Anforderungen" — FALSCH! Er gilt zum <strong>Zeitpunkt der Errichtung</strong> des Bauteils (DIN 4108).</div>
+      <div class="trap">„Feuchter Keller im Sommer = aufsteigende Feuchte" — Nicht unbedingt! Oft ist es <strong>Sommerkondensation</strong>. Nur lüften wenn absolute Feuchte außen &lt; innen!</div>
+      <div class="trap">„Schimmel ist nur ein Dämmproblem" — FALSCH! <strong>Nutzung, Lüftung, Möbelstellung, Luftzirkulation und Wärmebrücken</strong> spielen alle zusammen.</div>
+      <div class="trap">„Einfach abdichten löst Feuchteproblem" — FALSCH! Bei Bruchstein/diffusionsoffenen Beständen wird Feuchtigkeit nur <strong>verlagert</strong>. Erst Ursache analysieren!</div>
+      <div class="trap">„Beim Effizienzhaus Denkmal müssen Einzel-U-Werte nachgewiesen werden" — FALSCH! Nur der <strong>Primärenergiebedarf QP (160%)</strong> wird geprüft.</div>
+      <div class="trap">„Alte Fenster sind automatisch ein Austauschfall" — FALSCH! <strong>Erhalten und ertüchtigen</strong> vor austauschen. Kastenfenster oft mit geringem Eingriff verbesserbar.</div>
+      <div class="trap">„Innendämmung ist immer möglich" — FALSCH! Nur wenn Außenwand <strong>dicht und schlagregengeschützt</strong> ist. Sonst: Feuchteanreicherung und Schimmel.</div>
+      <div class="trap">„Dampfsperre und Dampfbremse sind dasselbe" — FALSCH! Dampfsperre: sd ≥ <strong>1.500 m</strong>, Dampfbremse: sd 0,5–1.500 m.</div>
+      <div class="trap">„Historische Bauteile sind so schlecht wie Tabellenwerte sagen" — FALSCH! Bruchsteinmauerwerk ist <strong>heterogen</strong> und oft besser als pauschale U-Werte vermuten lassen.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Freitext-Antwort-Schema Block 2</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Bei Fragen zu Materialien und energetischer Planung immer prüfen:</p>
+      <ol style="padding-left: 1.5rem; font-size: 0.9rem; line-height: 2;">
+        <li>Welche Gesetze/Verordnungen sind relevant? (GEG §105, DSchG, Bauordnung)</li>
+        <li>Welche bauphysikalischen Aspekte? (Wärme, Feuchte, Luftdichtheit)</li>
+        <li>Welche Materialien/Baukonstruktionen liegen vor? (Baualtersklasse, Bauweise)</li>
+        <li>Welche Messverfahren sind sinnvoll? (Thermografie, Feuchte, U-Wert)</li>
+        <li>Welche Schäden sind vorhanden oder zu erwarten?</li>
+        <li>Welche Voruntersuchungen sind nötig? (Raumbuch, Schadenskartierung)</li>
+        <li>Welche Maßnahmen sind denkmalgerecht und reversibel?</li>
+        <li>Förderung/Abstimmung vor Beginn geklärt?</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Denkmal-Logik: Nicht maximieren, sondern abwägen. Gesamtbilanz vor Einzelmaßnahme.</div>
+      <div class="merksatz">Erhalten, ergänzen, ertüchtigen — nicht vorschnell ersetzen.</div>
+      <div class="merksatz">Mindestwärmeschutz = DIN 4108, gilt ab Errichtungszeitpunkt</div>
+      <div class="merksatz">Historische Bauteile nicht pauschal mit Tabellen-U-Werten abtun — Bestand genau untersuchen!</div>
+      <div class="merksatz">U = 1/(R_si + Σd/λ + R_se) — je höher U, desto schlechter die Dämmung</div>
+      <div class="merksatz">6% mehr Heizenergie pro °C höhere Raumtemperatur</div>
+      <div class="merksatz">Sommerkondensation: Nur lüften wenn absolute Feuchte außen &lt; innen!</div>
+      <div class="merksatz">Dampfsperre ≥ 1.500m sd-Wert, Dampfbremse 0,5–1.500m</div>
+      <div class="merksatz">Innendämmung nur bei dichter/schlagregengeschützter Außenwand</div>
+      <div class="merksatz">EH Denkmal: nur QP 160%, keine Einzel-U-Werte — gilt auch für erhaltenswerte Bausubstanz!</div>
+      <div class="merksatz">5 Messgeräte: Wärmefluss, Thermografie, Feuchte, Karsten, Blower-Door</div>
+      <div class="merksatz">Wärmebrücken: geometrisch, konstruktiv, materialbedingt — immer auch Tauwasser/Schimmel nennen</div>
+      <div class="merksatz">Erst Bestandsaufnahme, dann Maßnahme — nie umgekehrt (DIN EN 16883)</div>
+      <div class="merksatz">WTA → DENA-Liste, Verlängerung alle 3 Jahre</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== DATA =====
+
+const topics = [
+  { id: 'gesetze', name: 'Gesetze & Verordnungen', icon: '⚖️' },
+  { id: 'brandschutz', name: 'Brandschutz', icon: '🔥' },
+  { id: 'waerme', name: 'Wärmeschutz', icon: '🌡️' },
+  { id: 'feuchte', name: 'Feuchteschutz', icon: '💧' },
+  { id: 'messung', name: 'Messverfahren', icon: '📏' },
+  { id: 'bruecken', name: 'Wärmebrücken', icon: '🌉' },
+  { id: 'material', name: 'Materialien & Baustoffe', icon: '🧱' },
+  { id: 'typologie', name: 'Gebäudetypologie', icon: '🏘️' },
+  { id: 'bestand', name: 'Bestandsaufnahme', icon: '🔍' },
+  { id: 'zertifikat', name: 'Zertifizierung', icon: '📋' },
+];
+
+const questions = [
+  // GESETZE
+  { topic: 'gesetze', type: 'sc', q: 'Was besagt der § 105 des GEG?', options: ['Damit ist geregelt, dass für Baudenkmale Abweichungen von den Anforderungen möglich sind.', 'In diesem Paragrafen wird auf die Wirtschaftlichkeit von energetischen Maßnahmen bei allen Gebäuden Bezug genommen.', 'Damit wird erklärt, dass Ausnahmen von den Anforderungen möglich sind.', 'Der Paragraf regelt alle Ausnahmen und Befreiungen von den Anforderungen des GEG.'], correct: 0, explanation: '§ 105 GEG regelt speziell für Baudenkmäler und besonders erhaltenswerte Bausubstanz, dass von den Anforderungen abgewichen werden kann, wenn Substanz oder Erscheinungsbild beeinträchtigt würde oder der Aufwand unverhältnismäßig hoch wäre.' },
+  { topic: 'gesetze', type: 'sc', q: 'Was regelt § 102 GEG?', options: ['Anforderungen an Neubauten', 'Befreiung bei unbilliger Härte und Unwirtschaftlichkeit', 'Denkmalschutzanforderungen', 'Energieausweis-Pflicht'], correct: 1, explanation: '§ 102 GEG ermöglicht Befreiungen wegen unbilliger Härte, z.B. bei Unwirtschaftlichkeit. Nachweis mit dynamischen Berechnungsverfahren.' },
+  { topic: 'gesetze', type: 'mc', q: 'Welche Nachrüstverpflichtungen gelten seit der EnEV 2002?', options: ['Dämmung oberster Geschossdecken', 'Austausch aller Fenster', 'Stilllegung von Heizkesseln älter als 30 Jahre', 'Dämmung von Warmwasserleitungen', 'Einbau einer Lüftungsanlage', 'Installation von Photovoltaik'], correct: [0, 2, 3], explanation: 'Seit EnEV 2002: Dämmung ungedämmter oberster Geschossdecken, Stilllegung von Heizkesseln über 30 Jahre (§ 72 GEG) und Dämmung ungedämmter Warmwasser-/Heizungsleitungen.' },
+  { topic: 'gesetze', type: 'sc', q: 'Welche Gebäudeklasse hat eine Höhe ≤ 7m und ≤ 2 Nutzungseinheiten mit ≤ 400 m²?', options: ['Gebäudeklasse 1', 'Gebäudeklasse 2', 'Gebäudeklasse 3', 'Gebäudeklasse 4'], correct: 1, explanation: 'GK 2: Höhe ≤ 7m, ≤ 2 NE, ≤ 400 m². GK 1 ist zusätzlich freistehend. GK 3 sind sonstige mit Höhe ≤ 7m.' },
+  { topic: 'gesetze', type: 'sc', q: 'Was ist das Wirtschaftlichkeitsgebot im EnEG/GEG?', options: ['Anforderungen müssen nach dem Stand der Technik erfüllbar und wirtschaftlich vertretbar sein', 'Alle Maßnahmen müssen sich innerhalb von 5 Jahren amortisieren', 'Nur die günstigste Maßnahme darf gewählt werden', 'Es gilt nur für Neubauten'], correct: 0, explanation: '§ 5 EnEG/GEG: Anforderungen müssen nach dem Stand der Technik erfüllbar und wirtschaftlich vertretbar sein.' },
+  { topic: 'gesetze', type: 'sc', q: 'Was regelt die Granadakonvention von 1985?', options: ['Energieeffizienz von Gebäuden', 'Schutz des architektonischen Erbes Europas', 'Brandschutzanforderungen', 'Barrierefreiheit'], correct: 1, explanation: 'Übereinkommen zum Schutz des architektonischen Erbes des Europarats. Verbietet u.a. die Versetzung von Baudenkmalen.' },
+  { topic: 'gesetze', type: 'sc', q: 'Was beschreibt die DIN EN 16883:2017?', options: ['Brandschutzanforderungen', 'Leitlinien für die Verbesserung der energiebezogenen Leistung historischer Gebäude', 'Wärmeschutzberechnung', 'Schallschutzanforderungen'], correct: 1, explanation: 'DIN EN 16883:2017 — Leitlinien für nachhaltige Verbesserung der Energieeffizienz historischer Gebäude. Gilt nicht nur für Baudenkmale.' },
+  { topic: 'gesetze', type: 'mc', q: 'Welche Ausnahmen sieht die EPBD 2024 vor?', options: ['Gebäude mit besonderem architektonischem/historischem Wert', 'Gebäude für religiöse Zwecke', 'Alle Gebäude über 50 Jahre', 'Provisorische Gebäude mit Nutzung < 2 Jahre', 'Wohngebäude mit Nutzung < 4 Monate/Jahr', 'Freistehende Gebäude < 50 m²'], correct: [0, 1, 3, 4, 5], explanation: 'EPBD 2024 nimmt u.a. historische, religiöse, provisorische (<2J), saisonal genutzte (<4 Mon.) und kleine freistehende (<50m²) Gebäude aus.' },
+
+  // BRANDSCHUTZ
+  { topic: 'brandschutz', type: 'sc', q: 'Welche Feuerwiderstandsklasse muss ein notwendiger Flur mindestens haben?', options: ['F15', 'F30', 'F60', 'F90'], correct: 1, explanation: 'Notwendiger Flur: ≥ F30. Treppenraum: F60 oder F90.' },
+  { topic: 'brandschutz', type: 'sc', q: 'Was regelt die MLAR?', options: ['Brandschutztechnische Anforderungen an Leitungsanlagen', 'Muster-Lüftungsanlage-Regelung', 'Mindest-Luftaustausch-Rate', 'Muster-Landesbau-Anforderungs-Richtlinie'], correct: 0, explanation: 'MLAR = Musterrichtlinie über brandschutztechnische Anforderungen an Leitungsanlagen (Einzelschottungen).' },
+  { topic: 'brandschutz', type: 'mc', q: 'Welche Probleme gibt es beim Brandschutz im Bestand?', options: ['Brand-/Rauchabschnitte nicht vorhanden (≤ 40m)', 'Fehlende Flucht- und Rettungswege', 'Fehlende Feuerwehrzufahrten', 'Fehlende Aufstellflächen für Feuerwehr', 'Zu hohe Decken'], correct: [0, 1, 2, 3], explanation: 'Typische Probleme: fehlende Brand-/Rauchabschnitte, Flucht-/Rettungswege, Feuerwehrzufahrten und Aufstellflächen.' },
+
+  // WÄRMESCHUTZ
+  { topic: 'waerme', type: 'sc', q: 'Was ist der Mindestwärmeschutz?', options: ['Der Mindestwärmeschutz entspricht der 140-%-Regel der EnEV.', 'In der DIN 4108 wird der Mindestwärmeschutz dargestellt.', 'Die Anforderung eines Bauteils an den Mindestwärmeschutz wird durch die Bauzeit bestimmt.', 'Mit dem Mindestwärmeschutz wird eine Aussage zum Speichervermögen getroffen.'], correct: 1, explanation: 'Mindestwärmeschutz ist in der DIN 4108 definiert. Er gilt zum Zeitpunkt der Errichtung und dient der Vermeidung von Tauwasser und Schimmelpilzbildung.' },
+  { topic: 'waerme', type: 'sc', q: 'Was ist die Einheit des U-Werts?', options: ['m²·K/W', 'W/(m²·K)', 'kWh/a', 'W/m'], correct: 1, explanation: 'U-Wert = Wärmedurchgangskoeffizient in W/(m²·K). Je höher, desto schlechter die Wärmedämmung.' },
+  { topic: 'waerme', type: 'sc', q: 'Was gilt für das Effizienzhaus Denkmal?', options: ['U-Werte der Einzelbauteile müssen nachgewiesen werden', 'Nur der Primärenergiebedarf QP (160% des Referenzgebäudes) muss nachgewiesen werden', 'Es gelten die gleichen Anforderungen wie für Neubauten', 'Blower-Door-Test ist Pflicht'], correct: 1, explanation: 'Beim EH Denkmal: nur QP ≤ 160% des Referenzgebäudes. Keine Einzel-U-Wert-Anforderungen, kein Pflicht-Blower-Door.' },
+  { topic: 'waerme', type: 'sc', q: 'Wie lautet die Formel für den U-Wert?', options: ['U = R_si + Σ(d/λ) + R_se', 'U = 1 / (R_si + Σ(d/λ) + R_se)', 'U = d × λ', 'U = Q_T / A'], correct: 1, explanation: 'U = 1/R_T = 1/(R_si + ΣR_i + R_se). R_si = 0,13 (innen, horizontal), R_se = 0,04 (außen).' },
+  { topic: 'waerme', type: 'sc', q: 'Was beschreibt die Wärmespeicherfähigkeit eines Bauteils?', options: ['Wie schnell Wärme durchfließt', 'Wie viel Wärme aufgenommen und zeitversetzt abgegeben werden kann', 'Den U-Wert', 'Die Luftdichtheit'], correct: 1, explanation: 'Wärmespeicherfähigkeit bestimmt Phasenverschiebung, sommerlichen Wärmeschutz und Auskühlzeit. Formel: a = λ/(ρ·c_p).' },
+  { topic: 'waerme', type: 'sc', q: 'Wie viel Prozent mehr Heizenergie pro °C höherer Raumlufttemperatur?', options: ['3 %', '6 %', '10 %', '15 %'], correct: 1, explanation: 'Jedes °C höhere Raumlufttemperatur = ca. 6% zusätzlicher Heizenergieverbrauch.' },
+  { topic: 'waerme', type: 'sc', q: 'Optimaler Luftspalt für Wärmeschutz einer Luftschicht?', options: ['2 cm', '4 cm', '8 cm', '12 cm'], correct: 1, explanation: 'Bester Wärmeschutz bei ca. 4 cm Dicke. Danach keine Verbesserung. R-Wert Luft: ca. 0,17 m²·K/W.' },
+  { topic: 'waerme', type: 'mc', q: 'Welche Anforderungswerte gelten beim Effizienzhaus Denkmal?', options: ['Primärenergiebedarf 160% des Referenzgebäudes', 'Transmissionswärmeverlust 175% als früherer Zielwert', 'U-Wert jedes Bauteils einzeln nachweisen', 'Blower-Door-Test verpflichtend', 'Nur Primärenergiebedarf wird geprüft'], correct: [0, 1, 4], explanation: 'EH Denkmal: QP ≤ 160%, früherer H_T-Zielwert 175% als Orientierung. Keine Einzel-U-Werte, kein Pflicht-Blower-Door.' },
+
+  // FEUCHTESCHUTZ
+  { topic: 'feuchte', type: 'mc', q: 'Warum ist es wichtig, nicht nur den Wärme-, sondern auch den Feuchteschutz zu beachten?', options: ['Feuchtigkeit wirkt sich nur im Winter aus.', 'Feuchtigkeit in den Baustoffporen erhöht die Wärmeleitung des Baustoffs.', 'Feuchteschutz wird in der DIN 4701 behandelt.', 'Feuchtigkeit beeinträchtigt die Bausubstanz und verschlechtert den Wärmeschutz.'], correct: [1, 3], explanation: 'Feuchtigkeit erhöht die Wärmeleitfähigkeit UND beeinträchtigt die Bausubstanz. DIN 4108-3 (nicht 4701) behandelt Feuchteschutz.' },
+  { topic: 'feuchte', type: 'mc', q: 'Welche Arten von Feuchte können in Bauteilen auftreten?', options: ['Regenfeuchte von außen', 'Tauwasser von innen', 'Aufsteigende Feuchte von unten', 'Anfangs-/Herstellungsfeuchte', 'Elektromagnetische Feuchte', 'Hygroskopische Feuchte durch Salze'], correct: [0, 1, 2, 3, 5], explanation: 'Fünf Feuchtearten: Regenfeuchte, Tauwasser, aufsteigende Feuchte, Herstellungsfeuchte, hygroskopische Feuchte. Elektromagnetische Feuchte gibt es nicht.' },
+  { topic: 'feuchte', type: 'sc', q: 'Was ist der sd-Wert?', options: ['Schichtdicke in Millimetern', 'Wasserdampfdiffusionsäquivalente Luftschichtdicke in Metern', 'Schalldämmmaß in Dezibel', 'Speicherdichte des Materials'], correct: 1, explanation: 'sd = μ × d (in Metern). Je höher, desto weniger Feuchtigkeit diffundiert durch das Material.' },
+  { topic: 'feuchte', type: 'sc', q: 'Ab welchem sd-Wert spricht man von einer Dampfsperre?', options: ['sd ≥ 0,5 m', 'sd ≥ 100 m', 'sd ≥ 1.500 m', 'sd ≥ 10.000 m'], correct: 2, explanation: 'Dampfsperre: sd ≥ 1.500 m. Dampfbremse: sd 0,5 bis 1.500 m.' },
+  { topic: 'feuchte', type: 'sc', q: 'Was ist Sommerkondensation?', options: ['Kondenswasser im Winter an Fenstern', 'Warme Außenluft kondensiert an kühlen Innenwänden dickwandiger Gebäude', 'Schwitzwasser an Rohrleitungen', 'Kondensation im Dach durch Schnee'], correct: 1, explanation: 'Sommerkondensation bei dickwandigen, un-/temporär beheizten Gebäuden — große Bauteilmassen behalten niedrige Oberflächentemperaturen.' },
+  { topic: 'feuchte', type: 'mc', q: 'Welche Schlagregenbeanspruchungsgruppen gibt es nach DIN 4108-3?', options: ['Gruppe I — gering (< 600 mm/a)', 'Gruppe II — mittel (600-800 mm/a)', 'Gruppe III — stark (> 800 mm/a)', 'Gruppe IV — extrem'], correct: [0, 1, 2], explanation: 'DIN 4108-3: drei Gruppen: I (gering), II (mittel), III (stark). Keine Gruppe IV.' },
+  { topic: 'feuchte', type: 'sc', q: 'Wie schützt man Fachwerkhäuser vor Schlagregen?', options: ['Nur Außenanstrich', 'Dachüberstand + Kalkputz/Lehm-Fugen + diffusionsoffener Innenputz', 'WDVS Außendämmung', 'PU/Silikon-Fugenmasse'], correct: 1, explanation: 'Schlagregenschutz Fachwerk: 1) Dachüberstand, 2) Kalkputz/Lehm (KEIN PU/Silikon!), 3) diffusionsoffener Innenputz.' },
+
+  // MESSVERFAHREN
+  { topic: 'messung', type: 'ft', q: 'Nennen Sie fünf sinnvolle messtechnische Geräte für Baudenkmäler.', keywords: ['wärmeflusssensor', 'thermografie', 'infrarot', 'feuchtemess', 'karsten', 'blower', 'door', 'datenlogger', 'endoskop', 'widerstand', 'hygrometer', 'stelzmann', 'franke', 'prüfplatte'], sampleAnswer: '1) Wärmeflusssensor (U-Wert, mind. 3 Tage), 2) Infrarot-Thermografie, 3) Feuchtemessgerät (elektr. Widerstand), 4) Karsten-Röhrchen (Schlagregenschutz), 5) Blower-Door (Luftdichtheit).' },
+  { topic: 'messung', type: 'sc', q: 'Was ist das Glaserverfahren?', options: ['Verfahren zur Glasqualität', 'Annäherungsverfahren zur Berechnung von Tauwasserausfall', 'Messung der Luftdichtheit', 'Bestimmung des U-Wertes'], correct: 1, explanation: 'Glaserverfahren (nach Helmut Glaser): tabellarisch-grafisch, zeigt ob/wo Tauwasser ausfällt. Bei kapillarem Transport: WUFI/DELPHIN nötig.' },
+  { topic: 'messung', type: 'sc', q: 'Wie lange muss eine U-Wert-Messung mit Wärmeflusssensor mindestens dauern?', options: ['1 Tag', '3 Tage', '7 Tage', '14 Tage'], correct: 1, explanation: 'Mindestens 3 Tage mit Datenlogger.' },
+  { topic: 'messung', type: 'mc', q: 'Welche Programme eignen sich für instationäre Feuchteberechnungen?', options: ['WUFI', 'DELPHIN', 'Glaserverfahren', 'AutoCAD', 'Excel'], correct: [0, 1], explanation: 'WUFI und DELPHIN. Glaserverfahren ist nur stationär.' },
+  { topic: 'messung', type: 'sc', q: 'Was misst die Karsten-Röhrchen-Methode?', options: ['Luftdichtheit', 'Wassereindringverhalten einer Fassade', 'Wärmeleitfähigkeit', 'CO2-Gehalt'], correct: 1, explanation: 'Karsten-Röhrchen: an Wand befestigt, mit Wasser gefüllt — prüft Wassereindringverhalten (Schlagregenschutz).' },
+
+  // WÄRMEBRÜCKEN
+  { topic: 'bruecken', type: 'mc', q: 'Welche drei Arten von Wärmebrücken gibt es?', options: ['Geometrische', 'Konstruktive', 'Materialbedingte', 'Thermische', 'Akustische'], correct: [0, 1, 2], explanation: '1) Geometrisch (Ecken), 2) Konstruktiv (Durchdringung Dämmebene), 3) Materialbedingt (höhere λ).' },
+  { topic: 'bruecken', type: 'mc', q: 'Wie können Wärmebrücken sichtbar gemacht werden?', options: ['Infrarot-Thermografie', 'Berechnungsverfahren', 'Sichtkontrolle bei Schnee', 'Ultraschallmessung'], correct: [0, 1, 2], explanation: 'Thermografie, Berechnung und Sichtkontrolle (abgetaute Flächen bei Schnee).' },
+  { topic: 'bruecken', type: 'sc', q: 'Pauschaler Wärmebrücken-Zuschlag ohne Gleichwertigkeitsnachweis?', options: ['0,05 W/m²K', '0,10 bzw. 0,15 W/m²K', '0,20 W/m²K', '0,50 W/m²K'], correct: 1, explanation: 'Pauschal: 0,10 oder 0,15 W/m²K. Gleichwertigkeit → 0,05 W/m²K.' },
+  { topic: 'bruecken', type: 'sc', q: 'Was kann durch Innendämmung an Ecken passieren?', options: ['Verbesserte Dämmung überall', 'Neue Wärmebrücken an Ecken und Einbindungen', 'Reduzierte Feuchtigkeit', 'Erhöhte Luftdichtheit'], correct: 1, explanation: 'Innendämmung kann NEUE Wärmebrücken erzeugen, besonders an Innenecken und Decken-/Wandeinbindungen.' },
+
+  // MATERIALIEN
+  { topic: 'material', type: 'mc', q: 'Was sind entscheidende Materialeigenschaften eines Bauteils in der denkmalgerechten Sanierung?', options: ['Geruch', 'Farbe', 'Haptik', 'Preis'], correct: [1, 2], explanation: 'Farbe und Haptik sind entscheidend — Erscheinungsbild und Oberflächenbeschaffenheit müssen erhalten bleiben.' },
+  { topic: 'material', type: 'sc', q: 'Lambda-Wert für Vollziegelmauerwerk (1600 kg/m³)?', options: ['λ = 0,04 W/(m·K)', 'λ = 0,28 W/(m·K)', 'λ = 0,68 W/(m·K)', 'λ = 2,1 W/(m·K)'], correct: 2, explanation: 'Vollziegel: λ = 0,68. Vergleich: Polystyrol 0,040, Bimsbeton 0,28, Normalbeton 2,1.' },
+  { topic: 'material', type: 'mc', q: 'Welche Baualtersklassen gibt es?', options: ['Klasse I: bis 1918', 'Klasse II: 1919-1948', 'Klasse III: 1949-1957', 'Klasse IV: 1958-1968', 'Klasse V: 1969-1978', 'Klasse X: ab 2020'], correct: [0, 1, 2, 3, 4], explanation: '9 Klassen (I-IX). Klasse X existiert nicht.' },
+  { topic: 'material', type: 'sc', q: 'Wozu dient die Bekanntmachung der Regeln zur Datenaufnahme?', options: ['Berechnung der Statik', 'Bestimmung von U-Werten bei fehlenden Bauteilinformationen', 'Festlegung der Gebäudeklasse', 'Berechnung der Förderhöhe'], correct: 1, explanation: 'Enthält U-Wert-Tabellen für verschiedene Wandaufbauten nach Baualter (Fassungen 2009 und 2020).' },
+
+  // TYPOLOGIE
+  { topic: 'typologie', type: 'mc', q: 'Welche Faktoren haben Einfluss auf die Nutzungszone?', options: ['Luftfeuchte', 'Raumhöhe', 'Raumbelichtung', 'Raumbreite'], correct: [0, 1], explanation: 'Luftfeuchte und Raumhöhe beeinflussen die Nutzungszone.' },
+  { topic: 'typologie', type: 'sc', q: 'Was beschreibt die Kompaktheit eines Gebäudes?', options: ['A/V-Verhältnis (Hüllfläche zu Volumen)', 'Dicke der Außenwände', 'Anzahl der Geschosse', 'Wohnfläche'], correct: 0, explanation: 'Kompaktheit = A/V. Je kleiner, desto kompakter und energieeffizienter.' },
+  { topic: 'typologie', type: 'mc', q: 'Welche 6 historischen Gebäudetypen wurden identifiziert?', options: ['Typ 1: vor 1650 (Gotik)', 'Typ 2: 1650-1780 (Barock)', 'Typ 3: 1780-1830 (Klassizismus)', 'Typ 4: 1830-1890 (Historismus)', 'Typ 5: 1890-1910', 'Typ 6: 1890-heute'], correct: [0, 1, 2, 3, 4, 5], explanation: '6 Typen aus Denkmaltopographie-Untersuchung (Esslingen, Heidelberg, Ludwigsburg).' },
+
+  // BESTANDSAUFNAHME
+  { topic: 'bestand', type: 'ft', q: 'Was sollte bei der energetischen Sanierung eines Dachstuhls im Vergleich mit einem normalen Altbau anders gemacht werden? Mindestens fünf Angaben.', keywords: ['substanz', 'denkmal', 'sparren', 'holz', 'schädling', 'schadstoff', 'balken', 'asbest', 'lindan', 'aufmaß', 'raumbuch', 'behörde', 'genehmigung', 'reversib', 'additiv', 'bestand', 'prüf', 'tragwerk', 'sichtbar', 'erhal'], sampleAnswer: '1) Substanzerhaltung — originale Hölzer erhalten. 2) Abstimmung mit Denkmalbehörde VOR Beginn. 3) Raumbuch/Schadenskartierung erstellen. 4) Schadstoffe prüfen (Lindan, Asbest, PCB). 5) Sichtbare Konstruktion erhalten. 6) Reversible Maßnahmen. 7) Tragwerksplaner einbinden.' },
+  { topic: 'bestand', type: 'ft', q: 'Welche Anträge müssen bei der energetischen Sanierung eines denkmalgeschützten Gebäudes gestellt werden? Welche Voruntersuchungen sind nötig?', keywords: ['denkmalerlaubnis', 'baugenehmigung', 'voruntersuchung', 'raumbuch', 'schadstoff', 'bauantrag', 'denkmalbehörde', 'genehmigung', 'förder', 'kfw', 'bafa', 'statik', 'tragwerk', 'brandschutz', 'abstimmung'], sampleAnswer: 'Anträge: 1) Denkmalerlaubnis (UDB), 2) Baugenehmigung, 3) KfW-Förderantrag VOR Beginn. Voruntersuchungen: Raumbuch, Schadstoffuntersuchung, Bauaufmaß, Schadenskartierung, Tragwerksuntersuchung, Dendrochronologie, Brandschutzkonzept.' },
+  { topic: 'bestand', type: 'ft', q: 'Erläutern Sie Vor- und Nachteile einer 70 cm starken Außenwand und schlagen Sie denkmalgerechte energetische Maßnahmen vor.', keywords: ['speicher', 'phasenverschieb', 'u-wert', 'schlecht', 'innendämm', 'feucht', 'wärmebrück', 'masse', 'träg', 'sommer', 'putz', 'dämmputz', 'diffusion', 'kapillar', 'erscheinungsbild'], sampleAnswer: 'Vorteile: Wärmespeicherung, Phasenverschiebung, langsame Auskühlung. Nachteile: Schlechter U-Wert (~1,5-2,0), hohe Transmissionsverluste. Maßnahmen: 1) Innendämmung diffusionsoffen, 2) Dämmputz, 3) Feuchteschutz prüfen, 4) Keine Außendämmung, 5) Wärmebrücken beachten.' },
+  { topic: 'bestand', type: 'mc', q: 'Welche Methoden gehören zur Bestandserfassung?', options: ['Visuelle Erfassung', 'Attributive Erfassung', 'Handaufmaß', 'Photogrammetrie', 'Tachymetrie', 'Laserscanning'], correct: [0, 1, 2, 3, 4, 5], explanation: 'Alle gehören dazu: visuell, attributiv, Handaufmaß, und digitale Verfahren.' },
+  { topic: 'bestand', type: 'mc', q: 'Welche Genauigkeitsstufen gibt es beim Bauaufmaß?', options: ['Stufe 1: Schematisch (1:100)', 'Stufe 2: Annähernd wirklichkeitsgetreu (1:50)', 'Stufe 3: Verformungsgetreu (1:25)', 'Stufe 4: Verformungsgetreu + detailliert (≥1:25)', 'Stufe 5: Millimetergenau'], correct: [0, 1, 2, 3], explanation: 'Vier Stufen (1-4). Stufe 5 existiert nicht.' },
+  { topic: 'bestand', type: 'sc', q: 'Was zeigt eine Schadenskartierung?', options: ['Nur die Sanierungskosten', 'Farbcodierte Darstellung von Schäden und Maßnahmen', 'Die Energieeffizienz', 'Den Grundriss mit Möblierung'], correct: 1, explanation: 'Farbcodiert: rot = Ersatz Altholz, schraffiert = Neuholz, grün = Verfestigung, gelb = Abbruch.' },
+
+  // ZERTIFIZIERUNG
+  { topic: 'zertifikat', type: 'sc', q: 'Über welche Organisation erfolgt die Eintragung als Energieberater Denkmal?', options: ['Direkt über DENA', 'Über die WTA', 'Über die IHK', 'Über das BAFA'], correct: 1, explanation: 'Eintragung über WTA GmbH, nicht direkt über DENA.' },
+  { topic: 'zertifikat', type: 'mc', q: 'Welche Kosten fallen für die Eintragung an?', options: ['Ersteintragung: 120 € (WG) + 20 € (NWG)', 'Jahresbeitrag: 130 € (WG) + 20 € (NWG)', 'Alle Beträge zzgl. MwSt.', 'Ersteintragung: 500 €', 'Keine Kosten'], correct: [0, 1, 2], explanation: 'Ersteintragung 120€+20€, Jahresbeitrag 130€+20€, zzgl. MwSt.' },
+  { topic: 'zertifikat', type: 'mc', q: 'Welche Alternativen gibt es für die Verlängerung alle 3 Jahre?', options: ['16h Fortbildung + 1 EH Denkmal Praxisnachweis', '16h Fortbildung + 2 Einzelmaßnahmen', '40h Fortbildung ohne Praxisnachweis', 'Keine Verlängerung nötig'], correct: [0, 1, 2], explanation: 'Drei Alternativen. Option 3 (40h) kann nicht zweimal hintereinander gewählt werden!' },
+
+  // ===== NEUE FRAGEN AUS LERNMATERIAL =====
+
+  // DENKMAL-LOGIK
+  { topic: 'gesetze', type: 'sc', q: 'Warum versucht man beim Baudenkmal nicht, jede Einzelmaßnahme maximal zu optimieren?', options: ['Weil Denkmäler nicht saniert werden dürfen', 'Weil die Gesamtbilanz zählt und historische Substanz Vorrang hat', 'Weil es keine Fördermittel gibt', 'Weil moderne Materialien nicht verwendet werden dürfen'], correct: 1, explanation: 'Beim Baudenkmal zählt die Gesamtbilanz über alle Bauteile, nicht die Perfektion einer Einzelmaßnahme. Substanzerhalt hat Vorrang vor Maximaldämmung. § 105 GEG erlaubt dafür Abweichungen.' },
+  { topic: 'gesetze', type: 'sc', q: 'Was ist die richtige Denkmal-Logik bei historischen Kastenfenstern?', options: ['Immer durch dreifach verglaste Fenster ersetzen', 'Prüfen ob Ertüchtigung möglich ist — erhalten geht vor ersetzen', 'Fenster nie verändern', 'Nur die Verglasung austauschen, Rahmen belassen'], correct: 1, explanation: 'Denkmal-Logik: Erhalten und ertüchtigen vor austauschen. Kastenfenster können oft mit geringem Eingriff verbessert werden — weniger Substanzverlust, weniger Materialeinsatz, trotzdem energetischer Gewinn.' },
+  { topic: 'gesetze', type: 'sc', q: 'Warum ist ein Baudenkmal bereits nachhaltig?', options: ['Weil es unter Denkmalschutz steht', 'Weil seine Bauenergie über eine sehr lange Nutzungsdauer amortisiert wurde', 'Weil es keine Heizung hat', 'Weil nur natürliche Materialien verwendet wurden'], correct: 1, explanation: 'Ein Baudenkmal ist nachhaltig, weil seine graue Energie (Bauenergie) über eine sehr lange Nutzungsdauer amortisiert wurde. Ertüchtigen ist oft energieeffizienter als Ersetzen.' },
+
+  // FEUCHTESCHUTZ — SOMMERKONDENSATION & SCHIMMEL
+  { topic: 'feuchte', type: 'sc', q: 'Ein Keller ist im Winter trocken, wird aber im Sommer feucht. Was ist die wahrscheinlichste Ursache?', options: ['Aufsteigende Feuchte', 'Sommerkondensation — warme feuchte Außenluft kondensiert an kalten Kellerwänden', 'Defekte Wasserleitung', 'Schlagregen'], correct: 1, explanation: 'Klassische Sommerkondensation: Warme Sommerluft mit hoher Feuchte trifft auf kalte Kellerwände und kondensiert. Nicht mehr lüften hilft, sondern nur lüften wenn absolute Außenluftfeuchte geringer ist als innen.' },
+  { topic: 'feuchte', type: 'sc', q: 'Wann sollte man im Sommer einen feuchten Keller lüften?', options: ['Immer bei geöffneten Fenstern', 'Nur wenn die absolute Luftfeuchtigkeit außen geringer ist als innen', 'Nur nachts', 'Gar nicht — Keller sollten nie gelüftet werden'], correct: 1, explanation: 'Lüften nur wenn absolute Luftfeuchtigkeit außen < innen. Falsches Sommerlüften (warme feuchte Luft reinlassen) verschlimmert das Problem!' },
+  { topic: 'feuchte', type: 'mc', q: 'Welche Faktoren begünstigen Schimmelbildung neben schlechter Dämmung?', options: ['Geringe Raumtemperatur (z.B. kühles Schlafzimmer)', 'Hoher Feuchteeintrag durch Nutzung', 'Möbel direkt an kalten Außenwänden', 'Mangelnde Luftzirkulation und Lüftung', 'Wärmebrücken', 'Helle Wandfarbe'], correct: [0, 1, 2, 3, 4], explanation: 'Schimmel ist NICHT nur ein Dämmproblem! Nutzung, Feuchteeintrag, geringe Lüftung, kalte Oberflächen, Möbelstellung und Wärmebrücken spielen zusammen.' },
+  { topic: 'feuchte', type: 'sc', q: 'Warum löst "einfach abdichten" bei historischen Gebäuden das Feuchteproblem oft nicht?', options: ['Weil Abdichtung zu teuer ist', 'Weil die Feuchtigkeit verlagert wird und an anderer Stelle wieder auftaucht', 'Weil Abdichtung verboten ist', 'Weil es keine geeigneten Materialien gibt'], correct: 1, explanation: 'Bei Bruchsteinmauerwerk oder diffusionsoffenen Beständen verlagert pauschales Abdichten die Feuchtigkeit oft nur. Die tatsächliche Feuchteursache muss zuerst analysiert werden.' },
+
+  // WÄRMESCHUTZ — HISTORISCHE BAUTEILE
+  { topic: 'waerme', type: 'sc', q: 'Können alte Holzbalkendecken mit Schüttung den Mindestwärmeschutz erfüllen?', options: ['Nein, sie sind immer unzureichend gedämmt', 'Ja, Schüttung und Luftschicht reichen häufig bis ca. Gründerzeit/1920er Jahre aus', 'Nur mit zusätzlicher Dämmung', 'Nur wenn sie nach 1945 gebaut wurden'], correct: 1, explanation: 'Viele Holzbalkendecken bis ca. 1920er Jahre erfüllen mit Schüttung (Sand, Schlacke) + Blindboden + Luftschicht bereits den Mindestwärmeschutz (R ≥ 0,9). Nicht „ungedämmt = schlecht" annehmen!' },
+  { topic: 'waerme', type: 'sc', q: 'Warum sind pauschale U-Werte aus Tabellen bei historischem Mauerwerk problematisch?', options: ['Weil die Tabellen veraltet sind', 'Weil heterogenes Bruchsteinmauerwerk oft besser ist als Tabellenwerte vermuten lassen', 'Weil die Tabellen nur für Neubauten gelten', 'Weil U-Werte bei Altbauten nicht relevant sind'], correct: 1, explanation: 'Bruchsteinmauerwerk ist heterogen — Tabellenwerte bilden das reale Verhalten nicht immer ab. Speichermasse, Lufteinschlüsse und Mörtelfugen beeinflussen die tatsächliche Leistung positiv.' },
+
+  // FENSTER, DACH, INNENDÄMMUNG
+  { topic: 'material', type: 'sc', q: 'Wann ist Innendämmung problematisch?', options: ['Immer bei Altbauten', 'Wenn die Außenwand feucht oder nicht schlagregengeschützt ist', 'Nur bei Gebäuden vor 1900', 'Wenn keine Fördermittel beantragt werden'], correct: 1, explanation: 'Innendämmung nur wenn Außenwand dicht/schlagregengeschützt ist! Bei feuchter oder schlagregenbelasteter Wand drohen Feuchteanreicherung, Tauwasser und Schimmel. Außerdem: Anschlüsse müssen gelöst sein.' },
+  { topic: 'material', type: 'sc', q: 'Warum ist Holzfaser als Dachdämmung bei Denkmälern besonders geeignet?', options: ['Weil sie am günstigsten ist', 'Weil sie guten sommerlichen Wärmeschutz durch Speichermasse und Phasenverschiebung bietet', 'Weil sie am dünnsten ist', 'Weil sie keine Dampfbremse braucht'], correct: 1, explanation: 'Holzfaserdämmung bietet durch ihre Speichermasse eine gute Phasenverschiebung und damit guten sommerlichen Wärmeschutz — besonders wichtig bei Dachräumen.' },
+  { topic: 'material', type: 'sc', q: 'Warum ist eine Gaube im historischen Sparrendach konstruktiv heikel?', options: ['Weil Gauben verboten sind', 'Weil größere Gauben die Konstruktion stark beeinflussen und Sparren nicht einfach ausgetauscht werden sollen', 'Weil Gauben den U-Wert verschlechtern', 'Weil nur Pfettendächer Gauben haben können'], correct: 1, explanation: 'Sparrendächer sind konstruktiv empfindlicher. Im Denkmal wird verlangt, möglichst additiv zu arbeiten und vorhandene Sparren nicht unnötig auszutauschen.' },
+
+  // BESTANDSAUFNAHME
+  { topic: 'bestand', type: 'sc', q: 'Ist die Bestandsaufnahme bei historischen Gebäuden immer zerstörungsfrei?', options: ['Ja, Eingriffe sind verboten', 'Nein, Materialprüfungen und Befunduntersuchungen erfordern oft Eingriffe in Oberflächen', 'Nur wenn keine Genehmigung vorliegt', 'Ja, es gibt nur digitale Verfahren'], correct: 1, explanation: 'Analyseverfahren sind möglichst schonend, aber nicht immer zerstörungsfrei. Farbabschabungen, Putzfreilegungen, Kernbohrungen und Materialproben können nötig sein.' },
+  { topic: 'bestand', type: 'mc', q: 'Auf welchen 4 Kriterien basiert die neue historische Gebäudetypologie?', options: ['Baualter', 'Stilmerkmale', 'Baukonstruktive Merkmale', 'Energetische Merkmale', 'Grundstücksgröße', 'Eigentümerstruktur'], correct: [0, 1, 2, 3], explanation: '4 Kriterien: 1) Baualter, 2) Stilmerkmale, 3) Baukonstruktive Merkmale, 4) Energetische Merkmale. Ziel: bessere Alterszuordnung und realistischere Einsparpotenziale als mit groben Baualtersklassen.' },
+
+  // BESONDERS ERHALTENSWERTE BAUSUBSTANZ
+  { topic: 'gesetze', type: 'sc', q: 'Was ist besonders erhaltenswerte Bausubstanz im Kontext des GEG?', options: ['Ein anderes Wort für Baudenkmal', 'Gebäude die nicht denkmalgeschützt sind, aber in § 105 GEG neben Baudenkmälern genannt werden', 'Nur Fachwerkhäuser', 'Gebäude mit besonders dicken Wänden'], correct: 1, explanation: '§ 105 GEG nennt ausdrücklich neben Baudenkmälern auch „sonstige besonders erhaltenswerte Bausubstanz". Oft über kommunale Erhaltungssatzungen (§ 172 BauGB) definiert — ein Graubereich mit kommunalen Unterschieden.' },
+  { topic: 'gesetze', type: 'sc', q: 'Gilt das Effizienzhaus Denkmal auch für besonders erhaltenswerte Bausubstanz?', options: ['Nein, nur für eingetragene Baudenkmäler', 'Ja, es gilt ausdrücklich auch für erhaltenswerte Bausubstanz', 'Nur in Baden-Württemberg', 'Nur mit Sondergenehmigung'], correct: 1, explanation: 'Wichtiger Merksatz: Das Effizienzhaus Denkmal gilt auch für besonders erhaltenswerte Bausubstanz, nicht nur für eingetragene Baudenkmäler!' },
+
+  // WÄRMEBRÜCKEN IM DENKMAL
+  { topic: 'bruecken', type: 'mc', q: 'Welche typischen Problemstellen für Wärmebrücken gibt es im Denkmalbereich?', options: ['Sockel ohne Perimeterdämmung', 'Anschlüsse bei Innendämmung', 'Dachortgänge ohne Kopfdämmung', 'Fenstereinbausituationen', 'Standarddetails nach Beiblatt 2'], correct: [0, 1, 2, 3], explanation: 'Im Denkmal können Standarddetails aus Beiblatt 2 oft nicht eingehalten werden. Typische Problemstellen: Sockel ohne Perimeterdämmung, Innendämmungs-Anschlüsse, Ortgänge ohne Kopfdämmung und Fenstereinbau.' },
+  { topic: 'bruecken', type: 'sc', q: 'Warum ist der detaillierte Wärmebrückennachweis im Denkmal besonders wichtig?', options: ['Weil er billiger ist', 'Weil Standarddetails konstruktiv oder gestalterisch oft nicht eingehalten werden können', 'Weil er gesetzlich vorgeschrieben ist', 'Weil Denkmäler keine Wärmebrücken haben'], correct: 1, explanation: 'Im Denkmal können Standarddetails aus Beiblatt 2 der DIN 4108 oft nicht umgesetzt werden (konstruktive/gestalterische Zwänge). Deshalb müssen Anschlüsse individuell berechnet werden.' },
+];
+
+// FLASHCARDS DATA
+const flashcards = [
+  { topic: 'gesetze', front: '§ 105 GEG — Denkmal im GEG?', back: '<ul><li>Abweichung von GEG möglich wenn:</li><li><strong>Substanz</strong> beeinträchtigt würde</li><li><strong>Erscheinungsbild</strong> beeinträchtigt würde</li><li>Aufwand <strong>unverhältnismäßig</strong> hoch wäre</li><li>Gilt für Baudenkmäler UND erhaltenswerte Bausubstanz</li></ul>' },
+  { topic: 'gesetze', front: '§ 102 GEG — Befreiung?', back: '<ul><li>Befreiung bei <strong>unbilliger Härte</strong></li><li>Nachweis mit dynamischem Berechnungsverfahren</li><li>Für jede einzelne Maßnahme nachzuweisen</li><li>Kopplungsprinzip: nur energetische Mehrkosten</li></ul>' },
+  { topic: 'gesetze', front: 'EnEG → EnEV → GEG?', back: '<ul><li><strong>1976:</strong> EnEG (Ermächtigungsgesetz)</li><li><strong>1977:</strong> 1. Wärmeschutzverordnung</li><li><strong>2002:</strong> EnEV (WSchVO + HeizAnlVO)</li><li><strong>2020:</strong> GEG (EnEV + EEWärmeG)</li></ul>' },
+  { topic: 'gesetze', front: 'Granadakonvention 1985?', back: '<ul><li>Schutz des <strong>architektonischen Erbes</strong> Europas</li><li>Erfassung in Inventaren</li><li>Vorschriften zum Schutz</li><li><strong>Verbot der Versetzung</strong> von Baudenkmalen</li></ul>' },
+  { topic: 'waerme', front: 'U-Wert Berechnung?', back: '<ul><li><strong>U = 1 / (R_si + Σ(d/λ) + R_se)</strong></li><li>R_si = 0,13 m²K/W (innen)</li><li>R_se = 0,04 m²K/W (außen)</li><li>Je höher U, desto <strong>schlechter</strong></li></ul>' },
+  { topic: 'waerme', front: 'Mindestwärmeschutz?', back: '<ul><li>Definiert in <strong>DIN 4108</strong></li><li>Gilt zum <strong>Zeitpunkt der Errichtung</strong></li><li>Vermeidung von Tauwasser und Schimmel</li><li>Wände gegen Außenluft: R ≥ 1,2 m²K/W</li></ul>' },
+  { topic: 'waerme', front: 'Effizienzhaus Denkmal?', back: '<ul><li>QP ≤ <strong>160%</strong> des Referenzgebäudes</li><li>Früherer Zielwert H_T: 175%</li><li><strong>Keine</strong> Einzel-U-Wert-Anforderungen</li><li>Blower-Door <strong>nicht Pflicht</strong></li></ul>' },
+  { topic: 'waerme', front: 'Wärmespeicherung — warum wichtig?', back: '<ul><li>Dicke Mauern: schlechter U-Wert, aber <strong>exzellente Speicherung</strong></li><li>Phasenverschiebung bis 7-8 Tage</li><li>Guter <strong>sommerlicher Wärmeschutz</strong></li><li>Formel: a = λ/(ρ·c_p)</li></ul>' },
+  { topic: 'feuchte', front: 'Dampfsperre vs. Dampfbremse?', back: '<ul><li><strong>Dampfsperre:</strong> sd ≥ 1.500 m</li><li><strong>Dampfbremse:</strong> sd 0,5 bis 1.500 m</li><li>sd = μ × d</li><li>Mineralwolle μ=1, Polystyrol μ≈50, PE-Folie μ=100.000</li></ul>' },
+  { topic: 'feuchte', front: 'Vier Arten von Feuchte?', back: '<ul><li>1) <strong>Regenfeuchte</strong> (Schlagregen)</li><li>2) <strong>Tauwasser</strong> (Kondensation)</li><li>3) <strong>Aufsteigende Feuchte</strong> (kapillar)</li><li>4) <strong>Herstellungsfeuchte</strong></li><li>+ Hygroskopische Feuchte (Salze)</li></ul>' },
+  { topic: 'feuchte', front: 'Schlagregenschutz Fachwerk?', back: '<ul><li>1) <strong>Dachüberstand</strong></li><li>2) Fugenverschluss: <strong>Kalkputz/Lehm</strong></li><li>3) KEIN PU/Silikon!</li><li>4) Diffusionsoffener <strong>Innenputz</strong></li><li>Innendämmung nur wenn Außenwand dicht</li></ul>' },
+  { topic: 'messung', front: '5 Messgeräte für Denkmäler?', back: '<ul><li>1) <strong>Wärmeflusssensor</strong> (U-Wert, mind. 3 Tage)</li><li>2) <strong>Infrarot-Thermografie</strong></li><li>3) <strong>Feuchtemessgerät</strong> (elektr. Widerstand)</li><li>4) <strong>Karsten-Röhrchen</strong></li><li>5) <strong>Blower-Door-Test</strong></li></ul>' },
+  { topic: 'messung', front: 'Glaserverfahren?', back: '<ul><li>Annäherung für <strong>Tauwasserausfall</strong></li><li>Nur bei <strong>Dampfdiffusion</strong> verwertbar</li><li>Bei kapillarem Transport: <strong>WUFI/DELPHIN</strong></li><li>Randbedingungen: -10°C/80% außen, +20°C/50% innen</li></ul>' },
+  { topic: 'bruecken', front: 'Drei Arten von Wärmebrücken?', back: '<ul><li>1) <strong>Geometrisch:</strong> Ecken, Vorsprünge</li><li>2) <strong>Konstruktiv:</strong> Durchdringung Dämmebene</li><li>3) <strong>Materialbedingt:</strong> höhere λ (Fenster)</li><li>Gefahr: Tauwasser + Schimmelpilz</li></ul>' },
+  { topic: 'material', front: 'Lambda-Werte historische Baustoffe?', back: '<ul><li>Vollziegel: <strong>λ = 0,68</strong></li><li>Naturstein (hart): <strong>λ = 0,99</strong></li><li>Fichtenholz: <strong>λ = 0,13</strong></li><li>Polystyrol: <strong>λ = 0,040</strong></li><li>Normalbeton: <strong>λ = 2,1</strong></li></ul>' },
+  { topic: 'material', front: 'Baualtersklassen I-IX?', back: '<ul><li><strong>I:</strong> bis 1918 (Fachwerk, Massivbau)</li><li><strong>II:</strong> 1919-1948 (einfach)</li><li><strong>III:</strong> 1949-1957 (Nachkrieg)</li><li><strong>IV:</strong> 1958-1968 (Bims, Hochlochziegel)</li><li><strong>V-IX:</strong> 1969-2002+ (zunehmend gedämmt)</li></ul>' },
+  { topic: 'typologie', front: '6 historische Gebäudetypen?', back: '<ul><li><strong>Typ 1:</strong> vor 1650 (Gotik)</li><li><strong>Typ 2:</strong> 1650-1780 (Barock)</li><li><strong>Typ 3:</strong> 1780-1830 (Klassizismus)</li><li><strong>Typ 4:</strong> 1830-1890 (Historismus)</li><li><strong>Typ 5:</strong> 1890-1910</li><li><strong>Typ 6:</strong> ab 1890</li></ul>' },
+  { topic: 'bestand', front: 'Genauigkeitsstufen Bauaufmaß?', back: '<ul><li><strong>Stufe 1:</strong> Schematisch (1:100)</li><li><strong>Stufe 2:</strong> Annähernd wirklichkeitsgetreu (1:50)</li><li><strong>Stufe 3:</strong> Verformungsgetreu (1:25)</li><li><strong>Stufe 4:</strong> Verformungsgetreu + detailliert (≥1:25)</li></ul>' },
+  { topic: 'bestand', front: 'Schadenskartierung?', back: '<ul><li>Farbcodiert in Plänen:</li><li><strong>Rot:</strong> Ersatz Altholz</li><li><strong>Schraffiert:</strong> Ergänzung Neuholz</li><li><strong>Grün:</strong> Verfestigung (PU)</li><li><strong>Gelb:</strong> Abbruch ohne Ersatz</li></ul>' },
+  { topic: 'zertifikat', front: 'WTA-Eintragung Kosten?', back: '<ul><li><strong>Ersteintragung:</strong> 120€ (WG) + 20€ (NWG)</li><li><strong>Jahresbeitrag:</strong> 130€ + 20€ (zzgl. MwSt.)</li><li>Verlängerung alle 3 Jahre</li><li>Option A: 16h + Praxisnachweis</li><li>Option B: 40h (nicht 2x nacheinander!)</li></ul>' },
+
+  // NEUE KARTEIKARTEN AUS LERNMATERIAL
+  { topic: 'gesetze', front: 'Denkmal-Logik — Grundprinzip?', back: '<ul><li>Nicht maximieren, sondern <strong>abwägen</strong></li><li>Gute <strong>Gesamtbilanz</strong> statt perfekter Einzelmaßnahme</li><li><strong>Substanzerhalt</strong> vor Maximaldämmung</li><li>Erhalten und ertüchtigen vor ersetzen</li><li>Baudenkmal = bereits nachhaltig (graue Energie amortisiert)</li></ul>' },
+  { topic: 'feuchte', front: 'Sommerkondensation — die Prüfungsfalle?', back: '<ul><li>Warme feuchte Sommerluft trifft auf <strong>kalte Kellerwände</strong></li><li>Keller im Winter trocken, im Sommer feucht</li><li>NICHT mehr lüften — sondern <strong>richtig</strong> lüften!</li><li>Nur lüften wenn absolute Feuchte außen &lt; innen</li><li>Falsches Sommerlüften verschlimmert das Problem</li></ul>' },
+  { topic: 'feuchte', front: 'Schimmel — nicht nur Dämmproblem?', back: '<ul><li>Geringe <strong>Raumtemperatur</strong> (kühles Schlafzimmer)</li><li>Hoher <strong>Feuchteeintrag</strong> durch Nutzung</li><li><strong>Möbel</strong> direkt an kalten Außenwänden</li><li>Mangelnde <strong>Luftzirkulation</strong></li><li><strong>Wärmebrücken</strong> senken Oberflächentemperatur</li><li>→ Zusammenspiel aller Faktoren!</li></ul>' },
+  { topic: 'material', front: 'Fenster am Denkmal?', back: '<ul><li><strong>Erhalten und ertüchtigen</strong> vor austauschen</li><li>Kastenfenster: mit geringem Eingriff verbesserbar</li><li>Verbundfenster: Glastausch oft sinnvoller als Komplettaustausch</li><li>Lange Nutzungsdauer = nachhaltig</li><li>Weniger Substanzverlust, weniger Materialeinsatz</li></ul>' },
+  { topic: 'material', front: 'Innendämmung — Voraussetzungen?', back: '<ul><li>Nur wenn Außenwand <strong>dicht/schlagregengeschützt</strong></li><li>Bei Fachwerk: Dachüberstand + Kalkputz-Fugen + diffusionsoffener Innenputz</li><li><strong>Anschlüsse</strong> müssen gelöst sein (Decke, Wand)</li><li>Sonst: neue Wärmebrücken, Feuchteanreicherung, Schimmel</li></ul>' },
+  { topic: 'gesetze', front: 'Erhaltenswerte Bausubstanz?', back: '<ul><li>Kein eingetragenes Baudenkmal, aber <strong>§ 105 GEG</strong> nennt sie ausdrücklich</li><li>Oft über <strong>§ 172 BauGB</strong> (Erhaltungssatzungen)</li><li><strong>Graubereich</strong> — kommunal unterschiedlich</li><li>Effizienzhaus Denkmal gilt <strong>auch</strong> dafür!</li><li>Nicht gelistet ≠ nicht erhaltenswert</li></ul>' },
+  { topic: 'bestand', front: 'Historische Typologien — 4 Kriterien?', back: '<ul><li>1) <strong>Baualter</strong></li><li>2) <strong>Stilmerkmale</strong></li><li>3) <strong>Baukonstruktive</strong> Merkmale</li><li>4) <strong>Energetische</strong> Merkmale</li><li>→ Bessere Zuordnung als grobe Baualtersklassen</li><li>→ Realistischere Einsparpotenziale</li></ul>' },
+];
+
+// ===== STATE =====
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {},
+  currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: 1800,
+  selectedOptions: new Set(),
+};
+
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+
+try {
+  const saved = localStorage.getItem('denkmal-block2-state');
+  if (saved) {
+    const s = JSON.parse(saved);
+    state.answered = s.answered || 0;
+    state.correct = s.correct || 0;
+    state.streak = s.streak || 0;
+    state.maxStreak = s.maxStreak || 0;
+    if (s.topicScores) state.topicScores = s.topicScores;
+  }
+} catch(e) {}
+
+function saveState() {
+  try {
+    localStorage.setItem('denkmal-block2-state', JSON.stringify({
+      answered: state.answered, correct: state.correct,
+      streak: state.streak, maxStreak: state.maxStreak,
+      topicScores: state.topicScores
+    }));
+  } catch(e) {}
+}
+
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => {
+    if (b.textContent.toLowerCase().includes(
+      id === 'dashboard' ? 'dashboard' : id === 'quiz' ? 'quiz' : id === 'flashcards' ? 'karte' : id === 'exam' ? 'prüf' : 'fallen'
+    )) b.classList.add('active');
+  });
+  if (id === 'dashboard') updateDashboard();
+  if (id === 'flashcards') initFlashcards();
+}
+
+// ===== DASHBOARD =====
+function updateDashboard() {
+  document.getElementById('stat-answered').textContent = state.answered;
+  document.getElementById('stat-correct').textContent = state.correct;
+  document.getElementById('stat-rate').textContent = state.answered > 0 ? Math.round(state.correct / state.answered * 100) + '%' : '--';
+  document.getElementById('stat-streak').textContent = state.streak;
+
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = topics.map(t => {
+    const s = state.topicScores[t.id];
+    const rate = s.answered > 0 ? Math.round(s.correct / s.answered * 100) : -1;
+    const rateText = rate >= 0 ? rate + '%' : 'Noch nicht geübt';
+    const color = rate < 0 ? '#999' : rate >= 70 ? 'var(--success)' : rate >= 40 ? 'var(--gold)' : 'var(--warn)';
+    return `<div class="topic-card" onclick="startQuiz('${t.id}')">
+      <div class="icon">${t.icon}</div>
+      <h4>${t.name}</h4>
+      <div class="score" style="color:${color}">${rateText}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== QUIZ =====
+function buildTopicFilter(containerId, defaultAll) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = `<button class="topic-btn ${defaultAll ? 'active' : ''}" data-topic="all" onclick="toggleTopic(this)">Alle</button>` +
+    topics.map(t => `<button class="topic-btn" data-topic="${t.id}" onclick="toggleTopic(this)">${t.icon} ${t.name}</button>`).join('');
+}
+
+function toggleTopic(btn) {
+  const container = btn.parentElement;
+  if (btn.dataset.topic === 'all') {
+    container.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    container.querySelector('[data-topic="all"]').classList.remove('active');
+    btn.classList.toggle('active');
+    if (!container.querySelector('.topic-btn.active')) {
+      container.querySelector('[data-topic="all"]').classList.add('active');
+    }
+  }
+}
+
+function getSelectedTopics(containerId) {
+  const btns = document.querySelectorAll(`#${containerId} .topic-btn.active`);
+  const ids = [...btns].map(b => b.dataset.topic);
+  if (ids.includes('all')) return topics.map(t => t.id);
+  return ids;
+}
+
+function startQuiz(topicOrMode) {
+  showSection('quiz');
+  let pool;
+  if (topicOrMode === 'all') {
+    pool = [...questions];
+  } else if (topicOrMode === 'weak') {
+    const weakTopics = topics.filter(t => {
+      const s = state.topicScores[t.id];
+      return s.answered === 0 || (s.correct / s.answered) < 0.7;
+    }).map(t => t.id);
+    pool = questions.filter(q => weakTopics.includes(q.topic));
+    if (pool.length === 0) pool = [...questions];
+  } else {
+    pool = questions.filter(q => q.topic === topicOrMode);
+  }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function startQuizFromFilter() {
+  const selectedTopics = getSelectedTopics('quiz-topic-filter');
+  let pool = questions.filter(q => selectedTopics.includes(q.topic));
+  if (pool.length === 0) { alert('Keine Fragen für diese Auswahl.'); return; }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  document.getElementById('quiz-progress').style.width = ((state.quizIndex / total) * 100) + '%';
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+  const typeClass = q.type;
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${typeClass}">${typeLabel}</span>
+      <span class="q-num">${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  html += `<div class="feedback" id="quiz-feedback"></div>`;
+  document.getElementById('quiz-card').innerHTML = html;
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="checkAnswer()">Prüfen</button>
+    <button class="btn btn-outline" onclick="skipQuestion()" style="margin-left:auto;">Überspringen</button>
+  `;
+}
+
+function selectOption(el, idx, type) {
+  if (document.getElementById('quiz-feedback').classList.contains('show')) return;
+  if (type === 'sc') {
+    document.querySelectorAll('#options-list .option').forEach(o => o.classList.remove('selected'));
+    state.selectedOptions = new Set([idx]);
+    el.classList.add('selected');
+  } else {
+    if (state.selectedOptions.has(idx)) {
+      state.selectedOptions.delete(idx);
+      el.classList.remove('selected');
+    } else {
+      state.selectedOptions.add(idx);
+      el.classList.add('selected');
+    }
+  }
+}
+
+function checkAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  const fb = document.getElementById('quiz-feedback');
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    const selected = [...state.selectedOptions][0];
+    isCorrect = selected === q.correct;
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (i === q.correct) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && i !== q.correct) o.classList.add('wrong');
+    });
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (correctSet.has(i)) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && !correctSet.has(i)) o.classList.add('wrong');
+    });
+  } else {
+    const answer = document.getElementById('ft-answer').value.toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+    fb.innerHTML = `<strong>${isCorrect ? 'Gut!' : 'Verbesserungsbedarf'} (${matched.length}/${q.keywords.length} Schlüsselbegriffe)</strong>
+      <p style="margin-top:0.5rem;"><strong>Musterantwort:</strong> ${q.sampleAnswer}</p>
+      <p style="margin-top:0.3rem; font-size:0.85rem; color:var(--muted);">Erkannte Begriffe: ${matched.length > 0 ? matched.join(', ') : 'keine'}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  if (q.type !== 'ft') {
+    fb.innerHTML = `<strong>${isCorrect ? 'Richtig!' : 'Falsch!'}</strong><p>${q.explanation}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) {
+    state.correct++;
+    state.streak++;
+    state.maxStreak = Math.max(state.maxStreak, state.streak);
+    state.topicScores[q.topic].correct++;
+  } else {
+    state.streak = 0;
+  }
+  state.quizAnswers.push(isCorrect);
+  saveState();
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="nextQuizQuestion()">Weiter</button>
+  `;
+}
+
+function skipQuestion() {
+  state.quizAnswers.push(null);
+  nextQuizQuestion();
+}
+
+function nextQuizQuestion() {
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    showQuizResults();
+  } else {
+    showQuizQuestion();
+  }
+}
+
+function showQuizResults() {
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const skipped = state.quizAnswers.filter(a => a === null).length;
+  const wrong = total - correct - skipped;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'block';
+  document.getElementById('quiz-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Ergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'Bestanden' : 'Nicht bestanden'}</small>
+    </div>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${wrong}</div><div class="label">Falsch</div></div>
+      <div class="stat"><div class="num" style="color:var(--muted)">${skipped}</div><div class="label">Übersprungen</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-primary" onclick="resetQuiz()">Neues Quiz</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="showSection('dashboard')">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-filter-card').style.display = 'block';
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'none';
+}
+
+// ===== FLASHCARDS =====
+function initFlashcards(topicFilter) {
+  const selectedTopics = topicFilter || topics.map(t => t.id);
+  state.currentFC = flashcards.filter(fc => selectedTopics.includes(fc.topic));
+  shuffle(state.currentFC);
+  state.fcIndex = 0;
+  state.fcFlipped = false;
+  showFlashcard();
+}
+
+function showFlashcard() {
+  if (state.currentFC.length === 0) return;
+  const fc = state.currentFC[state.fcIndex];
+  document.getElementById('fc-question').textContent = fc.front;
+  document.getElementById('fc-answer').innerHTML = fc.back;
+  document.getElementById('flashcard').classList.remove('flipped');
+  state.fcFlipped = false;
+  document.getElementById('fc-counter').textContent = `${state.fcIndex + 1} / ${state.currentFC.length}`;
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+  state.fcFlipped = !state.fcFlipped;
+}
+
+function nextCard() {
+  state.fcIndex = (state.fcIndex + 1) % state.currentFC.length;
+  showFlashcard();
+}
+
+function prevCard() {
+  state.fcIndex = (state.fcIndex - 1 + state.currentFC.length) % state.currentFC.length;
+  showFlashcard();
+}
+
+function markCardKnown() {
+  if (state.currentFC.length <= 1) { nextCard(); return; }
+  state.currentFC.splice(state.fcIndex, 1);
+  if (state.fcIndex >= state.currentFC.length) state.fcIndex = 0;
+  showFlashcard();
+}
+
+function markCardUnknown() {
+  nextCard();
+}
+
+// ===== EXAM =====
+function startExam() {
+  let pool = [...questions];
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, 15);
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  state.examActive = true;
+  state.examTimeLeft = 1800;
+
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-area').style.display = 'block';
+  document.getElementById('exam-results').style.display = 'none';
+
+  showExamQuestion();
+  startExamTimer();
+}
+
+function startExamTimer() {
+  clearInterval(state.examTimer);
+  state.examTimer = setInterval(() => {
+    state.examTimeLeft--;
+    const min = Math.floor(state.examTimeLeft / 60);
+    const sec = state.examTimeLeft % 60;
+    const el = document.getElementById('exam-timer');
+    el.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    el.classList.toggle('warning', state.examTimeLeft <= 300);
+    document.getElementById('exam-progress').style.width = ((1800 - state.examTimeLeft) / 1800 * 100) + '%';
+    if (state.examTimeLeft <= 0) {
+      clearInterval(state.examTimer);
+      finishExam();
+    }
+  }, 1000);
+}
+
+function showExamQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${q.type}">${typeLabel}</span>
+      <span class="q-num">Frage ${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  document.getElementById('exam-card').innerHTML = html;
+  document.getElementById('exam-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="submitExamAnswer()">Antwort abgeben</button>
+    ${state.quizIndex < total - 1 ? '<button class="btn btn-outline" onclick="skipExamQuestion()" style="margin-left:auto;">Überspringen</button>' : ''}
+  `;
+}
+
+function submitExamAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    isCorrect = [...state.selectedOptions][0] === q.correct;
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+  } else {
+    const answer = (document.getElementById('ft-answer')?.value || '').toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+  }
+
+  state.quizAnswers.push(isCorrect);
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) { state.correct++; state.topicScores[q.topic].correct++; }
+  saveState();
+
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function skipExamQuestion() {
+  state.quizAnswers.push(null);
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function finishExam() {
+  clearInterval(state.examTimer);
+  state.examActive = false;
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+  const timeUsed = 1800 - state.examTimeLeft;
+  const min = Math.floor(timeUsed / 60);
+  const sec = timeUsed % 60;
+
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'block';
+  document.getElementById('exam-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Prüfungsergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'BESTANDEN' : 'NICHT BESTANDEN'}</small>
+    </div>
+    <p style="text-align:center; margin-top:0.5rem; color:var(--muted);">Zeit: ${min}:${sec.toString().padStart(2, '0')} / 30:00</p>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${total - correct}</div><div class="label">Falsch/Übersprungen</div></div>
+      <div class="stat"><div class="num">${total}</div><div class="label">Gesamt</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-gold" onclick="resetExam(); startExam();">Nochmal</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="resetExam(); showSection('dashboard');">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetExam() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'none';
+}
+
+// ===== UTILS =====
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ===== INIT =====
+buildTopicFilter('quiz-topic-filter', true);
+buildTopicFilter('fc-topic-filter', true);
+updateDashboard();
+initFlashcards();
+
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('flashcards').classList.contains('active')) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+    if (e.key === 'ArrowRight') nextCard();
+    if (e.key === 'ArrowLeft') prevCard();
+  }
+});
+</script>
+</body>
+</html>

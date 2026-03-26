@@ -1,0 +1,6 @@
+.DS_Store
+*.pdf
+*.m4a
+*.m4a.txt
+audio/
+.claude/

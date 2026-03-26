@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denkmalschutz Block 3 - Interaktives Lernen</title>
+<style>
+  :root {
+    --primary: #035357;
+    --accent: #50D2CA;
+    --gold: #C59B00;
+    --warn: #c00;
+    --success: #2e7d32;
+    --bg: #f5f5f0;
+    --card: #fff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0e0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+  header p { font-size: 0.9rem; opacity: 0.85; }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav button {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--accent); color: var(--primary); }
+  .nav button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* Main */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .q-type {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .q-type.sc { background: #e3f2fd; color: #1565c0; }
+  .q-type.mc { background: #f3e5f5; color: #7b1fa2; }
+  .q-type.ft { background: #fff3e0; color: #e65100; }
+  .q-num { font-size: 0.85rem; color: var(--muted); }
+  .q-topic { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.5rem; }
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+  }
+
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); background: #f8fffe; }
+  .option.selected { border-color: var(--primary); background: #e8f5f5; }
+  .option.correct { border-color: var(--success); background: #e8f5e9; }
+  .option.wrong { border-color: var(--warn); background: #ffebee; }
+  .option .marker {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .option.mc-option .marker { border-radius: 4px; }
+  .option.selected .marker { border-color: var(--primary); background: var(--primary); color: white; }
+  .option.correct .marker { border-color: var(--success); background: var(--success); color: white; }
+  .option.wrong .marker { border-color: var(--warn); background: var(--warn); color: white; }
+  .option-text { font-size: 0.95rem; }
+
+  .ft-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .ft-input:focus { outline: none; border-color: var(--accent); }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { background: #e8f5e9; border-left: 4px solid var(--success); }
+  .feedback.wrong-fb { background: #ffebee; border-left: 4px solid var(--warn); }
+  .feedback.info-fb { background: #e3f2fd; border-left: 4px solid #1565c0; }
+  .feedback strong { display: block; margin-bottom: 0.3rem; }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: #046a6f; }
+  .btn-accent { background: var(--accent); color: var(--primary); }
+  .btn-accent:hover { background: #3fc4bc; }
+  .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: var(--primary); color: white; }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a88200; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .flashcard-container { perspective: 1000px; margin: 1rem 0; }
+  .flashcard {
+    width: 100%;
+    min-height: 250px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    width: 100%;
+    min-height: 250px;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .flashcard-front {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+  }
+  .flashcard-front h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .flashcard-front .hint { font-size: 0.85rem; opacity: 0.7; margin-top: 1rem; }
+  .flashcard-back {
+    background: white;
+    border: 2px solid var(--accent);
+    transform: rotateY(180deg);
+    text-align: left;
+  }
+  .flashcard-back h4 { color: var(--primary); margin-bottom: 0.75rem; }
+  .flashcard-back ul { padding-left: 1.2rem; }
+  .flashcard-back li { margin-bottom: 0.3rem; font-size: 0.95rem; }
+
+  .fc-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  .fc-counter { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+  .topic-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .topic-btn {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .topic-btn:hover { border-color: var(--accent); }
+  .topic-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .exam-timer {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 0.5rem;
+  }
+  .exam-timer.warning { color: var(--warn); }
+
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto;
+    font-weight: 800;
+    font-size: 2rem;
+    border: 6px solid;
+  }
+  .result-circle.pass { border-color: var(--success); color: var(--success); }
+  .result-circle.fail { border-color: var(--warn); color: var(--warn); }
+  .result-circle small { font-size: 0.8rem; font-weight: 600; }
+
+  .merksatz {
+    background: linear-gradient(135deg, #fff9e6, #fff3cc);
+    border-left: 4px solid var(--gold);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .merksatz::before { content: "Merksatz: "; font-weight: 700; color: var(--gold); }
+
+  .trap {
+    background: #ffebee;
+    border-left: 4px solid var(--warn);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .trap::before { content: "Prüfungsfalle: "; font-weight: 700; color: var(--warn); }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .checklist li::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  @media (max-width: 768px) {
+    main { padding: 1rem; }
+    .card { padding: 1.2rem 1.2rem; }
+    .topic-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+    .flashcard, .flashcard-face { min-height: 220px; }
+    .flashcard-face { padding: 1.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    header { padding: 1rem 1rem; }
+    header h1 { font-size: 1.15rem; }
+    header p { font-size: 0.8rem; }
+    .nav {
+      justify-content: flex-start;
+      gap: 0.4rem;
+      padding: 0.6rem 0.75rem;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav button {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-width: 1.5px;
+    }
+    main { padding: 0.75rem; }
+    .card { padding: 1rem; border-radius: 10px; margin-bottom: 0.75rem; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+    .stat { min-width: 0; padding: 0.75rem 0.5rem; border-radius: 8px; }
+    .stat .num { font-size: 1.4rem; }
+    .stat .label { font-size: 0.7rem; }
+    .topic-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+    .topic-card { padding: 0.6rem 0.4rem; border-radius: 8px; }
+    .topic-card .icon { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .topic-card h4 { font-size: 0.7rem; line-height: 1.3; }
+    .topic-card .score { font-size: 0.65rem; }
+    .topic-filter { gap: 0.3rem; margin-bottom: 1rem; }
+    .topic-btn { padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .question-text { font-size: 1rem; margin-bottom: 1rem; }
+    .q-type { font-size: 0.68rem; padding: 0.15rem 0.5rem; }
+    .q-num { font-size: 0.78rem; }
+    .q-topic { font-size: 0.7rem; }
+    .options { gap: 0.4rem; }
+    .option { padding: 0.7rem 0.8rem; gap: 0.6rem; border-radius: 8px; border-width: 1.5px; -webkit-tap-highlight-color: transparent; }
+    .option .marker { width: 24px; height: 24px; font-size: 0.72rem; }
+    .option-text { font-size: 0.88rem; }
+    .ft-input { min-height: 80px; font-size: 16px; padding: 0.7rem 0.8rem; }
+    .feedback { padding: 0.8rem 1rem; font-size: 0.85rem; }
+    .btn { padding: 0.65rem 1rem; font-size: 0.88rem; }
+    .btn-row { gap: 0.5rem; margin-top: 1rem; }
+    .btn-row .btn { flex: 1; min-width: 0; text-align: center; }
+    .flashcard-container { margin: 0.75rem 0; }
+    .flashcard, .flashcard-face { min-height: 200px; }
+    .flashcard-face { padding: 1.2rem; }
+    .flashcard-front h3 { font-size: 1.1rem; }
+    .flashcard-front .hint { font-size: 0.78rem; }
+    .flashcard-back h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .flashcard-back ul { padding-left: 1rem; }
+    .flashcard-back li { font-size: 0.85rem; margin-bottom: 0.25rem; }
+    .fc-nav { margin-top: 0.75rem; }
+    .fc-nav .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    .fc-counter { font-size: 0.8rem; }
+    .exam-timer { font-size: 1.3rem; padding: 0.3rem; }
+    .result-circle { width: 110px; height: 110px; font-size: 1.6rem; border-width: 5px; }
+    .result-circle small { font-size: 0.7rem; }
+    .merksatz, .trap { padding: 0.7rem 0.8rem; font-size: 0.83rem; margin: 0.5rem 0; }
+    .card ol { padding-left: 1.2rem; font-size: 0.83rem; line-height: 1.8; }
+    .progress-bar { height: 6px; margin: 0.75rem 0; }
+  }
+
+  @media (max-width: 360px) {
+    .topic-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats { gap: 0.4rem; }
+    .stat .num { font-size: 1.2rem; }
+    .nav button { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .flashcard, .flashcard-face { min-height: 180px; }
+    .flashcard-face { padding: 1rem; }
+    .flashcard-front h3 { font-size: 1rem; }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .option:hover { border-color: var(--border); background: transparent; }
+    .option.selected:hover { border-color: var(--primary); background: #e8f5f5; }
+    .topic-card:hover { transform: none; box-shadow: none; }
+    .topic-card:active { transform: scale(0.97); }
+    .option:active { background: #f0f0f0; }
+    .btn:active { transform: scale(0.97); }
+  }
+
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    .nav { padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right)); }
+  }
+
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .card { animation: slideIn 0.3s ease; }
+
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .topic-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .topic-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .topic-card .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+  .topic-card h4 { font-size: 0.85rem; color: var(--primary); margin-bottom: 0.2rem; }
+  .topic-card .score { font-size: 0.75rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Denkmalschutz Block 3</h1>
+  <p>Anlagentechnik und Versorgungskonzepte - Interaktives Lernen</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p>
+      <div class="topic-grid" id="topic-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Schnellstart</h3>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button>
+        <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+        <button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card">
+      <h3 style="margin-bottom: 0.75rem;">Thema wählen</h3>
+      <div class="topic-filter" id="quiz-topic-filter"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button>
+      </div>
+    </div>
+    <div id="quiz-area" style="display:none;">
+      <div class="progress-bar"><div class="fill" id="quiz-progress"></div></div>
+      <div class="card" id="quiz-card"></div>
+      <div class="btn-row" id="quiz-buttons"></div>
+    </div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 0.5rem;">Karteikarten</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen. Wische oder nutze die Pfeile.</p>
+      <div class="topic-filter" id="fc-topic-filter"></div>
+    </div>
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-face flashcard-front" id="fc-front">
+          <h3 id="fc-question">Lade...</h3>
+          <div class="hint">Klicken zum Umdrehen</div>
+        </div>
+        <div class="flashcard-face flashcard-back" id="fc-back">
+          <h4 id="fc-answer-title">Antwort</h4>
+          <div id="fc-answer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-outline" onclick="prevCard()">Zurück</button>
+      <span class="fc-counter" id="fc-counter">1 / 1</span>
+      <button class="btn btn-outline" onclick="nextCard()">Weiter</button>
+    </div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;">
+      <button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button>
+      <button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup">
+      <h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">15 Fragen, 30 Minuten, gemischte Formate. Bestanden ab 70%.</p>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="startExam()">Prüfung starten</button>
+      </div>
+    </div>
+    <div id="exam-area" style="display:none;">
+      <div class="card" style="text-align:center;">
+        <div class="exam-timer" id="exam-timer">30:00</div>
+        <div class="progress-bar"><div class="fill" id="exam-progress"></div></div>
+      </div>
+      <div class="card" id="exam-card"></div>
+      <div class="btn-row" id="exam-buttons"></div>
+    </div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <!-- TRAPS -->
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen</h3>
+      <div class="trap">„Erst neue Heizung, dann Hülle dämmen" — FALSCH! Grundsatz: <strong>erst Hülle, dann Heizung</strong>. Sonst Teillast und Ineffizienz.</div>
+      <div class="trap">„Wärmepumpe ist immer die beste Lösung" — ZU PAUSCHAL! Immer abhängig von <strong>Heizlast, Heizflächen, VL-Temperatur, Denkmalbelangen und Standort</strong>.</div>
+      <div class="trap">„Wärmepumpe geht nur mit Fußbodenheizung" — FALSCH! Auch <strong>Heizkörper können reichen</strong>, wenn Heizlast und Heizfläche zusammenpassen.</div>
+      <div class="trap">„Aus dem Jahresverbrauch kann ich den Kessel dimensionieren" — FALSCH! Für die Dimensionierung ist die <strong>Heizlast (kW)</strong> maßgeblich, nicht die Jahresarbeit (kWh).</div>
+      <div class="trap">„Hydraulischer Abgleich = alle Thermostatventile gleich einstellen" — FALSCH! Es ist eine <strong>gezielte Anpassung der Volumenströme</strong> an den Bedarf jedes Heizkörpers.</div>
+      <div class="trap">„Vorhandene Heizkörper reichen bei Wärmepumpenbetrieb automatisch" — FALSCH! <strong>Heizkörperleistungskorrektur</strong> nötig — bei 50/38°C nur noch ~39% der Nennleistung.</div>
+      <div class="trap">„Speicher macht die Anlage automatisch effizient" — FALSCH! Puffer hilft nur wenn <strong>Hydraulik, Temperaturniveau und Nutzung</strong> passen. Verluste beachten!</div>
+      <div class="trap">„Vorlauftemperatur einfach runterdrehen" — FALSCH! Geht nur wenn <strong>Heizlast und Heizflächen</strong> dazu passen. Sonst werden Räume nicht warm.</div>
+      <div class="trap">„Flächenheizung ist immer besser als Heizkörper" — Im Denkmal nicht automatisch! <strong>Eingriffstiefe</strong> in historische Böden ist oft das Hauptproblem.</div>
+      <div class="trap">„Nach Fenstertausch reicht normale Lüftung" — FALSCH! Höhere Dichtheit → <strong>Lüftungskonzept</strong> muss mitgedacht werden.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Freitext-Antwort-Schema Block 3</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Bei Fallaufgaben zur Anlagentechnik immer diese Reihenfolge:</p>
+      <ol style="padding-left: 1.5rem; font-size: 0.9rem; line-height: 2;">
+        <li>Randbedingungen klären (Standort, Nutzung, kommunale Wärmeplanung)</li>
+        <li>Heizlast und Heizflächen prüfen (raumweise!)</li>
+        <li>Passenden Wärmeerzeuger wählen (nie isoliert bewerten)</li>
+        <li>Hydraulischen Abgleich mitdenken</li>
+        <li>Lüftungskonzept berücksichtigen</li>
+        <li>Warmwasser separat planen</li>
+        <li>Wirtschaftlichkeit und Wärmeplanung einordnen</li>
+        <li>Denkmalbelange bei allen Schritten mitdenken</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Erst Hülle, dann Heizung — erst Bedarf senken, dann Erzeuger dimensionieren.</div>
+      <div class="merksatz">Heizlast (kW) ≠ Energiebilanz (kWh). Kessel dimensioniert man mit Heizlast!</div>
+      <div class="merksatz">Hydraulischer Abgleich: jeder HK bekommt nicht gleich viel, sondern genau so viel wie nötig.</div>
+      <div class="merksatz">Wärmepumpe: Heizlast + Heizfläche + niedrige VL + Denkmalprüfung = Voraussetzungen.</div>
+      <div class="merksatz">Sinkt die Vorlauftemperatur, sinkt die Heizkörperleistung — Korrektur nötig!</div>
+      <div class="merksatz">JAZ = Wärme-Output / Strom-Input. Ziel: JAZ > 3,0 (besser > 3,5).</div>
+      <div class="merksatz">Kommunale Wärmeplanung bis 30.06.2028 — hat Einfluss auf Wärmeerzeuger-Wahl!</div>
+      <div class="merksatz">Pufferspeicher: Q = V · ρ · c · ΔT — Volumen und Temperaturhub entscheiden.</div>
+      <div class="merksatz">Raumwärme und Trinkwarmwasser immer getrennt denken, aber im selben System lösen.</div>
+      <div class="merksatz">Nach Modernisierung: Lüftungskonzept mitdenken! Höhere Dichtheit = weniger natürliche Lüftung.</div>
+      <div class="merksatz">Nicht pauschal „WP geht" oder „WP geht nicht" — immer abgewogen argumentieren.</div>
+      <div class="merksatz">Wärmeerzeuger nie isoliert bewerten — Standort, Netz, Heizflächen und Denkmal gehören dazu.</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== DATA =====
+
+const topics = [
+  { id: 'anlagen', name: 'Anlagentechnik', icon: '🔧' },
+  { id: 'heizlast', name: 'Heizlastberechnung', icon: '📊' },
+  { id: 'abgleich', name: 'Hydraulischer Abgleich', icon: '⚖️' },
+  { id: 'waermepumpe', name: 'Wärmepumpe', icon: '♨️' },
+  { id: 'heizflaechen', name: 'Heizflächen & Übergabe', icon: '🌡️' },
+  { id: 'lueftung', name: 'Lüftung & Raumklima', icon: '💨' },
+  { id: 'wirtschaft', name: 'Wirtschaftlichkeit', icon: '💶' },
+  { id: 'versorgung', name: 'Versorgungskonzepte', icon: '🏘️' },
+  { id: 'warmwasser', name: 'Warmwasser & Speicher', icon: '🚿' },
+  { id: 'lebenszyklus', name: 'Lebenszyklus', icon: '♻️' },
+];
+
+const questions = [
+  // ANLAGENTECHNIK
+  { topic: 'anlagen', type: 'sc', q: 'Was ist der richtige Grundsatz bei zeitnaher Sanierung?', options: ['Erst neue Heizung, dann Hülle dämmen', 'Erst Gebäudehülle sanieren, dann bedarfsgerechte Heizung einsetzen', 'Beides gleichzeitig machen', 'Nur die Heizung tauschen reicht'], correct: 1, explanation: 'Grundsatz: IMMER zuerst die Gebäudehülle sanieren, dann eine bedarfsgerechte Heizung einsetzen. Heizungen in tiefer Teillast sind ineffizient. Erst den Bedarf senken, dann den Erzeuger dimensionieren.' },
+  { topic: 'anlagen', type: 'mc', q: 'Welche Wärmeerzeuger werden im Bestand eingesetzt?', options: ['Ölheizung', 'Gasheizung', 'Biomasse (Pellets, Hackschnitzel)', 'Wärmepumpe', 'Brennstoffzelle', 'Nah-/Fernwärme'], correct: [0, 1, 2, 3, 4, 5], explanation: 'Alle genannten Systeme werden im Bestand eingesetzt. Öl/Gas werden perspektivisch ungünstiger (CO2-Preis, fehlende Förderung). WP wird immer wichtiger, Wärmenetz standortabhängig.' },
+  { topic: 'anlagen', type: 'sc', q: 'Was kostet eine Wärmepumpe ungefähr bei Sanierung?', options: ['ca. 17.000 €', 'ca. 25.000 €', 'ca. 40.000 €', 'ca. 60.000 €'], correct: 2, explanation: 'Wärmepumpe ca. 40.000 €. Zum Vergleich: Öl/Gas je ca. 17.000 €, Biomasse ca. 36.000 €. WP ist im Altbau herausfordernd aber immer häufiger.' },
+  { topic: 'anlagen', type: 'sc', q: 'Was ist eine Brennstoffzelle?', options: ['Ein Verbrennungsmotor', 'Eine elektrochemische Reaktion von Sauerstoff und Wasserstoff (kalte Verbrennung)', 'Ein Wärmespeicher', 'Eine Solaranlage'], correct: 1, explanation: 'Brennstoffzelle: elektrochemische Reaktion (keine Verbrennung!). Energieträger: Erdgas/Biomethan. NT-BZ: 30-40% Strom + 50-55% Wärme. HT-BZ: 60-62% Strom + 25% Wärme. Gesamtwirkungsgrad bis 92%.' },
+  { topic: 'anlagen', type: 'mc', q: 'Warum ist Öl als Wärmeerzeuger perspektivisch ungünstig?', options: ['Keine Förderung mehr', 'CO2-Preis belastet zusätzlich', 'Im Bestand immer seltener', 'Technisch nicht mehr möglich', 'Ölheizungen sind verboten'], correct: [0, 1, 2], explanation: 'Öl: keine Förderung mehr, CO2-Preis steigt, im Bestand immer seltener. NICHT verboten, aber wirtschaftlich zunehmend ungünstig.' },
+
+  // HEIZLASTBERECHNUNG
+  { topic: 'heizlast', type: 'sc', q: 'Was ist der Unterschied zwischen Heizlast und Energiebilanz?', options: ['Heizlast = Jahresenergie, Energiebilanz = Momentanleistung', 'Heizlast = erforderliche Leistung am Auslegungspunkt (kW), Energiebilanz = Energiemenge über die Zeit (kWh)', 'Kein Unterschied', 'Heizlast gilt nur für Neubauten'], correct: 1, explanation: 'Heizlast = Leistung am kältesten Auslegungstag (W/kW) → Dimensionierung von Kessel und Heizflächen. Energiebilanz = Energiemenge über Heizperiode/Jahr (kWh) → Jahresverbrauch.' },
+  { topic: 'heizlast', type: 'sc', q: 'Wie wird die Normheizlast nach DIN EN 12831 berechnet?', options: ['Nur über das Gebäudevolumen', 'Raumweise: Transmissions- + Lüftungswärmeverluste', 'Nur über den U-Wert der Außenwand', 'Über den Jahresverbrauch'], correct: 1, explanation: 'Φ_HL,i = Φ_T,i + Φ_V,i + Φ_RH,i. Raumweise Berechnung: Transmissionswärmeverlust + Lüftungswärmeverlust (+ ggf. Aufheizleistung). Gebäudeheizlast = Summe aller Räume.' },
+  { topic: 'heizlast', type: 'sc', q: 'Was ist ein Referenzraum bei der Heizlastberechnung?', options: ['Der größte Raum', 'Ein thermisch ungünstiger, häufig genutzter Raum mit erhöhter Anforderung', 'Der Keller', 'Jeder beheizte Raum'], correct: 1, explanation: 'Referenzräume sind kritische Räume (thermisch ungünstig, häufig genutzt, erhöhte Solltemperatur). Z.B. Bad, große Kinderzimmer, Küche. NICHT innenliegende Flure oder Treppenhaus.' },
+  { topic: 'heizlast', type: 'sc', q: 'Kann man aus dem Jahresverbrauch den Wärmeerzeuger dimensionieren?', options: ['Ja, direkt', 'Nein, dafür braucht man die Heizlast', 'Ja, mit einem Faktor von 1,2', 'Nur bei Neubauten'], correct: 1, explanation: 'Für die Dimensionierung des Wärmeerzeugers ist die HEIZLAST (kW) maßgeblich, NICHT der Jahresverbrauch (kWh). Heizlast bestimmt die erforderliche Leistung am kältesten Tag.' },
+  { topic: 'heizlast', type: 'sc', q: 'Was passiert, wenn der Heizkörper bei 75/65°C 2625 W leistet und auf 50/38°C umgestellt wird?', options: ['Die Leistung bleibt gleich', 'Die Leistung sinkt auf ca. 1024 W (Korrekturfaktor ~0,39)', 'Die Leistung verdoppelt sich', 'Die Leistung sinkt auf 0'], correct: 1, explanation: 'Bei Absenkung von 75/65 auf 50/38°C: Korrekturfaktor ca. 0,39 → 2625 W × 0,39 ≈ 1024 W. Das ist weniger als die Hälfte! Deshalb muss bei niedrigen VL-Temperaturen geprüft werden, ob Heizflächen reichen.' },
+
+  // HYDRAULISCHER ABGLEICH
+  { topic: 'abgleich', type: 'sc', q: 'Was passiert ohne hydraulischen Abgleich?', options: ['Alle Räume werden gleichmäßig warm', 'Pumpennahe HK bekommen zu viel, entfernte zu wenig Durchfluss → Über-/Unterversorgung und Geräusche', 'Die Heizung schaltet sich ab', 'Der Energieverbrauch sinkt'], correct: 1, explanation: 'Ohne Abgleich: pumpennahe HK zu heiß + Pfeifgeräusche, entfernte HK zu kalt. Mit Abgleich: jeder HK bekommt genau den nötigen Durchfluss → Komfort + Effizienz.' },
+  { topic: 'abgleich', type: 'sc', q: 'Um wie viel Kelvin kann der hydraulische Abgleich die Vorlauftemperatur senken?', options: ['0 K', '3–7 K', '15–20 K', '30 K'], correct: 1, explanation: 'Hydraulischer Abgleich kann 3–7 K niedrigere Vorlauftemperaturen ermöglichen. Das ist besonders für Wärmepumpen wertvoll!' },
+  { topic: 'abgleich', type: 'mc', q: 'Was gehört zum hydraulischen Abgleich?', options: ['Heizflächen und Heizlasten erfassen', 'Systemtemperaturen festlegen', 'Über-/Unterdimensionierungsfaktor korrigieren', 'Massenstrom berechnen', 'Rohrdimensionierung durchführen', 'Thermostatventile alle gleich einstellen'], correct: [0, 1, 2, 3, 4], explanation: 'Hydraulischer Abgleich: Heizflächen erfassen, Systemtemp. festlegen, fu-Korrekturfaktor, Massenstrom berechnen, Rohrdimensionierung. NICHT "alle Ventile gleich einstellen"!' },
+  { topic: 'abgleich', type: 'mc', q: 'Welche Arten von Flächenheizungen gibt es?', options: ['Wandheizung', 'Deckenheizung', 'Fußbodenheizung', 'Dachheizung', 'Kellerheizung'], correct: [0, 1, 2], explanation: 'Drei Arten: Wand-, Decken- und Fußbodenheizung. Alle arbeiten mit niedrigen Vorlauftemperaturen. Im Denkmal: Eingriffstiefe, Substanzerhalt und Aufbauhöhe beachten!' },
+
+  // WÄRMEPUMPE
+  { topic: 'waermepumpe', type: 'sc', q: 'Was ist die Jahresarbeitszahl (JAZ) einer Wärmepumpe?', options: ['Die Anzahl der Betriebsstunden pro Jahr', 'Das Verhältnis von abgegebener Wärme zu eingesetztem Strom über das Jahr', 'Die maximale Vorlauftemperatur', 'Die Lebensdauer in Jahren'], correct: 1, explanation: 'JAZ = Wärme-AUSGANG / Strom-EINGANG über das gesamte Jahr. Effizienzziele: energie-effizient ab JAZ > 3,0, nennenswert effizient ab JAZ > 3,5.' },
+  { topic: 'waermepumpe', type: 'mc', q: 'Unter welchen Voraussetzungen ist eine Wärmepumpe im Denkmal möglich?', options: ['Heizlast muss genau ermittelt sein', 'Heizflächen müssen für niedrige Vorlauftemperaturen geeignet sein', 'Denkmalrechtliche Prüfung der Außeneinheit nötig', 'Hydraulischer Abgleich muss durchgeführt sein', 'Es muss immer eine Fußbodenheizung eingebaut werden'], correct: [0, 1, 2, 3], explanation: 'WP im Denkmal: Heizlast ermitteln, Heizflächen prüfen, niedrige VL-Temperaturen sicherstellen, hydraulischen Abgleich machen, Außeneinheit denkmalrechtlich klären. NICHT zwingend Fußbodenheizung!' },
+  { topic: 'waermepumpe', type: 'mc', q: 'Welche Wärmepumpen-Typen gibt es?', options: ['Luft-Wasser-Wärmepumpe', 'Sole-Wasser-Wärmepumpe', 'Wasser-Wasser-Wärmepumpe', 'Luft-Luft-Wärmepumpe', 'Brauchwasser-Wärmepumpe'], correct: [0, 1, 2, 3, 4], explanation: 'Alle fünf Typen existieren. Luft-Wasser am häufigsten, Sole-Wasser beste JAZ (4–5), Luft-Luft ohne wasserführendes System. Brauchwasser-WP nur für Warmwasser.' },
+  { topic: 'waermepumpe', type: 'sc', q: 'Welche Wärmepumpe hat die beste Jahresarbeitszahl?', options: ['Luft-Luft (JAZ 2,5)', 'Luft-Wasser (JAZ 2,5–4,5)', 'Sole-Wasser (JAZ 4–5)', 'Alle gleich'], correct: 2, explanation: 'Sole-Wasser: JAZ 4–5 (beste). Wasser-Wasser: JAZ 4–5. Luft-Wasser: JAZ 2,5–4,5. Luft-Luft: JAZ 2,5. Je konstanter die Wärmequelle, desto besser die JAZ.' },
+  { topic: 'waermepumpe', type: 'sc', q: 'Seit wann sind nur noch Kältemittel mit GWP ≤ 750 erlaubt?', options: ['Seit 2020', 'Seit 2025', 'Seit 2030', 'Es gibt keine Begrenzung'], correct: 1, explanation: 'Seit 2025: nur noch Kältemittel mit GWP ≤ 750. Natürliche Kältemittel: R717 (Ammoniak, GWP 0), R744 (CO2, GWP 1), R290 (Propan, GWP 3, aber brennbar!).' },
+
+  // HEIZFLÄCHEN
+  { topic: 'heizflaechen', type: 'sc', q: 'Warum können kleine alte Heizkörper ein Problem für Wärmepumpen sein?', options: ['Sie verbrauchen zu viel Strom', 'Sie liefern bei niedrigen Vorlauftemperaturen zu wenig Leistung', 'Sie sind nicht wasserführend', 'Sie sind zu schwer'], correct: 1, explanation: 'Kleine Heizkörper brauchen hohe VL-Temperaturen für ausreichende Leistung. WP braucht niedrige VL-Temperaturen für gute JAZ. Lösung: größere HK, Niedertemperatur-HK oder Flächenheizung.' },
+  { topic: 'heizflaechen', type: 'sc', q: 'Stimmt es, dass Wärmepumpen nur mit Fußbodenheizung funktionieren?', options: ['Ja, immer', 'Nein — auch Heizkörper können reichen, wenn Heizlast und Heizfläche passen', 'Ja, im Altbau immer', 'Nein, WP braucht gar keine Heizflächen'], correct: 1, explanation: 'Nicht jeder Altbau braucht Fußbodenheizung! Große alte Heizkörper können bei VL um 40°C noch ausreichen. Entscheidend: Heizlast, Heizfläche und VL-Temperatur müssen zusammenpassen.' },
+  { topic: 'heizflaechen', type: 'sc', q: 'Warum ist Fußbodenheizung im Denkmal oft kritisch?', options: ['Weil sie zu teuer ist', 'Wegen Eingriffen in historische Böden, Aufbauhöhen, Türanschlüsse und konstruktive Schichten', 'Weil sie nicht funktioniert', 'Weil sie nur mit Gas betrieben werden kann'], correct: 1, explanation: 'Im Denkmal: historische Böden, Aufbauhöhen (Türanschlüsse!), Treppen, Sockel, konstruktive Schichten. Wandheizung oder Deckenheizung oft bessere Alternative.' },
+  { topic: 'heizflaechen', type: 'sc', q: 'Was ist die witterungsgeführte Regelung?', options: ['Die Heizung wird nach Wetterbericht gesteuert', 'Die Vorlauftemperatur wird automatisch an die Außentemperatur angepasst', 'Die Fenster werden automatisch geöffnet', 'Der Thermostat wird vom Vermieter eingestellt'], correct: 1, explanation: 'Witterungsgeführte Regelung: Außentemperaturfühler → zentrales Regelgerät → passt Vorlauftemperatur automatisch an. Je kälter draußen, desto höher der Vorlauf. Heizkurve bestimmt den Zusammenhang.' },
+
+  // LÜFTUNG
+  { topic: 'lueftung', type: 'sc', q: 'Warum ist nach einer Modernisierung ein Lüftungskonzept nötig?', options: ['Weil es gesetzlich vorgeschrieben ist', 'Weil die Dichtheit steigt und natürliche Lüftung nicht mehr ausreicht', 'Weil die Heizung sonst nicht funktioniert', 'Weil die Fenster kleiner werden'], correct: 1, explanation: 'Nach Modernisierung (neue Fenster, Dichtungen): höhere Luftdichtheit → natürliche Lüftung reicht oft nicht mehr → Feuchteschäden, Schadstoffe, schlechte Luft. Lüftungskonzept muss mitgedacht werden!' },
+  { topic: 'lueftung', type: 'mc', q: 'Was muss bei der Raumlüftung im Denkmal beachtet werden?', options: ['Anforderungen an Luftdichtheit (Blower-Door)', 'Lüftung über Fenster oder Bauhülle möglich?', 'Abluftanlage für Küche/Bad nötig?', 'Historische Substanz nicht schädigen', 'Zentrale Zu-/Abluft mit Wärmerückgewinnung immer einbauen'], correct: [0, 1, 2, 3], explanation: 'Im Denkmal: Dichtheit prüfen, Fensterlüftung/Bauhülle nutzen, Abluft Küche/Bad, Substanz schonen. NICHT automatisch zentrale Anlage — denkmalverträgliche Strategie suchen!' },
+
+  // WIRTSCHAFTLICHKEIT
+  { topic: 'wirtschaft', type: 'mc', q: 'Welche „kleinen" Maßnahmen bringen schnelle Energieeinsparung?', options: ['Rohrdämmung', 'Pumpentausch (Hocheffizienzpumpe)', 'Nachtabsenkung der Temperatur', 'Heizkurvenanpassung', 'Komplettsanierung der Fassade'], correct: [0, 1, 2, 3], explanation: 'Kleine wirksame Maßnahmen: Rohrdämmung, Pumpentausch, Temperaturabsenkung, Heizkurvenanpassung. Fassadensanierung ist eine GROSSE Maßnahme.' },
+  { topic: 'wirtschaft', type: 'sc', q: 'Welche EE-Anteile gelten für neue Heizungen mit fossilen Brennstoffen?', options: ['Ab 2029: 15%, ab 2035: 30%, ab 2040: 60%', 'Sofort 100%', 'Keine Anforderung', 'Ab 2030: 50%'], correct: 0, explanation: 'Stufenplan fossile Heizungen: ab 2029 → 15% EE (aktualisiert auf 10%), ab 2035 → 30%, ab 2040 → 60%. Bestandsheizungen dürfen bis 2045 ohne EE-Pflicht repariert werden.' },
+
+  // VERSORGUNGSKONZEPTE
+  { topic: 'versorgung', type: 'sc', q: 'Was ist die kommunale Wärmeplanung?', options: ['Ein privater Heizungsplan', 'Eine gesetzliche Pflicht für Kommunen bis 30.06.2028, die die Wärmeversorgung strategisch plant', 'Ein freiwilliges Programm', 'Eine EU-Richtlinie für Industriegebäude'], correct: 1, explanation: 'Kommunale Wärmeplanung: Pflicht bis 30.06.2028. Plant strategisch, welche Gebiete per Wärmenetz, Wärmepumpe oder andere Systeme versorgt werden. Hat Einfluss auf Sanierungsentscheidungen!' },
+  { topic: 'versorgung', type: 'sc', q: 'Was muss bei der Wahl des Wärmeerzeugers IMMER mitgedacht werden?', options: ['Nur der Preis', 'Standort, kommunale Wärmeplanung, Wärmenetz-Option, Heizflächen und Gebäudezustand', 'Nur die Marke des Herstellers', 'Nur der CO2-Ausstoß'], correct: 1, explanation: 'Wärmeerzeuger nie isoliert bewerten! Immer: Standort, Wärmeplanung, Netz-Option, dezentrale Alternativen, Heizflächen, Gebäudezustand und Denkmalschutz mitdenken.' },
+  { topic: 'versorgung', type: 'mc', q: 'Welche Hybrid-Kombinationen gibt es?', options: ['Heizkessel + Solarthermie', 'Heizkessel + Wärmepumpe', 'Wärmepumpe + Photovoltaik', 'Kamin (wasserführend) + Wärmepumpe', 'Fernwärme + Photovoltaik'], correct: [0, 1, 2, 3, 4], explanation: 'Alle genannten Hybridkombinationen sind möglich. Grundidee: WP/EE deckt Grundlast, Spitzenlastwärmeerzeuger nur bei Bedarf. Hybrid ist Übergangs- oder Dauerlösung im Bestand.' },
+
+  // WARMWASSER & SPEICHER
+  { topic: 'warmwasser', type: 'sc', q: 'Was ist eine Frischwasserstation?', options: ['Ein Kaltwasseranschluss', 'Warmwasser wird bei Bedarf über einen Wärmetauscher erwärmt statt in großer Menge heiß gespeichert', 'Eine Regenwassernutzung', 'Ein Filtergerät'], correct: 1, explanation: 'Frischwasserstation: Trinkwarmwasser wird erst bei Bedarf über Wärmetauscher erwärmt → Pufferspeicher kann auf niedrigerem Temperaturniveau bleiben → besser für WP-Effizienz.' },
+  { topic: 'warmwasser', type: 'sc', q: 'Wovon hängt die speicherbare Energie eines Pufferspeichers ab?', options: ['Nur vom Material', 'Von Volumen und Temperaturdifferenz (Q = V · ρ · c · ΔT)', 'Nur von der Dämmung', 'Nur von der Höhe'], correct: 1, explanation: 'Q = V · ρ · c · ΔT. Mehr Volumen und größere Temperaturspreizung = mehr Speicherenergie. Niedrigere Maximaltemperatur = weniger Speicherenergie.' },
+  { topic: 'warmwasser', type: 'mc', q: 'Wozu dient ein Pufferspeicher bei einer Wärmepumpe?', options: ['Längere Laufzeiten des Kompressors', 'Weniger Taktung', 'Überbrückung von Sperrzeiten', 'Einbindung eines Heizstabs', 'Lastspitzen abfangen'], correct: [0, 1, 2, 3, 4], explanation: 'Pufferspeicher bei WP: längere Laufzeiten, weniger Taktung, Sperrzeiten überbrücken, Heizstab einbinden, Lastspitzen puffern. ABER: auch Speicherverluste beachten!' },
+  { topic: 'warmwasser', type: 'sc', q: 'Wie viel Prozent des WW-Bedarfs entfällt auf Bad/Dusche?', options: ['25%', '40%', '60%', '80%'], correct: 2, explanation: 'WW-Anteile im Haushalt: Bad/Dusche 60%, Küche 25%, Handwaschbecken 15%.' },
+
+  // LEBENSZYKLUS
+  { topic: 'lebenszyklus', type: 'sc', q: 'Was bedeutet Lebenszyklusbetrachtung bei der Anlagentechnik?', options: ['Nur die Anschaffungskosten betrachten', 'Ressourcen, Emissionen und Kosten über die gesamte Lebensdauer des Systems bewerten', 'Nur die Lebensdauer der Heizung', 'Die Lebensdauer des Gebäudes ignorieren'], correct: 1, explanation: 'Lebenszyklusbetrachtung: nicht nur Anschaffung, sondern Betrieb, Wartung, Emissionen und Entsorgung über die gesamte Nutzungsdauer. Gebäude als Wärmespeicher mitdenken!' },
+
+  // FREITEXTFRAGEN
+  { topic: 'anlagen', type: 'ft', q: 'Warum soll bei einer Sanierung zuerst die Gebäudehülle und danach die Heizung betrachtet werden?', keywords: ['hülle', 'heizlast', 'bedarf', 'senk', 'dimensionier', 'teillast', 'ineffizient', 'überdimensio', 'bedarfsgerecht', 'erst', 'dann'], sampleAnswer: 'Zuerst die Gebäudehülle verbessern, weil dadurch die Heizlast sinkt. Erst danach kann die Heizung bedarfsgerecht dimensioniert werden. Wird zuerst die Heizung eingebaut und dann die Hülle verbessert, arbeitet die Anlage in tiefer Teillast und damit ineffizient.' },
+  { topic: 'waermepumpe', type: 'ft', q: 'Unter welchen Voraussetzungen ist eine Luft-Wasser-Wärmepumpe im Baudenkmal möglich?', keywords: ['heizlast', 'heizfläche', 'vorlauf', 'temperatur', 'niedrig', 'außeneinheit', 'denkmal', 'abgleich', 'hydraul', 'hülle', 'genehmigung', 'prüf'], sampleAnswer: 'Grundsätzlich möglich, aber: 1) Heizlast genau ermitteln, 2) Heizflächen prüfen — zu kleine HK = zu hohe VL-Temp = schlechte JAZ, 3) Ggf. größere Heizflächen oder Hüllsanierung, 4) Hydraulischen Abgleich durchführen, 5) Aufstellung der Außeneinheit denkmalrechtlich klären (Erscheinungsbild, Schall).' },
+  { topic: 'abgleich', type: 'ft', q: 'Erläutern Sie den Unterschied zwischen Heizlast und Energiebilanz.', keywords: ['leistung', 'kw', 'kwh', 'auslegung', 'kält', 'jahres', 'energiemenge', 'zeit', 'dimensionier', 'heizfläche', 'kessel'], sampleAnswer: 'Die Heizlast ist die notwendige Wärmeleistung am Normauslegungspunkt (W/kW) — zur Dimensionierung von Kessel, Heizflächen und Verteilung. Die Energiebilanz beschreibt die Energiemenge über einen Zeitraum (kWh/a) — für den Jahresverbrauch. Heizlast = Leistungsgröße, Energiebilanz = Arbeitsgröße.' },
+  { topic: 'versorgung', type: 'ft', q: 'Welche Wärmeversorgung empfehlen Sie für ein Baudenkmal in Freiburg? Begründen Sie Ihre Empfehlung.', keywords: ['wärmenetz', 'fernwärme', 'wärmepumpe', 'biomasse', 'standort', 'kommunal', 'wärmeplanung', 'heizfläche', 'vorlauf', 'denkmal', 'pellet', 'solar'], sampleAnswer: 'Erst kommunale Wärmeplanung prüfen: Ist Wärmenetz/Fernwärme geplant? → erste Option prüfen. Falls nicht: Wärmepumpe möglich wenn Heizflächen und VL-Temperaturen passen + Außeneinheit denkmalverträglich. Biomasse (Pellets) als Alternative bei Brennstofflagerung und Abgasweg. Immer: Standort, Netzperspektive, Heizflächen und Denkmalbelange abwägen.' },
+  { topic: 'heizflaechen', type: 'ft', q: 'Welche Möglichkeiten gibt es, die Vorlauftemperatur in einem Bestandsgebäude zu senken?', keywords: ['heizfläche', 'größer', 'hülle', 'dämm', 'abgleich', 'hydraul', 'heizkurve', 'regelung', 'niedertemperatur', 'fläche'], sampleAnswer: '1) Heizlast senken durch Hüllverbesserung, 2) Heizflächen vergrößern (größere HK, Niedertemperatur-HK, Flächenheizung), 3) Hydraulischen Abgleich durchführen (3–7 K Absenkung möglich), 4) Heizkurve und Regelung optimieren, 5) Wärmeübergabe insgesamt verbessern.' },
+];
+
+// FLASHCARDS DATA
+const flashcards = [
+  { topic: 'anlagen', front: 'Erst Hülle, dann Heizung?', back: '<ul><li>Grundsatz: <strong>Erst Gebäudehülle</strong> sanieren</li><li>Dann <strong>bedarfsgerecht</strong> Heizung dimensionieren</li><li>Heizungen in tiefer Teillast = ineffizient</li><li>Erst Bedarf senken, dann Erzeuger wählen</li></ul>' },
+  { topic: 'anlagen', front: 'Wärmeerzeuger im Bestand?', back: '<ul><li><strong>Öl:</strong> keine Förderung, CO2-Preis (~17.000€)</li><li><strong>Gas:</strong> Netzverdichtung, keine Förderung (~17.000€)</li><li><strong>Biomasse:</strong> Pellets, Lagerung beachten (~36.000€)</li><li><strong>Wärmepumpe:</strong> im Altbau herausfordernd (~40.000€)</li><li><strong>Wärmenetz:</strong> standortabhängig, Wärmeplanung prüfen</li></ul>' },
+  { topic: 'heizlast', front: 'Heizlast vs. Energiebilanz?', back: '<ul><li><strong>Heizlast:</strong> Leistung am kältesten Tag (W/kW)</li><li>→ Dimensionierung Kessel + Heizflächen</li><li><strong>Energiebilanz:</strong> Energiemenge über das Jahr (kWh)</li><li>→ Jahresverbrauch, Kosten</li><li>kW ≠ kWh!</li></ul>' },
+  { topic: 'heizlast', front: 'Normheizlast Raum?', back: '<ul><li><strong>Φ_HL = Φ_T + Φ_V + Φ_RH</strong></li><li>Φ_T = Transmissionswärmeverlust</li><li>Φ_V = Lüftungswärmeverlust</li><li>Φ_RH = Aufheizleistung</li><li>Raumweise berechnen!</li><li>Gebäude = Summe aller Räume</li></ul>' },
+  { topic: 'heizlast', front: 'Heizkörperleistungskorrektur?', back: '<ul><li>HK-Leistung hängt von <strong>Systemtemperatur</strong> ab</li><li>75/65°C → 50/38°C: Faktor <strong>~0,39</strong></li><li>2625 W wird zu nur ~1024 W!</li><li>Umkehrfaktor: 2,56 (brauche 2,56× größeren HK)</li><li>→ Immer prüfen bei VL-Absenkung!</li></ul>' },
+  { topic: 'abgleich', front: 'Hydraulischer Abgleich?', back: '<ul><li><strong>Ohne:</strong> vorne zu warm, hinten zu kalt, Geräusche</li><li><strong>Mit:</strong> jeder HK bekommt genau den nötigen Durchfluss</li><li>Kann VL-Temperatur um <strong>3–7 K senken</strong></li><li>Wichtig für WP-Effizienz!</li><li>≠ „alle Ventile gleich einstellen"</li></ul>' },
+  { topic: 'waermepumpe', front: 'JAZ — Jahresarbeitszahl?', back: '<ul><li><strong>JAZ = Wärme-Output / Strom-Input</strong> (übers Jahr)</li><li>Energie-effizient: JAZ > 3,0</li><li>Nennenswert effizient: JAZ > 3,5</li><li>Luft-Wasser: JAZ 2,5–4,5</li><li>Sole-Wasser: JAZ 4–5 (beste)</li><li>Niedrige VL-Temp → bessere JAZ</li></ul>' },
+  { topic: 'waermepumpe', front: 'WP im Denkmal — Bedingungen?', back: '<ul><li>1) <strong>Heizlast</strong> genau ermitteln</li><li>2) <strong>Heizflächen</strong> für niedrige VL geeignet?</li><li>3) <strong>Hydraulischer Abgleich</strong></li><li>4) <strong>Außeneinheit</strong> denkmalrechtlich klären</li><li>5) Ggf. Hülle erst verbessern</li><li>Nie pauschal „geht" oder „geht nicht"!</li></ul>' },
+  { topic: 'waermepumpe', front: 'Kältemittel seit 2025?', back: '<ul><li>Nur noch <strong>GWP ≤ 750</strong> erlaubt</li><li>R290 (Propan): GWP 3 (aber brennbar!)</li><li>R744 (CO2): GWP 1</li><li>R717 (Ammoniak): GWP 0</li><li>R32: GWP 675 (knapp unter Grenze)</li><li>Kältemittel ≠ Frostschutzmittel (Glykol in Sole)</li></ul>' },
+  { topic: 'heizflaechen', front: 'Flächenheizung im Denkmal?', back: '<ul><li><strong>Wandheizung:</strong> niedrige VL, große Fläche, aber historische Wände?</li><li><strong>Deckenheizung:</strong> oft gut wenn Wände sensibel</li><li><strong>Fußbodenheizung:</strong> sehr niedrige VL, aber Aufbauhöhe!</li><li>Im Denkmal: Eingriffstiefe entscheidet</li><li>Energetisch gut ≠ automatisch denkmalverträglich</li></ul>' },
+  { topic: 'lueftung', front: 'Lüftungskonzept nach Sanierung?', back: '<ul><li>Dichtheit steigt → natürliche Lüftung reicht nicht</li><li>Feuchte, Schadstoffe, CO2 müssen abgeführt werden</li><li>Im Denkmal: <strong>vorhandene Struktur nutzen</strong></li><li>Nicht automatisch zentrale Anlage</li><li>Abluft Küche/Bad oft wichtigster Schritt</li></ul>' },
+  { topic: 'versorgung', front: 'Kommunale Wärmeplanung?', back: '<ul><li>Pflicht für Kommunen bis <strong>30.06.2028</strong></li><li>Plant: Wärmenetz, WP, Biomasse pro Gebiet</li><li><strong>Hat Einfluss</strong> auf Sanierungsentscheidungen!</li><li>Immer prüfen vor Wärmeerzeuger-Wahl</li><li>Freiburg: Wärmenetz zentral, dezentral WP/Biomasse</li></ul>' },
+  { topic: 'warmwasser', front: 'Frischwasserstation?', back: '<ul><li>WW wird <strong>bei Bedarf</strong> über Wärmetauscher erwärmt</li><li>Nicht in großer Menge heiß gespeichert</li><li>Puffer kann auf <strong>niedrigerem Niveau</strong> bleiben</li><li>Besser für WP-Effizienz</li><li>Auch mit Zirkulation möglich</li></ul>' },
+  { topic: 'warmwasser', front: 'Pufferspeicher — Formel?', back: '<ul><li><strong>Q = V · ρ · c · ΔT</strong></li><li>Mehr Volumen = mehr Speicher</li><li>Größere Temperaturspreizung = mehr Speicher</li><li>Nutzen: Taktung reduzieren, Laufzeiten verlängern</li><li>Aber: auch <strong>Speicherverluste</strong> beachten!</li></ul>' },
+  { topic: 'wirtschaft', front: 'Kleine wirksame Maßnahmen?', back: '<ul><li>1) <strong>Rohrdämmung</strong></li><li>2) <strong>Pumpentausch</strong> (Hocheffizienzpumpe)</li><li>3) <strong>Nachtabsenkung</strong></li><li>4) <strong>Heizkurvenanpassung</strong></li><li>Schnell, günstig, messbar wirksam</li></ul>' },
+  { topic: 'anlagen', front: 'Fossile Heizungen — EE-Pflicht?', back: '<ul><li>Ab 2029: <strong>15%</strong> (bzw. 10%) EE-Anteil</li><li>Ab 2035: <strong>30%</strong></li><li>Ab 2040: <strong>60%</strong></li><li>Bestandsanlagen: bis 2045 ohne EE-Pflicht reparierbar</li><li>Neue fossile Heizungen DÜRFEN noch, mit EE-Anteil</li></ul>' },
+  { topic: 'versorgung', front: 'Hybrid-Logik?', back: '<ul><li>WP deckt <strong>Grundlast</strong> effizient (niedrige Temp.)</li><li>Spitzenlast: Brennwertkessel, Heizstab, Biomasse</li><li>Sinnvoll bei teilsaniertem Bestand</li><li>Hydraulik muss stimmen!</li><li>WP darf nicht von hoher Temp. „abgewürgt" werden</li></ul>' },
+  { topic: 'heizflaechen', front: 'Vorlauftemperaturen senken?', back: '<ul><li>1) Heizlast senken (Hülle verbessern)</li><li>2) Heizflächen vergrößern</li><li>3) <strong>Hydraulischer Abgleich</strong> (3–7 K möglich)</li><li>4) Heizkurve optimieren</li><li>VL-Absenkung = kein Wunschwert, sondern Ergebnis des Gesamtsystems</li></ul>' },
+  { topic: 'lebenszyklus', front: 'Gebäude als Wärmespeicher?', back: '<ul><li>Gebäude + Komponenten = <strong>Kurzzeitspeicher</strong></li><li>Stunden bis mehrere Tage</li><li>Flexibilisierung im Wärmemarkt</li><li>Wärmespeicher, WP, KWK zusammendenken</li><li>Lebenszyklusbetrachtung: nicht nur Anschaffung!</li></ul>' },
+  { topic: 'anlagen', front: 'Systemtemperaturen — Überblick?', back: '<ul><li><strong>90/70°C:</strong> alte Systeme (veralteter Kessel)</li><li><strong>75/65°C:</strong> Brennwertkessel Standard</li><li><strong>55/45°C:</strong> Brennwert niedrig / WP möglich</li><li><strong>40/30°C:</strong> WP-optimiert</li><li><strong>35/28°C:</strong> Fußbodenheizung ideal</li><li>Je niedriger → bessere WP-Effizienz</li></ul>' },
+];
+
+// ===== STATE =====
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {},
+  currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: 1800,
+  selectedOptions: new Set(),
+};
+
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+
+try {
+  const saved = localStorage.getItem('denkmal-block3-state');
+  if (saved) {
+    const s = JSON.parse(saved);
+    state.answered = s.answered || 0;
+    state.correct = s.correct || 0;
+    state.streak = s.streak || 0;
+    state.maxStreak = s.maxStreak || 0;
+    if (s.topicScores) state.topicScores = s.topicScores;
+  }
+} catch(e) {}
+
+function saveState() {
+  try {
+    localStorage.setItem('denkmal-block3-state', JSON.stringify({
+      answered: state.answered, correct: state.correct,
+      streak: state.streak, maxStreak: state.maxStreak,
+      topicScores: state.topicScores
+    }));
+  } catch(e) {}
+}
+
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => {
+    if (b.textContent.toLowerCase().includes(
+      id === 'dashboard' ? 'dashboard' : id === 'quiz' ? 'quiz' : id === 'flashcards' ? 'karte' : id === 'exam' ? 'prüf' : 'fallen'
+    )) b.classList.add('active');
+  });
+  if (id === 'dashboard') updateDashboard();
+  if (id === 'flashcards') initFlashcards();
+}
+
+// ===== DASHBOARD =====
+function updateDashboard() {
+  document.getElementById('stat-answered').textContent = state.answered;
+  document.getElementById('stat-correct').textContent = state.correct;
+  document.getElementById('stat-rate').textContent = state.answered > 0 ? Math.round(state.correct / state.answered * 100) + '%' : '--';
+  document.getElementById('stat-streak').textContent = state.streak;
+
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = topics.map(t => {
+    const s = state.topicScores[t.id];
+    const rate = s.answered > 0 ? Math.round(s.correct / s.answered * 100) : -1;
+    const rateText = rate >= 0 ? rate + '%' : 'Noch nicht geübt';
+    const color = rate < 0 ? '#999' : rate >= 70 ? 'var(--success)' : rate >= 40 ? 'var(--gold)' : 'var(--warn)';
+    return `<div class="topic-card" onclick="startQuiz('${t.id}')">
+      <div class="icon">${t.icon}</div>
+      <h4>${t.name}</h4>
+      <div class="score" style="color:${color}">${rateText}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== QUIZ =====
+function buildTopicFilter(containerId, defaultAll) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = `<button class="topic-btn ${defaultAll ? 'active' : ''}" data-topic="all" onclick="toggleTopic(this)">Alle</button>` +
+    topics.map(t => `<button class="topic-btn" data-topic="${t.id}" onclick="toggleTopic(this)">${t.icon} ${t.name}</button>`).join('');
+}
+
+function toggleTopic(btn) {
+  const container = btn.parentElement;
+  if (btn.dataset.topic === 'all') {
+    container.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    container.querySelector('[data-topic="all"]').classList.remove('active');
+    btn.classList.toggle('active');
+    if (!container.querySelector('.topic-btn.active')) {
+      container.querySelector('[data-topic="all"]').classList.add('active');
+    }
+  }
+}
+
+function getSelectedTopics(containerId) {
+  const btns = document.querySelectorAll(`#${containerId} .topic-btn.active`);
+  const ids = [...btns].map(b => b.dataset.topic);
+  if (ids.includes('all')) return topics.map(t => t.id);
+  return ids;
+}
+
+function startQuiz(topicOrMode) {
+  showSection('quiz');
+  let pool;
+  if (topicOrMode === 'all') {
+    pool = [...questions];
+  } else if (topicOrMode === 'weak') {
+    const weakTopics = topics.filter(t => {
+      const s = state.topicScores[t.id];
+      return s.answered === 0 || (s.correct / s.answered) < 0.7;
+    }).map(t => t.id);
+    pool = questions.filter(q => weakTopics.includes(q.topic));
+    if (pool.length === 0) pool = [...questions];
+  } else {
+    pool = questions.filter(q => q.topic === topicOrMode);
+  }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function startQuizFromFilter() {
+  const selectedTopics = getSelectedTopics('quiz-topic-filter');
+  let pool = questions.filter(q => selectedTopics.includes(q.topic));
+  if (pool.length === 0) { alert('Keine Fragen für diese Auswahl.'); return; }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  document.getElementById('quiz-progress').style.width = ((state.quizIndex / total) * 100) + '%';
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+  const typeClass = q.type;
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${typeClass}">${typeLabel}</span>
+      <span class="q-num">${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  html += `<div class="feedback" id="quiz-feedback"></div>`;
+  document.getElementById('quiz-card').innerHTML = html;
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="checkAnswer()">Prüfen</button>
+    <button class="btn btn-outline" onclick="skipQuestion()" style="margin-left:auto;">Überspringen</button>
+  `;
+}
+
+function selectOption(el, idx, type) {
+  if (document.getElementById('quiz-feedback').classList.contains('show')) return;
+  if (type === 'sc') {
+    document.querySelectorAll('#options-list .option').forEach(o => o.classList.remove('selected'));
+    state.selectedOptions = new Set([idx]);
+    el.classList.add('selected');
+  } else {
+    if (state.selectedOptions.has(idx)) {
+      state.selectedOptions.delete(idx);
+      el.classList.remove('selected');
+    } else {
+      state.selectedOptions.add(idx);
+      el.classList.add('selected');
+    }
+  }
+}
+
+function checkAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  const fb = document.getElementById('quiz-feedback');
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    const selected = [...state.selectedOptions][0];
+    isCorrect = selected === q.correct;
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (i === q.correct) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && i !== q.correct) o.classList.add('wrong');
+    });
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (correctSet.has(i)) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && !correctSet.has(i)) o.classList.add('wrong');
+    });
+  } else {
+    const answer = document.getElementById('ft-answer').value.toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+    fb.innerHTML = `<strong>${isCorrect ? 'Gut!' : 'Verbesserungsbedarf'} (${matched.length}/${q.keywords.length} Schlüsselbegriffe)</strong>
+      <p style="margin-top:0.5rem;"><strong>Musterantwort:</strong> ${q.sampleAnswer}</p>
+      <p style="margin-top:0.3rem; font-size:0.85rem; color:var(--muted);">Erkannte Begriffe: ${matched.length > 0 ? matched.join(', ') : 'keine'}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  if (q.type !== 'ft') {
+    fb.innerHTML = `<strong>${isCorrect ? 'Richtig!' : 'Falsch!'}</strong><p>${q.explanation}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) {
+    state.correct++;
+    state.streak++;
+    state.maxStreak = Math.max(state.maxStreak, state.streak);
+    state.topicScores[q.topic].correct++;
+  } else {
+    state.streak = 0;
+  }
+  state.quizAnswers.push(isCorrect);
+  saveState();
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="nextQuizQuestion()">Weiter</button>
+  `;
+}
+
+function skipQuestion() {
+  state.quizAnswers.push(null);
+  nextQuizQuestion();
+}
+
+function nextQuizQuestion() {
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    showQuizResults();
+  } else {
+    showQuizQuestion();
+  }
+}
+
+function showQuizResults() {
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const skipped = state.quizAnswers.filter(a => a === null).length;
+  const wrong = total - correct - skipped;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'block';
+  document.getElementById('quiz-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Ergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'Bestanden' : 'Nicht bestanden'}</small>
+    </div>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${wrong}</div><div class="label">Falsch</div></div>
+      <div class="stat"><div class="num" style="color:var(--muted)">${skipped}</div><div class="label">Übersprungen</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-primary" onclick="resetQuiz()">Neues Quiz</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="showSection('dashboard')">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-filter-card').style.display = 'block';
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'none';
+}
+
+// ===== FLASHCARDS =====
+function initFlashcards(topicFilter) {
+  const selectedTopics = topicFilter || topics.map(t => t.id);
+  state.currentFC = flashcards.filter(fc => selectedTopics.includes(fc.topic));
+  shuffle(state.currentFC);
+  state.fcIndex = 0;
+  state.fcFlipped = false;
+  showFlashcard();
+}
+
+function showFlashcard() {
+  if (state.currentFC.length === 0) return;
+  const fc = state.currentFC[state.fcIndex];
+  document.getElementById('fc-question').textContent = fc.front;
+  document.getElementById('fc-answer').innerHTML = fc.back;
+  document.getElementById('flashcard').classList.remove('flipped');
+  state.fcFlipped = false;
+  document.getElementById('fc-counter').textContent = `${state.fcIndex + 1} / ${state.currentFC.length}`;
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+  state.fcFlipped = !state.fcFlipped;
+}
+
+function nextCard() {
+  state.fcIndex = (state.fcIndex + 1) % state.currentFC.length;
+  showFlashcard();
+}
+
+function prevCard() {
+  state.fcIndex = (state.fcIndex - 1 + state.currentFC.length) % state.currentFC.length;
+  showFlashcard();
+}
+
+function markCardKnown() {
+  if (state.currentFC.length <= 1) { nextCard(); return; }
+  state.currentFC.splice(state.fcIndex, 1);
+  if (state.fcIndex >= state.currentFC.length) state.fcIndex = 0;
+  showFlashcard();
+}
+
+function markCardUnknown() {
+  nextCard();
+}
+
+// ===== EXAM =====
+function startExam() {
+  let pool = [...questions];
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, 15);
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  state.examActive = true;
+  state.examTimeLeft = 1800;
+
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-area').style.display = 'block';
+  document.getElementById('exam-results').style.display = 'none';
+
+  showExamQuestion();
+  startExamTimer();
+}
+
+function startExamTimer() {
+  clearInterval(state.examTimer);
+  state.examTimer = setInterval(() => {
+    state.examTimeLeft--;
+    const min = Math.floor(state.examTimeLeft / 60);
+    const sec = state.examTimeLeft % 60;
+    const el = document.getElementById('exam-timer');
+    el.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    el.classList.toggle('warning', state.examTimeLeft <= 300);
+    document.getElementById('exam-progress').style.width = ((1800 - state.examTimeLeft) / 1800 * 100) + '%';
+    if (state.examTimeLeft <= 0) {
+      clearInterval(state.examTimer);
+      finishExam();
+    }
+  }, 1000);
+}
+
+function showExamQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${q.type}">${typeLabel}</span>
+      <span class="q-num">Frage ${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  document.getElementById('exam-card').innerHTML = html;
+  document.getElementById('exam-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="submitExamAnswer()">Antwort abgeben</button>
+    ${state.quizIndex < total - 1 ? '<button class="btn btn-outline" onclick="skipExamQuestion()" style="margin-left:auto;">Überspringen</button>' : ''}
+  `;
+}
+
+function submitExamAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    isCorrect = [...state.selectedOptions][0] === q.correct;
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+  } else {
+    const answer = (document.getElementById('ft-answer')?.value || '').toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+  }
+
+  state.quizAnswers.push(isCorrect);
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) { state.correct++; state.topicScores[q.topic].correct++; }
+  saveState();
+
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function skipExamQuestion() {
+  state.quizAnswers.push(null);
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function finishExam() {
+  clearInterval(state.examTimer);
+  state.examActive = false;
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+  const timeUsed = 1800 - state.examTimeLeft;
+  const min = Math.floor(timeUsed / 60);
+  const sec = timeUsed % 60;
+
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'block';
+  document.getElementById('exam-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Prüfungsergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'BESTANDEN' : 'NICHT BESTANDEN'}</small>
+    </div>
+    <p style="text-align:center; margin-top:0.5rem; color:var(--muted);">Zeit: ${min}:${sec.toString().padStart(2, '0')} / 30:00</p>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${total - correct}</div><div class="label">Falsch/Übersprungen</div></div>
+      <div class="stat"><div class="num">${total}</div><div class="label">Gesamt</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-gold" onclick="resetExam(); startExam();">Nochmal</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="resetExam(); showSection('dashboard');">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetExam() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'none';
+}
+
+// ===== UTILS =====
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ===== INIT =====
+buildTopicFilter('quiz-topic-filter', true);
+buildTopicFilter('fc-topic-filter', true);
+updateDashboard();
+initFlashcards();
+
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('flashcards').classList.contains('active')) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+    if (e.key === 'ArrowRight') nextCard();
+    if (e.key === 'ArrowLeft') prevCard();
+  }
+});
+</script>
+</body>
+</html>

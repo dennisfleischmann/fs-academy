@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Denkmalschutz Block 1 - Interaktives Lernen</title>
+<style>
+  :root {
+    --primary: #035357;
+    --accent: #50D2CA;
+    --gold: #C59B00;
+    --warn: #c00;
+    --success: #2e7d32;
+    --bg: #f5f5f0;
+    --card: #fff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0e0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+  header p { font-size: 0.9rem; opacity: 0.85; }
+
+  /* Navigation */
+  .nav {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav button {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--accent); color: var(--primary); }
+  .nav button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  /* Main */
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  /* Sections hidden by default */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Progress bar */
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat .num {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat .label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* Quiz */
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .q-type {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .q-type.sc { background: #e3f2fd; color: #1565c0; }
+  .q-type.mc { background: #f3e5f5; color: #7b1fa2; }
+  .q-type.ft { background: #fff3e0; color: #e65100; }
+  .q-num { font-size: 0.85rem; color: var(--muted); }
+  .q-topic { font-size: 0.75rem; color: var(--accent); margin-bottom: 0.5rem; }
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 0.5rem; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .option:hover { border-color: var(--accent); background: #f8fffe; }
+  .option.selected { border-color: var(--primary); background: #e8f5f5; }
+  .option.correct { border-color: var(--success); background: #e8f5e9; }
+  .option.wrong { border-color: var(--warn); background: #ffebee; }
+  .option .marker {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .option.mc-option .marker { border-radius: 4px; }
+  .option.selected .marker { border-color: var(--primary); background: var(--primary); color: white; }
+  .option.correct .marker { border-color: var(--success); background: var(--success); color: white; }
+  .option.wrong .marker { border-color: var(--warn); background: var(--warn); color: white; }
+  .option-text { font-size: 0.95rem; }
+
+  /* Free text */
+  .ft-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+  .ft-input:focus { outline: none; border-color: var(--accent); }
+
+  /* Feedback */
+  .feedback {
+    margin-top: 1rem;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { background: #e8f5e9; border-left: 4px solid var(--success); }
+  .feedback.wrong-fb { background: #ffebee; border-left: 4px solid var(--warn); }
+  .feedback.info-fb { background: #e3f2fd; border-left: 4px solid #1565c0; }
+  .feedback strong { display: block; margin-bottom: 0.3rem; }
+
+  /* Buttons */
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: #046a6f; }
+  .btn-accent { background: var(--accent); color: var(--primary); }
+  .btn-accent:hover { background: #3fc4bc; }
+  .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-outline:hover { background: var(--primary); color: white; }
+  .btn-gold { background: var(--gold); color: white; }
+  .btn-gold:hover { background: #a88200; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  /* Flashcard */
+  .flashcard-container { perspective: 1000px; margin: 1rem 0; }
+  .flashcard {
+    width: 100%;
+    min-height: 250px;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped { transform: rotateY(180deg); }
+  .flashcard-face {
+    position: absolute;
+    width: 100%;
+    min-height: 250px;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .flashcard-front {
+    background: linear-gradient(135deg, var(--primary), #04696e);
+    color: white;
+  }
+  .flashcard-front h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
+  .flashcard-front .hint { font-size: 0.85rem; opacity: 0.7; margin-top: 1rem; }
+  .flashcard-back {
+    background: white;
+    border: 2px solid var(--accent);
+    transform: rotateY(180deg);
+    text-align: left;
+  }
+  .flashcard-back h4 { color: var(--primary); margin-bottom: 0.75rem; }
+  .flashcard-back ul { padding-left: 1.2rem; }
+  .flashcard-back li { margin-bottom: 0.3rem; font-size: 0.95rem; }
+
+  .fc-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+  .fc-counter { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+
+  /* Topic filter */
+  .topic-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .topic-btn {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .topic-btn:hover { border-color: var(--accent); }
+  .topic-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Exam mode */
+  .exam-timer {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-align: center;
+    padding: 0.5rem;
+  }
+  .exam-timer.warning { color: var(--warn); }
+
+  /* Results */
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto;
+    font-weight: 800;
+    font-size: 2rem;
+    border: 6px solid;
+  }
+  .result-circle.pass { border-color: var(--success); color: var(--success); }
+  .result-circle.fail { border-color: var(--warn); color: var(--warn); }
+  .result-circle small { font-size: 0.8rem; font-weight: 600; }
+
+  /* Merksatz */
+  .merksatz {
+    background: linear-gradient(135deg, #fff9e6, #fff3cc);
+    border-left: 4px solid var(--gold);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .merksatz::before { content: "Merksatz: "; font-weight: 700; color: var(--gold); }
+
+  /* Trap */
+  .trap {
+    background: #ffebee;
+    border-left: 4px solid var(--warn);
+    padding: 0.8rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .trap::before { content: "Prüfungsfalle: "; font-weight: 700; color: var(--warn); }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .checklist li::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ===== MOBILE RESPONSIVE ===== */
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    main { padding: 1rem; }
+    .card { padding: 1.2rem 1.2rem; }
+    .topic-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+    .flashcard, .flashcard-face { min-height: 220px; }
+    .flashcard-face { padding: 1.5rem; }
+  }
+
+  /* Phone */
+  @media (max-width: 480px) {
+    /* Header compact */
+    header { padding: 1rem 1rem; }
+    header h1 { font-size: 1.15rem; }
+    header p { font-size: 0.8rem; }
+
+    /* Nav as horizontal scrollable strip */
+    .nav {
+      justify-content: flex-start;
+      gap: 0.4rem;
+      padding: 0.6rem 0.75rem;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav button {
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border-width: 1.5px;
+    }
+
+    /* Main */
+    main { padding: 0.75rem; }
+
+    /* Cards */
+    .card {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Stats row: 2x2 grid instead of 4 across */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .stat {
+      min-width: 0;
+      padding: 0.75rem 0.5rem;
+      border-radius: 8px;
+    }
+    .stat .num { font-size: 1.4rem; }
+    .stat .label { font-size: 0.7rem; }
+
+    /* Topic grid: 3 columns compact */
+    .topic-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+    }
+    .topic-card {
+      padding: 0.6rem 0.4rem;
+      border-radius: 8px;
+    }
+    .topic-card .icon { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .topic-card h4 { font-size: 0.7rem; line-height: 1.3; }
+    .topic-card .score { font-size: 0.65rem; }
+
+    /* Topic filter pills: smaller, scroll if needed */
+    .topic-filter {
+      gap: 0.3rem;
+      margin-bottom: 1rem;
+    }
+    .topic-btn {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.72rem;
+    }
+
+    /* Quiz question */
+    .question-text {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .q-type { font-size: 0.68rem; padding: 0.15rem 0.5rem; }
+    .q-num { font-size: 0.78rem; }
+    .q-topic { font-size: 0.7rem; }
+
+    /* Options: more touch-friendly */
+    .options { gap: 0.4rem; }
+    .option {
+      padding: 0.7rem 0.8rem;
+      gap: 0.6rem;
+      border-radius: 8px;
+      border-width: 1.5px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .option .marker {
+      width: 24px;
+      height: 24px;
+      font-size: 0.72rem;
+    }
+    .option-text { font-size: 0.88rem; }
+
+    /* Free text input */
+    .ft-input {
+      min-height: 80px;
+      font-size: 16px; /* prevents iOS zoom on focus */
+      padding: 0.7rem 0.8rem;
+    }
+
+    /* Feedback */
+    .feedback {
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    /* Buttons: full width on mobile */
+    .btn {
+      padding: 0.65rem 1rem;
+      font-size: 0.88rem;
+    }
+    .btn-row {
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .btn-row .btn {
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+    }
+
+    /* Flashcards */
+    .flashcard-container { margin: 0.75rem 0; }
+    .flashcard, .flashcard-face {
+      min-height: 200px;
+    }
+    .flashcard-face { padding: 1.2rem; }
+    .flashcard-front h3 { font-size: 1.1rem; }
+    .flashcard-front .hint { font-size: 0.78rem; }
+    .flashcard-back h4 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .flashcard-back ul { padding-left: 1rem; }
+    .flashcard-back li { font-size: 0.85rem; margin-bottom: 0.25rem; }
+
+    .fc-nav { margin-top: 0.75rem; }
+    .fc-nav .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    .fc-counter { font-size: 0.8rem; }
+
+    /* Exam timer */
+    .exam-timer { font-size: 1.3rem; padding: 0.3rem; }
+
+    /* Results */
+    .result-circle {
+      width: 110px;
+      height: 110px;
+      font-size: 1.6rem;
+      border-width: 5px;
+    }
+    .result-circle small { font-size: 0.7rem; }
+
+    /* Merksatz & Trap */
+    .merksatz, .trap {
+      padding: 0.7rem 0.8rem;
+      font-size: 0.83rem;
+      margin: 0.5rem 0;
+    }
+
+    /* Freitext-Schema ordered list */
+    .card ol {
+      padding-left: 1.2rem;
+      font-size: 0.83rem;
+      line-height: 1.8;
+    }
+
+    /* Progress bar slightly thicker for visibility */
+    .progress-bar { height: 6px; margin: 0.75rem 0; }
+  }
+
+  /* Very small phones (iPhone SE, etc.) */
+  @media (max-width: 360px) {
+    .topic-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats { gap: 0.4rem; }
+    .stat .num { font-size: 1.2rem; }
+    .nav button { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+    .flashcard, .flashcard-face { min-height: 180px; }
+    .flashcard-face { padding: 1rem; }
+    .flashcard-front h3 { font-size: 1rem; }
+  }
+
+  /* Touch device improvements */
+  @media (hover: none) and (pointer: coarse) {
+    .option:hover { border-color: var(--border); background: transparent; }
+    .option.selected:hover { border-color: var(--primary); background: #e8f5f5; }
+    .topic-card:hover { transform: none; box-shadow: none; }
+    .topic-card:active { transform: scale(0.97); }
+    .option:active { background: #f0f0f0; }
+    .btn:active { transform: scale(0.97); }
+  }
+
+  /* Safe area for notched phones */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    .nav { padding-left: max(0.75rem, env(safe-area-inset-left)); padding-right: max(0.75rem, env(safe-area-inset-right)); }
+  }
+
+  /* Animations */
+  @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .card { animation: slideIn 0.3s ease; }
+
+  /* Topic overview grid */
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+  .topic-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .topic-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .topic-card .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+  .topic-card h4 { font-size: 0.85rem; color: var(--primary); margin-bottom: 0.2rem; }
+  .topic-card .score { font-size: 0.75rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Denkmalschutz Block 1</h1>
+  <p>Energieberatung für Baudenkmale - Interaktives Lernen</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p>
+      <div class="topic-grid" id="topic-grid"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 0.75rem;">Schnellstart</h3>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button>
+        <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+        <button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card">
+      <h3 style="margin-bottom: 0.75rem;">Thema wählen</h3>
+      <div class="topic-filter" id="quiz-topic-filter"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button>
+      </div>
+    </div>
+    <div id="quiz-area" style="display:none;">
+      <div class="progress-bar"><div class="fill" id="quiz-progress"></div></div>
+      <div class="card" id="quiz-card"></div>
+      <div class="btn-row" id="quiz-buttons"></div>
+    </div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div id="flashcards" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 0.5rem;">Karteikarten</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen. Wische oder nutze die Pfeile.</p>
+      <div class="topic-filter" id="fc-topic-filter"></div>
+    </div>
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="flashcard-face flashcard-front" id="fc-front">
+          <h3 id="fc-question">Lade...</h3>
+          <div class="hint">Klicken zum Umdrehen</div>
+        </div>
+        <div class="flashcard-face flashcard-back" id="fc-back">
+          <h4 id="fc-answer-title">Antwort</h4>
+          <div id="fc-answer"></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-nav">
+      <button class="btn btn-outline" onclick="prevCard()">Zurück</button>
+      <span class="fc-counter" id="fc-counter">1 / 1</span>
+      <button class="btn btn-outline" onclick="nextCard()">Weiter</button>
+    </div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;">
+      <button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button>
+      <button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup">
+      <h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">15 Fragen, 30 Minuten, gemischte Formate. Bestanden ab 70%.</p>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="startExam()">Prüfung starten</button>
+      </div>
+    </div>
+    <div id="exam-area" style="display:none;">
+      <div class="card" style="text-align:center;">
+        <div class="exam-timer" id="exam-timer">30:00</div>
+        <div class="progress-bar"><div class="fill" id="exam-progress"></div></div>
+      </div>
+      <div class="card" id="exam-card"></div>
+      <div class="btn-row" id="exam-buttons"></div>
+    </div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <!-- TRAPS -->
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen</h3>
+      <div class="trap">„Alt" ist nicht automatisch Denkmal. Entscheidend ist die Bedeutung im Interesse der Allgemeinheit.</div>
+      <div class="trap">In Bayern gilt das <strong>deklaratorische</strong> Prinzip, nicht konstitutiv. Das Gebäude ist Denkmal, auch ohne Eintragung.</div>
+      <div class="trap">Beim Einzeldenkmal ist nicht nur die Fassade geschützt, sondern grundsätzlich alle Gebäudebestandteile.</div>
+      <div class="trap">Die denkmalrechtliche Erlaubnis ersetzt nicht automatisch die Baugenehmigung.</div>
+      <div class="trap">PV-Anlagen sind am Denkmal nicht pauschal erlaubt und nicht pauschal verboten.</div>
+      <div class="trap">Fensteraustausch ist nicht automatisch die beste Lösung. Reparatur historischer Fenster hat Vorrang.</div>
+      <div class="trap">Ohne Abstimmung <strong>vor</strong> Maßnahmenbeginn kann die Steuerbegünstigung (§§ 7i, 10f EStG) scheitern.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Freitext-Antwort-Schema</h3>
+      <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">Bei Maßnahmenbeurteilung immer diese Reihenfolge:</p>
+      <ol style="padding-left: 1.5rem; font-size: 0.9rem; line-height: 2;">
+        <li>Einzeldenkmal, Ensemble oder Nähefall?</li>
+        <li>Ist die Maßnahme erlaubnispflichtig?</li>
+        <li>Welche denkmalwerten Substanzen sind betroffen?</li>
+        <li>Gibt es eine VU / Befundlage?</li>
+        <li>Ist die Maßnahme materialverträglich und reversibel?</li>
+        <li>Gibt es eine denkmalverträglichere Alternative?</li>
+        <li>Förderung / Steuer / Genehmigung vor Beginn geklärt?</li>
+        <li>Abwägung: Substanz - Erscheinungsbild - Nutzung - Wirtschaftlichkeit - Energie</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Denkmal = Bedeutung + Allgemeininteresse</div>
+      <div class="merksatz">Fast jede Änderung = Erlaubnispflicht</div>
+      <div class="merksatz">Antrag = UDB, Fachbehörde = BLfD</div>
+      <div class="merksatz">Ziel = Erhalt authentischer Substanz</div>
+      <div class="merksatz">Energie ja, aber denkmalgerecht</div>
+      <div class="merksatz">GEG § 105 erlaubt Abweichungen am Denkmal</div>
+      <div class="merksatz">VU ist die fachliche Grundlage für alles</div>
+      <div class="merksatz">Förderung und Steuer nur mit Abstimmung vor Beginn</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== DATA =====
+
+const topics = [
+  { id: 'denkmal', name: 'Denkmalbegriff', icon: '🏛️' },
+  { id: 'arten', name: 'Denkmalarten', icon: '📋' },
+  { id: 'liste', name: 'Denkmalliste', icon: '📜' },
+  { id: 'zustaendig', name: 'Zuständigkeiten', icon: '🏢' },
+  { id: 'erlaubnis', name: 'Erlaubnisverfahren', icon: '📝' },
+  { id: 'leitidee', name: 'Leitidee Denkmalpflege', icon: '🎯' },
+  { id: 'vu', name: 'Voruntersuchung', icon: '🔍' },
+  { id: 'energie', name: 'Energetische Ertüchtigung', icon: '⚡' },
+  { id: 'massnahmen', name: 'Maßnahmen am Denkmal', icon: '🔨' },
+  { id: 'geg', name: 'GEG § 105', icon: '⚖️' },
+  { id: 'pv', name: 'PV & Erneuerbare', icon: '☀️' },
+  { id: 'foerderung', name: 'Förderung & Steuer', icon: '💰' },
+  { id: 'baustile', name: 'Historische Bauweisen', icon: '🏰' },
+  { id: 'sonnenschutz', name: 'Sonnenschutz', icon: '🪟' },
+];
+
+const questions = [
+  // DENKMALBEGRIFF
+  {
+    topic: 'denkmal', type: 'sc',
+    q: 'Was ist die entscheidende Voraussetzung, damit etwas als Denkmal gilt?',
+    options: [
+      'Es muss mindestens 100 Jahre alt sein',
+      'Es muss in der Denkmalliste eingetragen sein',
+      'Seine Erhaltung muss im Interesse der Allgemeinheit liegen',
+      'Es muss unter Naturschutz stehen'
+    ],
+    correct: 2,
+    explanation: 'Ein Denkmal sind vom Menschen geschaffene Sachen aus vergangener Zeit, deren Erhaltung wegen ihrer geschichtlichen, künstlerischen, städtebaulichen, wissenschaftlichen oder volkskundlichen Bedeutung im Interesse der Allgemeinheit liegt.'
+  },
+  {
+    topic: 'denkmal', type: 'mc',
+    q: 'Welche Bedeutungskategorien können ein Denkmal begründen?',
+    options: [
+      'Geschichtliche Bedeutung',
+      'Wirtschaftliche Bedeutung',
+      'Künstlerische Bedeutung',
+      'Städtebauliche Bedeutung',
+      'Wissenschaftliche Bedeutung',
+      'Touristische Bedeutung'
+    ],
+    correct: [0, 2, 3, 4],
+    explanation: 'Die fünf Kategorien sind: geschichtlich, künstlerisch, städtebaulich, wissenschaftlich und volkskundlich. Wirtschaftliche und touristische Bedeutung gehören nicht dazu.'
+  },
+  {
+    topic: 'denkmal', type: 'sc',
+    q: 'Ein Gebäude ist 200 Jahre alt, aber ohne besondere Bedeutung. Ist es ein Denkmal?',
+    options: [
+      'Ja, alles über 100 Jahre ist automatisch Denkmal',
+      'Nein, Alter allein reicht nicht - die Bedeutung im Allgemeininteresse ist entscheidend',
+      'Ja, wenn es in der Denkmalliste steht',
+      'Nur wenn der Eigentümer zustimmt'
+    ],
+    correct: 1,
+    explanation: 'Prüfungsfalle: Nicht nur „alt" = Denkmal. Entscheidend ist die Bedeutung im Interesse der Allgemeinheit.'
+  },
+
+  // DENKMALARTEN
+  {
+    topic: 'arten', type: 'sc',
+    q: 'Was steht bei einem Ensemble im Vordergrund des Schutzes?',
+    options: [
+      'Die Innenausstattung aller Gebäude',
+      'Das äußere Erscheinungsbild / Orts-, Platz- oder Straßenbild',
+      'Die Kellergewölbe',
+      'Die Grundstücksgrenzen'
+    ],
+    correct: 1,
+    explanation: 'Im Ensemble steht vor allem die äußere Hülle / das Erscheinungsbild im Vordergrund. Auch Gebäude, die keine Einzeldenkmäler sind, können Teil eines Ensembles sein.'
+  },
+  {
+    topic: 'arten', type: 'sc',
+    q: 'Was ist beim Einzelbaudenkmal geschützt?',
+    options: [
+      'Nur die Fassade',
+      'Nur das Dach und die Fassade',
+      'Grundsätzlich alle Gebäudebestandteile',
+      'Nur die Teile, die in der Denkmalliste aufgeführt sind'
+    ],
+    correct: 2,
+    explanation: 'Beim Einzelbaudenkmal sind grundsätzlich alle Gebäudebestandteile geschützt. Auch die Ausstattung kann dazugehören, wenn sie eine Einheit mit dem Gebäude bildet.'
+  },
+  {
+    topic: 'arten', type: 'mc',
+    q: 'Welche Aussagen zum Ensemble sind korrekt?',
+    options: [
+      'Es ist eine Mehrheit baulicher Anlagen',
+      'Jedes einzelne Gebäude muss ein Einzeldenkmal sein',
+      'Das erhaltenwerte Orts-, Platz- oder Straßenbild steht im Fokus',
+      'Auch Nicht-Einzeldenkmäler können Ensemblebestandteil sein'
+    ],
+    correct: [0, 2, 3],
+    explanation: 'Im Ensemble können auch Gebäude enthalten sein, die keine Einzeldenkmäler sind. Der Fokus liegt auf dem Gesamtbild.'
+  },
+  {
+    topic: 'arten', type: 'sc',
+    q: 'Wann ist ein Nähefall genehmigungspflichtig?',
+    options: [
+      'Immer, wenn ein Denkmal in der Nähe steht',
+      'Nur bei Abriss des Nachbargebäudes',
+      'Wenn sich Maßnahmen auf Bestand oder Erscheinungsbild des benachbarten Denkmals auswirken können',
+      'Nie, der Nähefall ist nur informativ'
+    ],
+    correct: 2,
+    explanation: 'Der Nähefall ist genehmigungspflichtig nur, wenn sich Maßnahmen auf Bestand oder Erscheinungsbild des benachbarten Denkmals auswirken können.'
+  },
+
+  // DENKMALLISTE
+  {
+    topic: 'liste', type: 'sc',
+    q: 'Welches Prinzip gilt in Bayern für die Denkmaleigenschaft?',
+    options: [
+      'Das konstitutive Prinzip - erst die Eintragung macht es zum Denkmal',
+      'Das deklaratorische Prinzip - die Eintragung bestätigt nur nachrichtlich',
+      'Das konsensuale Prinzip - Eigentümer und Behörde müssen zustimmen',
+      'Das subsidiäre Prinzip - erst wenn der Bund nicht zuständig ist'
+    ],
+    correct: 1,
+    explanation: 'In Bayern gilt das deklaratorische Prinzip: Ein Gebäude ist bereits Denkmal, wenn es die gesetzlichen Kriterien erfüllt. Die Eintragung bestätigt das nur nachrichtlich.'
+  },
+  {
+    topic: 'liste', type: 'mc',
+    q: 'Welche Aussagen zur Denkmalliste in Bayern sind richtig?',
+    options: [
+      'Sie wird vom BLfD geführt',
+      'Die Eintragung erfolgt im Benehmen mit der Gemeinde',
+      'Nur der Eigentümer kann eine Eintragung beantragen',
+      'Dritte können auf ein mögliches Denkmal aufmerksam machen',
+      'Die Eintragung kann von Amts wegen erfolgen'
+    ],
+    correct: [0, 1, 3, 4],
+    explanation: 'Die Denkmalliste wird vom BLfD im Benehmen mit der Gemeinde geführt. Eintragung kann von Amts wegen erfolgen. Dritte können auf Denkmäler hinweisen.'
+  },
+
+  // ZUSTÄNDIGKEITEN
+  {
+    topic: 'zustaendig', type: 'sc',
+    q: 'Wo wird die denkmalrechtliche Erlaubnis beantragt?',
+    options: [
+      'Beim BLfD',
+      'Bei der Obersten Denkmalschutzbehörde',
+      'Bei der UDB (Untere Denkmalschutzbehörde)',
+      'Beim Bundesamt für Bauwesen'
+    ],
+    correct: 2,
+    explanation: 'Merksatz: Antrag an UDB, Fachstellungnahme vom BLfD. Die UDB sitzt beim Landratsamt oder bei der kreisfreien Stadt.'
+  },
+  {
+    topic: 'zustaendig', type: 'mc',
+    q: 'Welche Aufgaben hat das BLfD (Bayerisches Landesamt für Denkmalpflege)?',
+    options: [
+      'Denkmalrechtliche Erlaubnisse erteilen',
+      'Stellungnahmen im Erlaubnisverfahren abgeben',
+      'Die Denkmalliste führen',
+      'Beratung anbieten',
+      'Förderung vergeben'
+    ],
+    correct: [1, 2, 3, 4],
+    explanation: 'Das BLfD ist die Fachbehörde. Es gibt Stellungnahmen ab, führt die Denkmalliste, berät und fördert. Die Erlaubnis erteilt die UDB.'
+  },
+  {
+    topic: 'zustaendig', type: 'sc',
+    q: 'Welches Ministerium ist die Oberste Denkmalschutzbehörde in Bayern?',
+    options: [
+      'Bayerisches Staatsministerium für Wohnen, Bau und Verkehr',
+      'Bayerisches Staatsministerium für Wissenschaft und Kunst',
+      'Bayerisches Staatsministerium des Innern',
+      'Bayerisches Staatsministerium für Umwelt und Verbraucherschutz'
+    ],
+    correct: 1,
+    explanation: 'Die Oberste Denkmalschutzbehörde in Bayern ist das Bayerische Staatsministerium für Wissenschaft und Kunst.'
+  },
+
+  // ERLAUBNISVERFAHREN
+  {
+    topic: 'erlaubnis', type: 'sc',
+    q: 'Welche Aussage zum Erlaubnisverfahren ist korrekt?',
+    options: [
+      'Nur Fassadenänderungen sind erlaubnispflichtig',
+      'Jede Veränderung an einem Baudenkmal ist erlaubnispflichtig',
+      'Nur Abriss ist erlaubnispflichtig',
+      'Innenraumänderungen sind nie erlaubnispflichtig'
+    ],
+    correct: 1,
+    explanation: 'Prüfungs-Kernsatz: Jede Veränderung an einem Baudenkmal ist erlaubnispflichtig (Art. 6 BayDSchG).'
+  },
+  {
+    topic: 'erlaubnis', type: 'mc',
+    q: 'Welche Maßnahmen sind nach Art. 6 BayDSchG insbesondere erlaubnispflichtig?',
+    options: [
+      'Beseitigen',
+      'Verändern',
+      'Verbringen',
+      'Veränderung geschützter Ausstattungsgegenstände',
+      'Besichtigen'
+    ],
+    correct: [0, 1, 2, 3],
+    explanation: 'Erlaubnispflichtig sind: Beseitigen, Verändern, Verbringen und Veränderung geschützter Ausstattungsgegenstände.'
+  },
+  {
+    topic: 'erlaubnis', type: 'sc',
+    q: 'Ersetzt die denkmalrechtliche Erlaubnis automatisch die Baugenehmigung?',
+    options: [
+      'Ja, sie ersetzt alle anderen Genehmigungen',
+      'Ja, aber nur bei Einzeldenkmälern',
+      'Nein, die denkmalrechtliche Erlaubnis ersetzt nicht automatisch die Baugenehmigung',
+      'Nur bei Maßnahmen unter 50.000 Euro'
+    ],
+    correct: 2,
+    explanation: 'Prüfungsfalle: Die denkmalrechtliche Erlaubnis ersetzt NICHT automatisch die Baugenehmigung. Beide Verfahren können erforderlich sein.'
+  },
+
+  // LEITIDEE
+  {
+    topic: 'leitidee', type: 'sc',
+    q: 'Von wem stammt der Leitsatz „Konservieren, nicht restaurieren"?',
+    options: [
+      'Viollet-le-Duc',
+      'Georg Dehio',
+      'John Ruskin',
+      'Walter Gropius'
+    ],
+    correct: 1,
+    explanation: 'Georg Dehio prägte den Paradigmenwechsel um 1900 mit „Konservieren, nicht restaurieren". Vorher stand oft das idealisierte Weiterbauen im Vordergrund.'
+  },
+  {
+    topic: 'leitidee', type: 'sc',
+    q: 'Was betont die Charta von Venedig (1964)?',
+    options: [
+      'Denkmäler sollten stilrein restauriert werden',
+      'Nur mittelalterliche Bauten sind schützenswert',
+      'Die Betonung der authentischen Substanz',
+      'Denkmäler sollten originalgetreu nachgebaut werden'
+    ],
+    correct: 2,
+    explanation: 'Die Charta von Venedig 1964 betont die Wiederentdeckung und Betonung der authentischen Substanz als zentralen Maßstab.'
+  },
+  {
+    topic: 'leitidee', type: 'mc',
+    q: 'Welche Grundprinzipien gehören zur Leitidee der Denkmalpflege?',
+    options: [
+      'Authentische Substanz erhalten',
+      'Erscheinungsbild wahren',
+      'Eingriffe maximieren für bestmögliche Modernisierung',
+      'Materialverträglichkeit beachten',
+      'Abwägung statt Pauschallösung'
+    ],
+    correct: [0, 1, 3, 4],
+    explanation: 'Die Leitidee umfasst: authentische Substanz erhalten, konservieren statt restaurieren, Erscheinungsbild wahren, Eingriffe MINIMIEREN, Materialverträglichkeit beachten, Abwägung statt Pauschallösung.'
+  },
+
+  // VORUNTERSUCHUNG
+  {
+    topic: 'vu', type: 'sc',
+    q: 'Was ist die denkmalpflegerische Voruntersuchung (VU)?',
+    options: [
+      'Ein optionales Gutachten für den Bauherrn',
+      'Das wichtigste Instrument der Denkmalpflege und Leitfaden durch den Instandsetzungsprozess',
+      'Eine reine Kostenschätzung',
+      'Ein Genehmigungsformular der UDB'
+    ],
+    correct: 1,
+    explanation: 'Die VU ist das wichtigste Instrument der Denkmalpflege und der Leitfaden durch den Instandsetzungsprozess. Sie verbindet Fachfragen, Wünsche der Bauherrschaft und Finanzierbarkeit.'
+  },
+  {
+    topic: 'vu', type: 'mc',
+    q: 'Was sind Ziele der Voruntersuchung?',
+    options: [
+      'Bestandserhebung',
+      'Schadenserhebung',
+      'Planungssicherheit',
+      'Kostensicherheit',
+      'Automatische Genehmigung'
+    ],
+    correct: [0, 1, 2, 3],
+    explanation: 'Die vier Ziele der VU: Bestandserhebung, Schadenserhebung, Planungssicherheit und Kostensicherheit.'
+  },
+  {
+    topic: 'vu', type: 'mc',
+    q: 'Welche Bestandteile gehören typischerweise zur VU?',
+    options: [
+      'Dendrochronologie',
+      'Bauhistorische Untersuchung',
+      'Restauratorische Befunduntersuchung',
+      'Raumbuch',
+      'Marketingkonzept',
+      'Tragwerksgutachten'
+    ],
+    correct: [0, 1, 2, 3, 5],
+    explanation: 'Zur VU gehören u.a.: Zusammenstellung vorhandener Informationen, Aufmaß, Dendrochronologie, bauhistorische Untersuchung, restauratorische Befunduntersuchung, Raumbuch, naturwissenschaftliche Gutachten, Tragwerksgutachten.'
+  },
+  {
+    topic: 'vu', type: 'ft',
+    q: 'Nennen Sie mindestens 4 Anforderungen an eine restauratorische Befunduntersuchung.',
+    keywords: ['verortung', 'befundbeschreibung', 'foto', 'interpretation', 'analyse', 'these', 'beweisführung', 'dokumentation', 'archiv'],
+    sampleAnswer: 'Eine restauratorische Befunduntersuchung erfordert: 1) Eindeutige Verortung der Befunde, 2) Befundbeschreibung, 3) Lesbare Fotos, 4) Befundinterpretation mit Analyse, These und Beweisführung, 5) Offene Fragen benennen, 6) Archivbeständige Dokumentation.'
+  },
+
+  // ENERGETISCHE ERTÜCHTIGUNG
+  {
+    topic: 'energie', type: 'sc',
+    q: 'Was ist die zentrale Aussage zur energetischen Ertüchtigung von Denkmälern?',
+    options: [
+      'Denkmäler dürfen nicht energetisch verändert werden',
+      'Denkmäler können energetisch ertüchtigt werden, aber mit maßgeschneiderten Konzepten',
+      'Maximale Dämmung ist immer das Ziel',
+      'Energetische Maßnahmen brauchen keine denkmalrechtliche Erlaubnis'
+    ],
+    correct: 1,
+    explanation: 'Am Denkmal gilt nicht „maximal dämmen", sondern „denkmalgerecht optimieren". Maßgeschneiderte Konzepte sind der Schlüssel.'
+  },
+  {
+    topic: 'energie', type: 'mc',
+    q: 'Welche Grundprinzipien gelten bei der energetischen Ertüchtigung von Denkmälern?',
+    options: [
+      'Weiterverwendung historischer Bausubstanz ist aktiver Umweltschutz',
+      'Moderne Materialien und historische Konstruktionen können unkritisch gemischt werden',
+      'Historische Baustoffe vor ca. 1960 sind meist diffusionsoffen und kapillaraktiv',
+      'Wasser ist neben Feuer die größte Gefahr'
+    ],
+    correct: [0, 2, 3],
+    explanation: 'Moderne Materialien und historische Konstruktionen dürfen NICHT unkritisch gemischt werden. Materialverträglichkeit ist zentral.'
+  },
+
+  // MASSNAHMEN
+  {
+    topic: 'massnahmen', type: 'sc',
+    q: 'Was hat bei historischen Fenstern am Denkmal Vorrang?',
+    options: [
+      'Austausch gegen moderne Dreifachverglasung',
+      'Reparatur der historischen Fenster',
+      'Entfernung und Einlagerung',
+      'Übermalen der Fensterrahmen'
+    ],
+    correct: 1,
+    explanation: 'Prüfungsfalle: Reparatur historischer Fenster hat IMMER Vorrang. Fensteraustausch nur, wenn keine historischen Fenster vorhanden sind.'
+  },
+  {
+    topic: 'massnahmen', type: 'mc',
+    q: 'Welche Lösungen werden für historische Fenster am Denkmal genannt?',
+    options: [
+      'Innenvorsatzfenster',
+      'Winterfenster',
+      'Dichtungen ergänzen',
+      'Modernisierung historischer Fenster',
+      'Immer Austausch gegen Kunststofffenster'
+    ],
+    correct: [0, 1, 2, 3],
+    explanation: 'Typische Lösungen: Innenvorsatzfenster, Winterfenster, Dichtungen, ggf. Modernisierung historischer Fenster. Austausch ist NICHT die Standardlösung.'
+  },
+  {
+    topic: 'massnahmen', type: 'sc',
+    q: 'Wann ist Außendämmung an einem Denkmal vertretbar?',
+    options: [
+      'Immer, wenn der Eigentümer es wünscht',
+      'Nur wenn die historische Erscheinung unverändert bleibt (schlichte, ungegliederte Fassaden)',
+      'Bei Fachwerk und Stuckfassaden',
+      'Außendämmung ist am Denkmal nie erlaubt'
+    ],
+    correct: 1,
+    explanation: 'Außendämmung nur bei schlichten, ungegliederten Fassaden, Rückseiten oder Brandwänden. NICHT bei Fachwerk, Sandstein, Ziegel oder Stuckfassaden.'
+  },
+  {
+    topic: 'massnahmen', type: 'mc',
+    q: 'Welche Materialien werden für Innendämmung am Denkmal genannt?',
+    options: [
+      'Leichtlehm',
+      'Styropor (EPS)',
+      'Dämmputz',
+      'Schilfrohrmatten',
+      'Mineralschaum / Calciumsilikat'
+    ],
+    correct: [0, 2, 3, 4],
+    explanation: 'Genannte Materialien: Leichtlehm, Dämmputz, Schilfrohrmatten, Mineralschaum, Calciumsilikat. Styropor (EPS) wird nicht empfohlen.'
+  },
+  {
+    topic: 'massnahmen', type: 'sc',
+    q: 'Warum sind dampfsperrende Bodenaufbauten problematisch?',
+    options: [
+      'Sie sind zu teuer',
+      'Sie verursachen Feuchteumleitung in die Wände',
+      'Sie sind nicht erlaubnispflichtig',
+      'Sie verändern die Raumhöhe'
+    ],
+    correct: 1,
+    explanation: 'Dampfsperrende Bodenaufbauten können Feuchteumleitung in die Wände verursachen, was eine massive Schadensquelle am Denkmal ist.'
+  },
+  {
+    topic: 'massnahmen', type: 'ft',
+    q: 'Beschreiben Sie die Vor- und Nachteile der Aufsparrendämmung am Denkmal.',
+    keywords: ['bauphysikalisch', 'anschlüsse', 'einfacher', 'optisch', 'kaschierung', 'traufe', 'ortgang'],
+    sampleAnswer: 'Die Aufsparrendämmung ist bauphysikalisch vorteilhaft, da die Anschlüsse einfacher zu lösen sind. Allerdings erfordert sie eine optische Kaschierung an Traufe und Ortgang, um das historische Erscheinungsbild zu wahren.'
+  },
+
+  // GEG
+  {
+    topic: 'geg', type: 'sc',
+    q: 'Was regelt GEG § 105?',
+    options: [
+      'Die generelle Befreiung aller Altbauten vom GEG',
+      'Die Abweichungsmöglichkeit für Baudenkmäler und besonders erhaltenswerte Bausubstanz',
+      'Die Pflicht zur Vollsanierung von Denkmälern',
+      'Den Energieausweis für Denkmäler'
+    ],
+    correct: 1,
+    explanation: 'GEG § 105 regelt speziell die Abweichungsmöglichkeit für Baudenkmäler und sonstige besonders erhaltenswerte Bausubstanz.'
+  },
+  {
+    topic: 'geg', type: 'mc',
+    q: 'Wann kann von den GEG-Anforderungen bei Baudenkmälern abgewichen werden?',
+    options: [
+      'Wenn die Substanz beeinträchtigt würde',
+      'Wenn das Erscheinungsbild beeinträchtigt würde',
+      'Wenn der Aufwand unverhältnismäßig hoch wäre',
+      'Immer, wenn der Eigentümer es beantragt',
+      'Wenn das Gebäude vor 1900 gebaut wurde'
+    ],
+    correct: [0, 1, 2],
+    explanation: 'GEG § 105: Abweichung möglich wenn die Substanz oder das Erscheinungsbild beeinträchtigt würden ODER der Aufwand unverhältnismäßig hoch wäre.'
+  },
+
+  // PV
+  {
+    topic: 'pv', type: 'sc',
+    q: 'Wie ist die Rechtslage zu PV-Anlagen auf Denkmälern in Bayern seit 2023?',
+    options: [
+      'PV ist auf Denkmälern generell verboten',
+      'PV ist auf Denkmälern generell erlaubt',
+      'Es gibt einen Rechtsanspruch auf Nutzung erneuerbarer Energien, sofern denkmalverträglich errichtet',
+      'PV ist nur auf Ensembles erlaubt'
+    ],
+    correct: 2,
+    explanation: 'Seit 2023 gibt es einen Rechtsanspruch, sofern die Anlage denkmalverträglich errichtet wird. Aber: Ablehnung ist weiterhin möglich, wenn Denkmalbelange überwiegen.'
+  },
+  {
+    topic: 'pv', type: 'mc',
+    q: 'Welche Kriterien sind bei PV-Anlagen auf Denkmälern maßgeblich?',
+    options: [
+      'Substanzerhalt',
+      'Erscheinungsbild',
+      'Einsehbarkeit',
+      'Denkmalverträglichkeit',
+      'Maximale Leistung in kWp'
+    ],
+    correct: [0, 1, 2, 3],
+    explanation: 'Maßgeblich sind: Substanzerhalt, Erscheinungsbild, Einsehbarkeit, Integration und Denkmalverträglichkeit. Nicht die maximale Leistung.'
+  },
+
+  // FÖRDERUNG
+  {
+    topic: 'foerderung', type: 'sc',
+    q: 'Was muss VOR Maßnahmenbeginn bei der steuerlichen Begünstigung geklärt sein?',
+    options: [
+      'Nur die Kostenschätzung',
+      'Die Abstimmung mit dem Landesamt',
+      'Die Farbauswahl',
+      'Der Bauvertrag muss unterschrieben sein'
+    ],
+    correct: 1,
+    explanation: 'Prüfungsfalle: Ohne vorherige Abstimmung mit dem Landesamt keine steuerliche Begünstigung, selbst wenn die Maßnahme fachlich gut gelungen ist.'
+  },
+  {
+    topic: 'foerderung', type: 'mc',
+    q: 'Welche drei Voraussetzungen gelten für Steuervergünstigungen nach §§ 7i/10f EStG?',
+    options: [
+      'Denkmal- oder Kulturguteigenschaft',
+      'Erforderlichkeit der Maßnahme',
+      'Abstimmung mit dem Landesamt VOR Maßnahmenbeginn',
+      'Mindestinvestition von 100.000 Euro',
+      'Beauftragung eines zertifizierten Energieberaters'
+    ],
+    correct: [0, 1, 2],
+    explanation: 'Die drei Voraussetzungen: 1) Denkmal-/Kulturguteigenschaft, 2) Erforderlichkeit der Maßnahme, 3) Abstimmung mit dem Landesamt VOR Maßnahmenbeginn.'
+  },
+  {
+    topic: 'foerderung', type: 'ft',
+    q: 'Nennen Sie mindestens 5 mögliche Förderwege für Maßnahmen an Denkmälern.',
+    keywords: ['denkmalpflegemittel', 'entschädigungsfonds', 'steuer', 'kommune', 'kfw', 'stiftung', 'städtebauförderung', 'dorferneuerung', 'landesstiftung', 'kulturfonds', 'bezirk', 'landkreis'],
+    sampleAnswer: 'Mögliche Förderwege: 1) Staatliche Denkmalpflegemittel, 2) Entschädigungsfonds, 3) Steuervergünstigungen (§§ 7i/10f EStG), 4) Kommune/Landkreis/Bezirk, 5) Städtebauförderung, 6) Dorferneuerung, 7) Landesstiftung, 8) Kulturfonds, 9) KfW/Bundesmittel, 10) Private Stiftungen.'
+  },
+
+  // BAUSTILE
+  {
+    topic: 'baustile', type: 'sc',
+    q: 'Welche Leitidee kennzeichnet die Gotik?',
+    options: [
+      'Wehrhaft, massiv, kirchlich/herrschaftlich',
+      'Höhe, Licht, Kathedralen, städtisches Leben',
+      'Inszenierung, Pracht, Gegenreformation',
+      'Funktionalismus, „Form follows function"'
+    ],
+    correct: 1,
+    explanation: 'Gotik = Höhe, Licht, Kathedralen, städtisches Leben. Romanik = wehrhaft, massiv. Barock = Inszenierung, Pracht. Moderne = Funktionalismus.'
+  },
+  {
+    topic: 'baustile', type: 'sc',
+    q: 'Was kennzeichnet den Historismus?',
+    options: [
+      'Rückgriff auf Antike, Proportion, Humanismus',
+      'Neue Materialien, Funktion, Ingenieurbau',
+      'Reaktion auf strenge Moderne, neue Bildhaftigkeit',
+      'Aufklärung und Rationalität'
+    ],
+    correct: 1,
+    explanation: 'Historismus/Industrialisierung = neue Materialien, Funktion, Ingenieurbau. Renaissance = Rückgriff auf Antike. Postmoderne = Reaktion auf Moderne.'
+  },
+  {
+    topic: 'baustile', type: 'ft',
+    q: 'Ordnen Sie folgende Stilepochen chronologisch und nennen Sie je eine Leitidee: Gotik, Romanik, Barock, Klassizismus.',
+    keywords: ['romanik', 'gotik', 'barock', 'klassizismus', 'wehrhaft', 'massiv', 'höhe', 'licht', 'inszenierung', 'pracht', 'rationalität', 'aufklärung'],
+    sampleAnswer: '1) Romanik: wehrhaft, massiv, kirchlich/herrschaftlich. 2) Gotik: Höhe, Licht, Kathedralen, städtisches Leben. 3) Barock: Inszenierung, Pracht, Gegenreformation/Absolutismus. 4) Klassizismus: Rationalität, Aufklärung, Antike als Vorbild.'
+  },
+
+  // SONNENSCHUTZ
+  {
+    topic: 'sonnenschutz', type: 'mc',
+    q: 'Welche historischen Sonnenschutzformen werden genannt?',
+    options: [
+      'Jalousieläden',
+      'Rolljalousien',
+      'Faltläden',
+      'Elektrische Außenraffstores',
+      'Springgardinen / Stoffrollos'
+    ],
+    correct: [0, 1, 2, 4],
+    explanation: 'Historische Formen: Jalousieläden, Rolljalousien, Faltläden, Innenläden, Springgardinen/Stoffrollos. Elektrische Außenraffstores sind modern.'
+  },
+  {
+    topic: 'sonnenschutz', type: 'sc',
+    q: 'Warum ist innenliegender Sonnenschutz für Denkmäler oft günstig?',
+    options: [
+      'Er ist billiger als Außensonnenschutz',
+      'Er beeinträchtigt die historische Fassade nicht',
+      'Er ist energetisch besser',
+      'Er braucht keine Genehmigung'
+    ],
+    correct: 1,
+    explanation: 'Innenliegender Sonnenschutz ist für Denkmäler oft günstig, weil die historische Fassade nicht beeinträchtigt wird.'
+  },
+
+  // FREITEXT Übergreifend
+  {
+    topic: 'erlaubnis', type: 'ft',
+    q: 'Erklären Sie den Unterschied zwischen Einzeldenkmal und Ensemble hinsichtlich des Schutzumfangs.',
+    keywords: ['einzeldenkmal', 'alle gebäudebestandteile', 'ensemble', 'äußere', 'erscheinungsbild', 'hülle', 'straßenbild'],
+    sampleAnswer: 'Beim Einzeldenkmal sind grundsätzlich alle Gebäudebestandteile geschützt, einschließlich der Ausstattung, wenn sie eine Einheit mit dem Gebäude bildet. Beim Ensemble steht dagegen das äußere Erscheinungsbild (Orts-, Platz- oder Straßenbild) im Vordergrund. Im Ensemble können auch Gebäude enthalten sein, die keine Einzeldenkmäler sind.'
+  },
+  {
+    topic: 'energie', type: 'ft',
+    q: 'Warum ist die Weiterverwendung historischer Bausubstanz als aktiver Umweltschutz zu bewerten?',
+    keywords: ['graue energie', 'ressourcen', 'abriss', 'neubau', 'nachhaltigkeit', 'erhalt', 'material'],
+    sampleAnswer: 'Die Weiterverwendung historischer Bausubstanz ist aktiver Umweltschutz, weil in der bestehenden Substanz bereits erhebliche graue Energie (Herstellung, Transport) gebunden ist. Ein Abriss und Neubau würde zusätzliche Ressourcen verbrauchen. Der Erhalt vermeidet Abfall und nutzt langlebige, oft nachhaltige historische Materialien weiter.'
+  },
+];
+
+// FLASHCARDS DATA
+const flashcards = [
+  { topic: 'denkmal', front: 'Was ist ein Denkmal?', back: '<ul><li>Vom Menschen geschaffene Sachen aus vergangener Zeit</li><li>Deren Erhaltung im <strong>Interesse der Allgemeinheit</strong> liegt</li><li>Wegen: geschichtlicher, künstlerischer, städtebaulicher, wissenschaftlicher oder volkskundlicher Bedeutung</li></ul>' },
+  { topic: 'arten', front: 'Einzeldenkmal vs. Ensemble?', back: '<ul><li><strong>Einzeldenkmal:</strong> Alle Gebäudebestandteile geschützt</li><li><strong>Ensemble:</strong> Schwerpunkt auf äußerer Hülle / Erscheinungsbild</li><li>Im Ensemble können auch Nicht-Einzeldenkmäler sein</li></ul>' },
+  { topic: 'arten', front: 'Was ist ein Nähefall?', back: '<ul><li>Genehmigungspflichtig nur, wenn Maßnahmen sich auf <strong>Bestand oder Erscheinungsbild</strong> des benachbarten Denkmals auswirken können</li></ul>' },
+  { topic: 'liste', front: 'Deklaratorisch vs. Konstitutiv?', back: '<ul><li><strong>Bayern = deklaratorisch</strong></li><li>Gebäude IST Denkmal, wenn es Kriterien erfüllt</li><li>Eintragung bestätigt nur nachrichtlich</li><li>NICHT erst durch Eintragung Denkmal!</li></ul>' },
+  { topic: 'zustaendig', front: 'UDB vs. BLfD?', back: '<ul><li><strong>UDB</strong> = Untere Denkmalschutzbehörde (Landratsamt/Stadt) → Antrag + Genehmigung</li><li><strong>BLfD</strong> = Bayerisches Landesamt → Fachbehörde, Stellungnahmen, Denkmalliste, Beratung, Förderung</li></ul>' },
+  { topic: 'erlaubnis', front: 'Was ist erlaubnispflichtig?', back: '<ul><li><strong>Jede Veränderung</strong> an einem Baudenkmal!</li><li>Art. 6 BayDSchG: Beseitigen, Verändern, Verbringen</li><li>Auch geschützte Ausstattungsgegenstände</li><li>Denkmalerlaubnis ≠ Baugenehmigung!</li></ul>' },
+  { topic: 'leitidee', front: 'Dehio + Charta von Venedig?', back: '<ul><li><strong>Georg Dehio</strong> (~1900): „Konservieren, nicht restaurieren"</li><li><strong>Charta von Venedig</strong> (1964): Authentische Substanz als zentraler Maßstab</li><li>Vorher: idealisiertes Weiterbauen</li></ul>' },
+  { topic: 'vu', front: 'Was ist die VU?', back: '<ul><li><strong>Wichtigstes Instrument</strong> der Denkmalpflege</li><li>Leitfaden durch den Instandsetzungsprozess</li><li>Ziele: Bestandserhebung, Schadenserhebung, Planungssicherheit, Kostensicherheit</li><li>Ohne VU fehlt die fachliche Grundlage!</li></ul>' },
+  { topic: 'vu', front: 'Bestandteile der VU?', back: '<ul><li>Zusammenstellung vorhandener Infos</li><li>Aufmaß / Planerstellung</li><li>Dendrochronologie</li><li>Bauhistorische Untersuchung</li><li>Restauratorische Befunduntersuchung</li><li>Raumbuch</li><li>Naturwiss. + Tragwerksgutachten</li></ul>' },
+  { topic: 'energie', front: 'Energetische Ertüchtigung – Grundprinzip?', back: '<ul><li>Nicht „maximal dämmen" → „denkmalgerecht optimieren"</li><li>Weiterverwendung = aktiver Umweltschutz</li><li>Historische Baustoffe (vor ~1960): diffusionsoffen + kapillaraktiv</li><li>Wasser = neben Feuer größte Gefahr</li></ul>' },
+  { topic: 'massnahmen', front: 'Fenster am Denkmal?', back: '<ul><li><strong>Reparatur hat VORRANG!</strong></li><li>Austausch nur ohne historische Fenster</li><li>Lösungen: Innenvorsatzfenster, Winterfenster, Dichtungen, Modernisierung</li><li>NICHT automatisch „Fenster tauschen"!</li></ul>' },
+  { topic: 'massnahmen', front: 'Innendämmung am Denkmal?', back: '<ul><li>Fast immer möglich</li><li>Problematisch bei Stuck, Vertäfelungen, wertvollen Raumschalen</li><li>Materialien: Leichtlehm, Dämmputz, Schilfrohrmatten, Mineralschaum, Calciumsilikat</li></ul>' },
+  { topic: 'massnahmen', front: 'Außendämmung am Denkmal?', back: '<ul><li>Nur bei unverändert bleibender historischer Erscheinung</li><li>OK: schlichte, ungegliederte Fassaden, Rückseiten, Brandwände</li><li>NICHT OK: Fachwerk, Sandstein, Ziegel, Stuckfassaden</li></ul>' },
+  { topic: 'geg', front: 'GEG § 105?', back: '<ul><li>Abweichung von GEG möglich wenn:</li><li>Substanz beeinträchtigt würde</li><li>Erscheinungsbild beeinträchtigt würde</li><li>Aufwand unverhältnismäßig hoch wäre</li><li>GEG gilt NICHT blind am Denkmal!</li></ul>' },
+  { topic: 'pv', front: 'PV auf Denkmälern (Bayern)?', back: '<ul><li>Seit 2023: stärkeres Gewicht erneuerbarer Energien</li><li><strong>Rechtsanspruch</strong> auf Nutzung, sofern denkmalverträglich</li><li>Ablehnung weiterhin möglich wenn Denkmalbelange überwiegen</li><li>Kriterien: Substanz, Erscheinungsbild, Einsehbarkeit</li></ul>' },
+  { topic: 'foerderung', front: 'Steuer: §§ 7i/10f EStG?', back: '<ul><li>3 Voraussetzungen:</li><li>1) Denkmal-/Kulturguteigenschaft</li><li>2) Erforderlichkeit der Maßnahme</li><li>3) Abstimmung mit Landesamt <strong>VOR</strong> Beginn</li><li>Ohne vorherige Abstimmung → keine Begünstigung!</li></ul>' },
+  { topic: 'foerderung', front: 'Förderung – Grundsatz?', back: '<ul><li>VOR Maßnahmenbeginn: Finanzierung + Antrag klären!</li><li>Förderwege: Denkmalpflegemittel, Entschädigungsfonds, Steuer, Kommune, KfW, Stiftungen, Städtebauförderung, Dorferneuerung...</li><li>Kleine Denkmalpflege: fördert denkmalpflegerischen Mehraufwand</li></ul>' },
+  { topic: 'baustile', front: 'Epochen-Reihenfolge?', back: '<ul><li>Romanik → wehrhaft, massiv</li><li>Gotik → Höhe, Licht</li><li>Renaissance → Antike, Proportion</li><li>Barock → Inszenierung, Pracht</li><li>Klassizismus → Rationalität, Aufklärung</li><li>Historismus → neue Materialien</li><li>Moderne → Form follows function</li><li>Postmoderne → neue Bildhaftigkeit</li></ul>' },
+];
+
+// ===== STATE =====
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {},
+  currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: 1800,
+  selectedOptions: new Set(),
+};
+
+// Init topic scores
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+
+// Load state from localStorage
+try {
+  const saved = localStorage.getItem('denkmal-learn-state');
+  if (saved) {
+    const s = JSON.parse(saved);
+    state.answered = s.answered || 0;
+    state.correct = s.correct || 0;
+    state.streak = s.streak || 0;
+    state.maxStreak = s.maxStreak || 0;
+    if (s.topicScores) state.topicScores = s.topicScores;
+  }
+} catch(e) {}
+
+function saveState() {
+  try {
+    localStorage.setItem('denkmal-learn-state', JSON.stringify({
+      answered: state.answered, correct: state.correct,
+      streak: state.streak, maxStreak: state.maxStreak,
+      topicScores: state.topicScores
+    }));
+  } catch(e) {}
+}
+
+// ===== NAVIGATION =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => {
+    if (b.textContent.toLowerCase().includes(
+      id === 'dashboard' ? 'dashboard' : id === 'quiz' ? 'quiz' : id === 'flashcards' ? 'karte' : id === 'exam' ? 'prüf' : 'fallen'
+    )) b.classList.add('active');
+  });
+  if (id === 'dashboard') updateDashboard();
+  if (id === 'flashcards') initFlashcards();
+}
+
+// ===== DASHBOARD =====
+function updateDashboard() {
+  document.getElementById('stat-answered').textContent = state.answered;
+  document.getElementById('stat-correct').textContent = state.correct;
+  document.getElementById('stat-rate').textContent = state.answered > 0 ? Math.round(state.correct / state.answered * 100) + '%' : '--';
+  document.getElementById('stat-streak').textContent = state.streak;
+
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = topics.map(t => {
+    const s = state.topicScores[t.id];
+    const rate = s.answered > 0 ? Math.round(s.correct / s.answered * 100) : -1;
+    const rateText = rate >= 0 ? rate + '%' : 'Noch nicht geübt';
+    const color = rate < 0 ? '#999' : rate >= 70 ? 'var(--success)' : rate >= 40 ? 'var(--gold)' : 'var(--warn)';
+    return `<div class="topic-card" onclick="startQuiz('${t.id}')">
+      <div class="icon">${t.icon}</div>
+      <h4>${t.name}</h4>
+      <div class="score" style="color:${color}">${rateText}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== QUIZ =====
+function buildTopicFilter(containerId, defaultAll) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = `<button class="topic-btn ${defaultAll ? 'active' : ''}" data-topic="all" onclick="toggleTopic(this)">Alle</button>` +
+    topics.map(t => `<button class="topic-btn" data-topic="${t.id}" onclick="toggleTopic(this)">${t.icon} ${t.name}</button>`).join('');
+}
+
+function toggleTopic(btn) {
+  const container = btn.parentElement;
+  if (btn.dataset.topic === 'all') {
+    container.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    container.querySelector('[data-topic="all"]').classList.remove('active');
+    btn.classList.toggle('active');
+    if (!container.querySelector('.topic-btn.active')) {
+      container.querySelector('[data-topic="all"]').classList.add('active');
+    }
+  }
+}
+
+function getSelectedTopics(containerId) {
+  const btns = document.querySelectorAll(`#${containerId} .topic-btn.active`);
+  const ids = [...btns].map(b => b.dataset.topic);
+  if (ids.includes('all')) return topics.map(t => t.id);
+  return ids;
+}
+
+function startQuiz(topicOrMode) {
+  showSection('quiz');
+  let pool;
+  if (topicOrMode === 'all') {
+    pool = [...questions];
+  } else if (topicOrMode === 'weak') {
+    const weakTopics = topics.filter(t => {
+      const s = state.topicScores[t.id];
+      return s.answered === 0 || (s.correct / s.answered) < 0.7;
+    }).map(t => t.id);
+    pool = questions.filter(q => weakTopics.includes(q.topic));
+    if (pool.length === 0) pool = [...questions];
+  } else {
+    pool = questions.filter(q => q.topic === topicOrMode);
+  }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function startQuizFromFilter() {
+  const selectedTopics = getSelectedTopics('quiz-topic-filter');
+  let pool = questions.filter(q => selectedTopics.includes(q.topic));
+  if (pool.length === 0) { alert('Keine Fragen für diese Auswahl.'); return; }
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, Math.min(pool.length, 15));
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  document.getElementById('quiz-filter-card').style.display = 'none';
+  document.getElementById('quiz-area').style.display = 'block';
+  document.getElementById('quiz-results').style.display = 'none';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  document.getElementById('quiz-progress').style.width = ((state.quizIndex / total) * 100) + '%';
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+  const typeClass = q.type;
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${typeClass}">${typeLabel}</span>
+      <span class="q-num">${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  html += `<div class="feedback" id="quiz-feedback"></div>`;
+  document.getElementById('quiz-card').innerHTML = html;
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="checkAnswer()">Prüfen</button>
+    <button class="btn btn-outline" onclick="skipQuestion()" style="margin-left:auto;">Überspringen</button>
+  `;
+}
+
+function selectOption(el, idx, type) {
+  if (document.getElementById('quiz-feedback').classList.contains('show')) return;
+  if (type === 'sc') {
+    document.querySelectorAll('#options-list .option').forEach(o => o.classList.remove('selected'));
+    state.selectedOptions = new Set([idx]);
+    el.classList.add('selected');
+  } else {
+    if (state.selectedOptions.has(idx)) {
+      state.selectedOptions.delete(idx);
+      el.classList.remove('selected');
+    } else {
+      state.selectedOptions.add(idx);
+      el.classList.add('selected');
+    }
+  }
+}
+
+function checkAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  const fb = document.getElementById('quiz-feedback');
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    const selected = [...state.selectedOptions][0];
+    isCorrect = selected === q.correct;
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (i === q.correct) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && i !== q.correct) o.classList.add('wrong');
+    });
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+    document.querySelectorAll('#options-list .option').forEach((o, i) => {
+      if (correctSet.has(i)) o.classList.add('correct');
+      if (state.selectedOptions.has(i) && !correctSet.has(i)) o.classList.add('wrong');
+    });
+  } else {
+    const answer = document.getElementById('ft-answer').value.toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+    fb.innerHTML = `<strong>${isCorrect ? 'Gut!' : 'Verbesserungsbedarf'} (${matched.length}/${q.keywords.length} Schlüsselbegriffe)</strong>
+      <p style="margin-top:0.5rem;"><strong>Musterantwort:</strong> ${q.sampleAnswer}</p>
+      <p style="margin-top:0.3rem; font-size:0.85rem; color:var(--muted);">Erkannte Begriffe: ${matched.length > 0 ? matched.join(', ') : 'keine'}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  if (q.type !== 'ft') {
+    fb.innerHTML = `<strong>${isCorrect ? 'Richtig!' : 'Falsch!'}</strong><p>${q.explanation}</p>`;
+    fb.className = `feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  // Update stats
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) {
+    state.correct++;
+    state.streak++;
+    state.maxStreak = Math.max(state.maxStreak, state.streak);
+    state.topicScores[q.topic].correct++;
+  } else {
+    state.streak = 0;
+  }
+  state.quizAnswers.push(isCorrect);
+  saveState();
+
+  document.getElementById('quiz-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="nextQuizQuestion()">Weiter</button>
+  `;
+}
+
+function skipQuestion() {
+  state.quizAnswers.push(null);
+  nextQuizQuestion();
+}
+
+function nextQuizQuestion() {
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    showQuizResults();
+  } else {
+    showQuizQuestion();
+  }
+}
+
+function showQuizResults() {
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const skipped = state.quizAnswers.filter(a => a === null).length;
+  const wrong = total - correct - skipped;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'block';
+  document.getElementById('quiz-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Ergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'Bestanden' : 'Nicht bestanden'}</small>
+    </div>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${wrong}</div><div class="label">Falsch</div></div>
+      <div class="stat"><div class="num" style="color:var(--muted)">${skipped}</div><div class="label">Übersprungen</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-primary" onclick="resetQuiz()">Neues Quiz</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="showSection('dashboard')">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetQuiz() {
+  document.getElementById('quiz-filter-card').style.display = 'block';
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-results').style.display = 'none';
+}
+
+// ===== FLASHCARDS =====
+function initFlashcards(topicFilter) {
+  const selectedTopics = topicFilter || topics.map(t => t.id);
+  state.currentFC = flashcards.filter(fc => selectedTopics.includes(fc.topic));
+  shuffle(state.currentFC);
+  state.fcIndex = 0;
+  state.fcFlipped = false;
+  showFlashcard();
+}
+
+function showFlashcard() {
+  if (state.currentFC.length === 0) return;
+  const fc = state.currentFC[state.fcIndex];
+  document.getElementById('fc-question').textContent = fc.front;
+  document.getElementById('fc-answer').innerHTML = fc.back;
+  document.getElementById('flashcard').classList.remove('flipped');
+  state.fcFlipped = false;
+  document.getElementById('fc-counter').textContent = `${state.fcIndex + 1} / ${state.currentFC.length}`;
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+  state.fcFlipped = !state.fcFlipped;
+}
+
+function nextCard() {
+  state.fcIndex = (state.fcIndex + 1) % state.currentFC.length;
+  showFlashcard();
+}
+
+function prevCard() {
+  state.fcIndex = (state.fcIndex - 1 + state.currentFC.length) % state.currentFC.length;
+  showFlashcard();
+}
+
+function markCardKnown() {
+  if (state.currentFC.length <= 1) { nextCard(); return; }
+  state.currentFC.splice(state.fcIndex, 1);
+  if (state.fcIndex >= state.currentFC.length) state.fcIndex = 0;
+  showFlashcard();
+}
+
+function markCardUnknown() {
+  nextCard();
+}
+
+// ===== EXAM =====
+function startExam() {
+  let pool = [...questions];
+  shuffle(pool);
+  state.currentQuiz = pool.slice(0, 15);
+  state.quizIndex = 0;
+  state.quizAnswers = [];
+  state.examActive = true;
+  state.examTimeLeft = 1800;
+
+  document.getElementById('exam-setup').style.display = 'none';
+  document.getElementById('exam-area').style.display = 'block';
+  document.getElementById('exam-results').style.display = 'none';
+
+  showExamQuestion();
+  startExamTimer();
+}
+
+function startExamTimer() {
+  clearInterval(state.examTimer);
+  state.examTimer = setInterval(() => {
+    state.examTimeLeft--;
+    const min = Math.floor(state.examTimeLeft / 60);
+    const sec = state.examTimeLeft % 60;
+    const el = document.getElementById('exam-timer');
+    el.textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    el.classList.toggle('warning', state.examTimeLeft <= 300);
+    document.getElementById('exam-progress').style.width = ((1800 - state.examTimeLeft) / 1800 * 100) + '%';
+    if (state.examTimeLeft <= 0) {
+      clearInterval(state.examTimer);
+      finishExam();
+    }
+  }, 1000);
+}
+
+function showExamQuestion() {
+  const q = state.currentQuiz[state.quizIndex];
+  const total = state.currentQuiz.length;
+  state.selectedOptions = new Set();
+
+  const topicName = topics.find(t => t.id === q.topic)?.name || '';
+  const typeLabel = q.type === 'sc' ? 'Single Choice' : q.type === 'mc' ? 'Multiple Choice' : 'Freitext';
+
+  let html = `
+    <div class="question-header">
+      <span class="q-type ${q.type}">${typeLabel}</span>
+      <span class="q-num">Frage ${state.quizIndex + 1} / ${total}</span>
+    </div>
+    <div class="q-topic">${topicName}</div>
+    <div class="question-text">${q.q}</div>
+  `;
+
+  if (q.type === 'sc' || q.type === 'mc') {
+    html += `<div class="options" id="options-list">`;
+    q.options.forEach((opt, i) => {
+      const letter = String.fromCharCode(65 + i);
+      html += `<div class="option ${q.type === 'mc' ? 'mc-option' : ''}" data-idx="${i}" onclick="selectOption(this, ${i}, '${q.type}')">
+        <div class="marker">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<textarea class="ft-input" id="ft-answer" placeholder="Ihre Antwort..."></textarea>`;
+  }
+
+  document.getElementById('exam-card').innerHTML = html;
+  document.getElementById('exam-buttons').innerHTML = `
+    <button class="btn btn-primary" onclick="submitExamAnswer()">Antwort abgeben</button>
+    ${state.quizIndex < total - 1 ? '<button class="btn btn-outline" onclick="skipExamQuestion()" style="margin-left:auto;">Überspringen</button>' : ''}
+  `;
+}
+
+function submitExamAnswer() {
+  const q = state.currentQuiz[state.quizIndex];
+  let isCorrect = false;
+
+  if (q.type === 'sc') {
+    if (state.selectedOptions.size === 0) return;
+    isCorrect = [...state.selectedOptions][0] === q.correct;
+  } else if (q.type === 'mc') {
+    if (state.selectedOptions.size === 0) return;
+    const correctSet = new Set(q.correct);
+    isCorrect = state.selectedOptions.size === correctSet.size && [...state.selectedOptions].every(i => correctSet.has(i));
+  } else {
+    const answer = (document.getElementById('ft-answer')?.value || '').toLowerCase();
+    if (!answer.trim()) return;
+    const matched = q.keywords.filter(kw => answer.includes(kw));
+    isCorrect = matched.length >= Math.ceil(q.keywords.length * 0.4);
+  }
+
+  state.quizAnswers.push(isCorrect);
+  state.answered++;
+  state.topicScores[q.topic].answered++;
+  if (isCorrect) { state.correct++; state.topicScores[q.topic].correct++; }
+  saveState();
+
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function skipExamQuestion() {
+  state.quizAnswers.push(null);
+  state.quizIndex++;
+  if (state.quizIndex >= state.currentQuiz.length) {
+    finishExam();
+  } else {
+    showExamQuestion();
+  }
+}
+
+function finishExam() {
+  clearInterval(state.examTimer);
+  state.examActive = false;
+  const total = state.quizAnswers.length;
+  const correct = state.quizAnswers.filter(a => a === true).length;
+  const pct = Math.round(correct / total * 100);
+  const pass = pct >= 70;
+  const timeUsed = 1800 - state.examTimeLeft;
+  const min = Math.floor(timeUsed / 60);
+  const sec = timeUsed % 60;
+
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'block';
+  document.getElementById('exam-results').innerHTML = `
+    <h3 style="text-align:center; margin-bottom: 1rem;">Prüfungsergebnis</h3>
+    <div class="result-circle ${pass ? 'pass' : 'fail'}">
+      ${pct}%
+      <small>${pass ? 'BESTANDEN' : 'NICHT BESTANDEN'}</small>
+    </div>
+    <p style="text-align:center; margin-top:0.5rem; color:var(--muted);">Zeit: ${min}:${sec.toString().padStart(2, '0')} / 30:00</p>
+    <div class="stats" style="margin-top:1rem;">
+      <div class="stat"><div class="num" style="color:var(--success)">${correct}</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" style="color:var(--warn)">${total - correct}</div><div class="label">Falsch/Übersprungen</div></div>
+      <div class="stat"><div class="num">${total}</div><div class="label">Gesamt</div></div>
+    </div>
+    <div class="btn-row" style="justify-content:center; margin-top:1rem;">
+      <button class="btn btn-gold" onclick="resetExam(); startExam();">Nochmal</button>
+      <button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button>
+      <button class="btn btn-outline" onclick="resetExam(); showSection('dashboard');">Dashboard</button>
+    </div>
+  `;
+}
+
+function resetExam() {
+  document.getElementById('exam-setup').style.display = 'block';
+  document.getElementById('exam-area').style.display = 'none';
+  document.getElementById('exam-results').style.display = 'none';
+}
+
+// ===== UTILS =====
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ===== INIT =====
+buildTopicFilter('quiz-topic-filter', true);
+buildTopicFilter('fc-topic-filter', true);
+updateDashboard();
+initFlashcards();
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('flashcards').classList.contains('active')) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+    if (e.key === 'ArrowRight') nextCard();
+    if (e.key === 'ArrowLeft') prevCard();
+  }
+});
+</script>
+</body>
+</html>
