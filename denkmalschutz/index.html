@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Schulungen - Lernplattform</title>
+<title>Energieberatung für Baudenkmale - Lernplattform</title>
 <style>
   :root {
     --primary: #035357;
@@ -73,13 +73,13 @@
     color: var(--muted);
   }
 
-  .topics {
+  .blocks {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
-  .topic-card {
+  .block-card {
     background: var(--card);
     border-radius: 14px;
     padding: 1.8rem;
@@ -90,22 +90,22 @@
     display: flex;
     flex-direction: column;
   }
-  .topic-card.available {
+  .block-card.available {
     cursor: pointer;
     text-decoration: none;
     color: inherit;
   }
-  .topic-card.available:hover {
+  .block-card.available:hover {
     border-color: var(--accent);
     transform: translateY(-3px);
     box-shadow: 0 8px 24px rgba(3,83,87,0.12);
   }
-  .topic-card.pending {
+  .block-card.pending {
     opacity: 0.55;
     cursor: default;
   }
 
-  .topic-label {
+  .block-number {
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -113,25 +113,25 @@
     color: var(--accent);
     margin-bottom: 0.4rem;
   }
-  .topic-card.pending .topic-label { color: var(--muted); }
+  .block-card.pending .block-number { color: var(--muted); }
 
-  .topic-title {
+  .block-title {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--primary);
     margin-bottom: 0.5rem;
     line-height: 1.3;
   }
-  .topic-card.pending .topic-title { color: var(--muted); }
+  .block-card.pending .block-title { color: var(--muted); }
 
-  .topic-desc {
+  .block-desc {
     font-size: 0.88rem;
     color: var(--muted);
     line-height: 1.5;
     flex: 1;
   }
 
-  .topic-footer {
+  .block-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -140,12 +140,12 @@
     border-top: 1px solid var(--border);
   }
 
-  .topic-meta {
+  .block-meta {
     font-size: 0.78rem;
     color: var(--muted);
   }
 
-  .topic-status {
+  .block-status {
     font-size: 0.75rem;
     font-weight: 700;
     padding: 0.25rem 0.75rem;
@@ -162,7 +162,7 @@
     color: #999;
   }
 
-  .topic-icon {
+  .block-icon {
     font-size: 2rem;
     margin-bottom: 0.75rem;
   }
@@ -182,22 +182,22 @@
     header h1 { font-size: 1.5rem; }
     header p { font-size: 0.88rem; }
     main { padding: 1.25rem 0.75rem; }
-    .topics { grid-template-columns: 1fr; gap: 0.75rem; }
-    .topic-card { padding: 1.3rem; }
-    .topic-title { font-size: 1.1rem; }
-    .topic-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .blocks { grid-template-columns: 1fr; gap: 0.75rem; }
+    .block-card { padding: 1.3rem; }
+    .block-title { font-size: 1.1rem; }
+    .block-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
     .intro { margin-bottom: 1.5rem; }
     .intro h2 { font-size: 1.15rem; }
   }
 
   @media (max-width: 360px) {
     header h1 { font-size: 1.3rem; }
-    .topic-card { padding: 1rem; }
+    .block-card { padding: 1rem; }
   }
 
   @media (hover: none) and (pointer: coarse) {
-    .topic-card.available:hover { transform: none; box-shadow: none; }
-    .topic-card.available:active { transform: scale(0.98); }
+    .block-card.available:hover { transform: none; box-shadow: none; }
+    .block-card.available:active { transform: scale(0.98); }
   }
 
   @supports (padding: env(safe-area-inset-bottom)) {
@@ -209,41 +209,67 @@
 
 <header>
   <div class="badge">Interaktives Lernen</div>
-  <h1>Schulungen</h1>
-  <p>Wählen Sie ein Thema, um mit der Prüfungsvorbereitung zu beginnen.</p>
+  <h1>Energieberatung für Baudenkmale</h1>
+  <p>Wohngebäude - Prüfungsvorbereitung mit Quiz, Karteikarten und Prüfungssimulation</p>
 </header>
 
 <main>
   <div class="intro">
-    <h2>Verfügbare Themen</h2>
-    <p>Quiz, Karteikarten und Prüfungssimulation für Ihre Weiterbildung.</p>
+    <h2>4 Blöcke - Ihr Weg zum Zertifikat</h2>
+    <p>Wählen Sie einen Block, um mit dem interaktiven Lernen zu beginnen.</p>
   </div>
 
-  <div class="topics">
+  <div class="blocks">
 
-    <a href="denkmalschutz/index.html" class="topic-card available">
-      <div class="topic-icon">🏛️</div>
-      <div class="topic-label">Thema</div>
-      <div class="topic-title">Energieberatung für Baudenkmale</div>
-      <div class="topic-desc">
-        Wohngebäude - 4 Blöcke zu Denkmalschutz, Bauphysik, Anlagentechnik und Beratungsbericht.
+    <a href="block1/block1.html" class="block-card available">
+      <div class="block-icon">🏛️</div>
+      <div class="block-number">Block 1</div>
+      <div class="block-title">Einführung Denkmalschutz</div>
+      <div class="block-desc">
+        Denkmalbegriff, Denkmalarten, Zuständigkeiten, Erlaubnisverfahren, Voruntersuchung, energetische Ertüchtigung, GEG § 105, Förderung und historische Bauweisen.
       </div>
-      <div class="topic-footer">
-        <span class="topic-meta">79 UE &middot; 4 Blöcke</span>
-        <span class="topic-status status-active">Verfügbar</span>
+      <div class="block-footer">
+        <span class="block-meta">15 UE &middot; Prof. Pfeil</span>
+        <span class="block-status status-active">Verfügbar</span>
       </div>
     </a>
 
-    <a href="lca/index.html" class="topic-card available">
-      <div class="topic-icon">🌱</div>
-      <div class="topic-label">Thema</div>
-      <div class="topic-title">LCA - Ökobilanzierung</div>
-      <div class="topic-desc">
-        Life Cycle Assessment: Materialien, Bewertungsverfahren und Nachhaltigkeit im Bauwesen.
+    <a href="block2/block2.html" class="block-card available">
+      <div class="block-icon">🔍</div>
+      <div class="block-number">Block 2</div>
+      <div class="block-title">Materialien & energetische Planung</div>
+      <div class="block-desc">
+        Gesetze & Verordnungen, Bauphysik (Wärme-/Feuchteschutz), Messverfahren, Wärmebrücken, Materialien, Gebäudetypologie, Bestandsaufnahme und Zertifizierung.
       </div>
-      <div class="topic-footer">
-        <span class="topic-meta">Schulungsunterlagen</span>
-        <span class="topic-status status-active">Verfügbar</span>
+      <div class="block-footer">
+        <span class="block-meta">24 UE &middot; Dr. Wiedemann</span>
+        <span class="block-status status-active">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="block3/block3.html" class="block-card available">
+      <div class="block-icon">📐</div>
+      <div class="block-number">Block 3</div>
+      <div class="block-title">Anlagentechnik & Versorgung</div>
+      <div class="block-desc">
+        Wärmeerzeuger, Heizlastberechnung, hydraulischer Abgleich, Wärmepumpe im Denkmal, Heizflächen, Lüftung, Wirtschaftlichkeit, kommunale Wärmeplanung.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">24 UE &middot; Peter Kupetz</span>
+        <span class="block-status status-active">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="block4/block4.html" class="block-card available">
+      <div class="block-icon">⚡</div>
+      <div class="block-number">Block 4</div>
+      <div class="block-title">Ausführung & Beratungsbericht</div>
+      <div class="block-desc">
+        Nutzung & Zonierung, Raumklima, Gebäudehülle, Detailanschlüsse, Wärmebrücken & fRsi, Konzepterstellung, Beratungsbericht, Ausschreibung & Vergabe.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">16 UE &middot; Stephan Rothe</span>
+        <span class="block-status status-active">Verfügbar</span>
       </div>
     </a>
 
@@ -251,7 +277,7 @@
 </main>
 
 <footer>
-  <p>Lernplattform &middot; <a href="https://campus-ew.de">Campus-EW</a></p>
+  <p>Energieberatung für Baudenkmale &middot; Wohngebäude &middot; <a href="https://campus-ew.de">Campus-EW</a></p>
 </footer>
 
 </body>
