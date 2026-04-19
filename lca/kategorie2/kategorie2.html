@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 2 - KG 400 Technische Anlagen & F-Gase</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 2: KG 400 - Technische Anlagen & F-Gase</h1>
+  <p>Sockelbetrag, Wärmeerzeuger, PV, Batteriespeicher, Kältemittel</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen KG 400</h3>
+      <div class="trap">Sockelbetrag wechselt bei EH 40 oder besser von 1,20 auf <strong>1,30 kg CO₂</strong>. Kleine Änderung - große Wirkung.</div>
+      <div class="trap">Dimensionierungsregel: 6 kW Luft-Wasser-WP → Datensatz für <strong>7 kW</strong> wählen (nächstgelegene Dimensionierung).</div>
+      <div class="trap">Pufferspeicher-Masse IMMER im <strong>Leerzustand</strong> angeben - NICHT mit Wasser gefüllt!</div>
+      <div class="trap">Batteriespeicher wird IMMER zu 100% dem Gebäude zugeordnet, in dem er installiert ist - auch wenn das Nachbargebäude 100% nutzt.</div>
+      <div class="trap">KfW-O-Ton: Luft-/Sole-/Wasser-Wasser-WP = "klassische Wärmepumpe" - NICHT als Splitgerät klassifizieren (andere Leckageraten!).</div>
+      <div class="trap">Nicht-natürliche Kältemittel → zwingende F-Gase-Sonderberechnung nach Modul B1. Wechsel von R290 auf R32 kurz vor Fertigstellung kann die Förderung kosten.</div>
+      <div class="trap">Ab 01.01.2027: In Effizienzhäusern NUR noch WP mit natürlichem Kältemittel erlaubt.</div>
+      <div class="trap">PV-Datensätze 10.48 und 10.49 haben <strong>identische Werte</strong> - egal welchen man wählt.</div>
+      <div class="trap">Wärmeerzeuger versorgt zwei Gebäude → <strong>Eigennutzungsanteil</strong> ansetzen (z.B. 30% / 70%). Ausnahme: Batteriespeicher immer 100%.</div>
+      <div class="trap">Aufzug: Der <strong>Energieaufwand</strong> im Wohngebäude wird NICHT berücksichtigt - nur die Materialien (Grundkomponenten + stockwerkabhängig).</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Sockelbetrag-Werte</h3>
+      <div class="formula-box">Qₚ > 40%: GWP = 1,20 kg CO₂/(m²NRF·a)<br>Qₚ ≤ 40% (EH 40+): <strong>GWP = 1,30 kg CO₂/(m²NRF·a)</strong></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">F-Gase Sonderformel (Modul B1)</h3>
+      <div class="formula-box">BG = [(Lr/100 × Δt) + (Er/100 × Az)] × Fm × GWP / Δt</div>
+      <p style="font-size: 0.88rem; color: var(--muted); margin-top: 0.5rem;">Lr = Leckagerate %, Er = Entsorgungsrate %, Fm = Füllmenge kg, Az = Austauschzyklus, Δt = 50 a</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Zwei-Schritt: 1) Sockelbetrag 2) Einzelerfassung</div>
+      <div class="merksatz">EH 40 → Sockelbetrag 1,30 kg CO₂</div>
+      <div class="merksatz">Batteriespeicher IMMER 100% im Installationsgebäude</div>
+      <div class="merksatz">R290 (Propan) GWP 4 - keine Sonderberechnung nötig</div>
+      <div class="merksatz">R32 GWP 675 - Sonderberechnung F-Gase zwingend</div>
+      <div class="merksatz">Ab 2027: Nur noch natürliche Kältemittel im EH</div>
+      <div class="merksatz">Pufferspeicher-Masse = Leergewicht</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k2-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'sysgrenzen', name: 'Systemgrenzen KG 400', icon: '🏗️' },
+  { id: 'sockel', name: 'Sockelbetrag', icon: '💠' },
+  { id: 'einzel', name: 'Einzelerfassung', icon: '🔧' },
+  { id: 'pv_batt', name: 'PV & Batterie', icon: '🔋' },
+  { id: 'aufzug', name: 'Aufzug', icon: '🛗' },
+  { id: 'fgase', name: 'F-Gase / Kältemittel', icon: '❄️' },
+  { id: 'nutzung', name: 'Gemeinsame Nutzung', icon: '🔗' },
+];
+
+const questions = [
+  { topic: 'sysgrenzen', type: 'sc',
+    q: 'Welche Kostengruppe nach DIN 276 erfasst die Wärmeversorgungsanlagen?',
+    options: ['KG 410', 'KG 420', 'KG 430', 'KG 440'],
+    correct: 1,
+    explanation: 'KG 420 = Wärmeversorgungsanlagen. KG 410 = Abwasser/Wasser, KG 430 = Raumlufttechnik, KG 440 = Elektrische Anlagen.' },
+  { topic: 'sysgrenzen', type: 'mc',
+    q: 'Welche Anlagen gehören in KG 400?',
+    options: ['Aufzüge (KG 460)', 'Fundamente', 'Lüftungsanlagen (KG 430)', 'Außenwände', 'Kommunikationstechnik (KG 450)'],
+    correct: [0, 2, 4],
+    explanation: 'Aufzüge (460), Lüftung (430) und Kommunikationstechnik (450) gehören zu KG 400. Fundamente/Außenwände sind KG 300.' },
+
+  { topic: 'sockel', type: 'sc',
+    q: 'Wie hoch ist der Sockelbetrag bei einem EH 40 Neubau?',
+    options: ['1,00 kg CO₂/(m²NRF·a)', '1,20 kg CO₂/(m²NRF·a)', '1,30 kg CO₂/(m²NRF·a)', '1,50 kg CO₂/(m²NRF·a)'],
+    correct: 2,
+    explanation: 'EH 40 oder besser (Qₚ ≤ 40% von Qₚ,Ref) → Sockelbetrag 1,30 kg CO₂. Standard-Gebäude (>40%): 1,20 kg.' },
+  { topic: 'sockel', type: 'mc',
+    q: 'Was ist pauschal im Sockelbetrag enthalten?',
+    options: ['Steigleitungen, Fallrohre', 'Wärmeerzeuger (z.B. Wärmepumpe)', 'Sanitärobjekte', 'Niederspannungshauptverteiler, Kabel', 'Photovoltaik-Anlage', 'Elektro-Durchlauferhitzer'],
+    correct: [0, 2, 3, 5],
+    explanation: 'Im Sockelbetrag: Rohre, Sanitär, Kabel, Durchlauferhitzer. NICHT: eigenständige Wärmeerzeuger und PV (Einzelerfassung!).' },
+  { topic: 'sockel', type: 'sc',
+    q: 'Wann wird Sockelbetrag 1,20 angesetzt?',
+    options: ['Immer', 'Bei Qₚ > 40% von Qₚ,Ref', 'Bei Qₚ ≤ 40% von Qₚ,Ref', 'Bei Passivhaus'],
+    correct: 1,
+    explanation: 'Bei Qₚ > 40% (schwächerer Standard): 1,20. Bei Qₚ ≤ 40% (EH 40 oder besser): 1,30.' },
+
+  { topic: 'einzel', type: 'sc',
+    q: 'Eine Luft-Wasser-Wärmepumpe mit 6 kW ist zu bilanzieren. Welcher Datensatz wird verwendet?',
+    options: ['5 kW', '6 kW interpoliert', '7 kW (nächstgelegene Dimensionierung)', 'Durchschnitt aus 5 + 10 kW'],
+    correct: 2,
+    explanation: 'Dimensionierungsregel: nächstgelegene verfügbare Dimensionierung. Für 6 kW → Datensatz 10.27 (7 kW).' },
+  { topic: 'einzel', type: 'sc',
+    q: 'Wie wird die Masse eines Pufferspeichers angegeben?',
+    options: ['Mit Wasser gefüllt', 'Im Leerzustand', 'Mittelwert aus gefüllt und leer', 'Nach Herstellerspezifikation'],
+    correct: 1,
+    explanation: 'Wichtiger Praxishinweis: Pufferspeicher-Masse im LEERZUSTAND angeben, nicht mit Wasser gefüllt.' },
+
+  { topic: 'pv_batt', type: 'sc',
+    q: 'Welcher Austauschzyklus gilt für PV-Anlagen?',
+    options: ['0', '1', '2', '4'],
+    correct: 1,
+    explanation: 'PV-System: Austauschzyklus 1 (1 Austausch innerhalb 50 Jahre). LFP-Batterie: Austauschzyklus 2.' },
+  { topic: 'pv_batt', type: 'sc',
+    q: 'Ein Batteriespeicher versorgt überwiegend das Nachbargebäude. Wie wird er bilanziert?',
+    options: ['Anteilig zum Nutzungsanteil', '0% (weil Fremdnutzung)', '100% im Installationsgebäude - IMMER', 'Nur wenn Eigenverbrauch > 50%'],
+    correct: 2,
+    explanation: 'Absurde Ausnahme: Batteriespeicher wird IMMER zu 100% dem Gebäude zugeordnet, in dem er installiert ist - unabhängig von tatsächlicher Nutzung.' },
+  { topic: 'pv_batt', type: 'mc',
+    q: 'Was ist über die beiden PV-Datensätze 10.48 (1000 kWh/m²·a) und 10.49 (1200 kWh/m²·a) zu wissen?',
+    options: ['Sie haben identische Werte', 'Standort entscheidet, welchen man wählt', 'Die Wahl macht rechnerisch keinen Unterschied', 'Austauschzyklus = 1'],
+    correct: [0, 2, 3],
+    explanation: 'Beide Datensätze haben trotz unterschiedlicher Bezeichnung IDENTISCHE Werte. Austauschzyklus = 1.' },
+
+  { topic: 'aufzug', type: 'sc',
+    q: 'Wird der Energieaufwand eines Aufzugs im Wohngebäude berücksichtigt?',
+    options: ['Ja, voll', 'Ja, aber nur die Standby-Energie', 'Nein, nur die Materialien werden bilanziert', 'Nur bei mehr als 3 Geschossen'],
+    correct: 2,
+    explanation: 'Der Energieaufwand von Aufzugsanlagen wird im Wohngebäude NICHT berücksichtigt - nur die Materialien (Grundkomponenten + stockwerkabhängige Komponenten).' },
+  { topic: 'aufzug', type: 'mc',
+    q: 'Was sind "Grundkomponenten" einer Aufzugsanlage (CODE 10.51)?',
+    options: ['Kabine, Tür, Antrieb', 'Pro Anlage EINMALIG', 'Schachttüren pro Stockwerk', 'Stockwerkunabhängig', 'Austauschzyklus 1'],
+    correct: [0, 1, 3, 4],
+    explanation: 'Grundkomponenten = stockwerkunabhängig, einmalig pro Anlage. Schachttüren pro Stockwerk = stockwerkabhängig (10.52).' },
+
+  { topic: 'fgase', type: 'sc',
+    q: 'Welches Kältemittel benötigt KEINE F-Gase-Sonderberechnung?',
+    options: ['R32 (GWP 675)', 'R410A (GWP 2088)', 'R290 Propan (GWP 4)', 'R134a (GWP 1430)'],
+    correct: 2,
+    explanation: 'Natürliche Kältemittel (R290 Propan, R600a Isobutan, R717 Ammoniak, R718 Wasser, R744 CO₂) benötigen KEINE Sonderberechnung. Alle F-Gase mit hohem GWP schon.' },
+  { topic: 'fgase', type: 'mc',
+    q: 'Welche Aussagen zu F-Gasen sind korrekt?',
+    options: ['Sonderberechnung nach Modul B1', 'Luft-/Sole-/Wasser-Wasser-WP ≠ Splitgerät (KfW-O-Ton)', 'Leckagerate Wärmepumpe: 2,50% / Jahr', 'Ab 2027 in EH nur natürliche Kältemittel erlaubt', 'R32 ist natürliches Kältemittel'],
+    correct: [0, 1, 2, 3],
+    explanation: 'R32 ist NICHT natürlich (GWP 675). Alle anderen Aussagen stimmen.' },
+  { topic: 'fgase', type: 'ft',
+    q: 'Erkläre die F-Gase-Formel in einem Satz und nenne die kritische Konsequenz für die 24-kg-Grenze.',
+    keywords: ['leckage', 'entsorgung', 'füllmenge', 'gwp', 'betrachtungszeitraum', '50', 'förderung', 'grenze'],
+    sampleAnswer: 'Die F-Gase-Formel summiert Leckageverluste (Lr × Δt) und Entsorgungsverluste (Er × Austauschzyklus) multipliziert mit Füllmenge und GWP des Kältemittels, geteilt durch den Betrachtungszeitraum 50 Jahre. Konsequenz: Ein Wechsel von R290 auf R32 kann eine LCA von 23,8 kg CO₂ auf 24,2 kg heben - und damit die Förderung kosten.' },
+  { topic: 'fgase', type: 'sc',
+    q: 'Ab wann dürfen in Effizienzhäusern nur noch Wärmepumpen mit natürlichem Kältemittel eingebaut werden?',
+    options: ['01.01.2025', '01.01.2026', '01.01.2027', '01.01.2030'],
+    correct: 2,
+    explanation: 'Ab 01.01.2027 sind in Effizienzhäusern nur noch Wärmepumpen mit natürlichem Kältemittel zulässig.' },
+
+  { topic: 'nutzung', type: 'sc',
+    q: 'Eine Wärmepumpe im Garten versorgt Gebäude A (30%) und B (70%). Wie wird sie in der LCA von Gebäude A bilanziert?',
+    options: ['100%', '50%', '30% (Eigennutzungsanteil)', '0%'],
+    correct: 2,
+    explanation: 'Anteilig am Eigennutzungsanteil - hier 30%. AUSNAHME: Batteriespeicher immer 100% im Installationsgebäude.' },
+];
+
+const flashcards = [
+  { topic: 'sysgrenzen', front: 'Systemgrenzen KG 400', back: '<ul><li>KG 410 Abwasser/Wasser</li><li>KG 420 Wärmeversorgung</li><li>KG 430 Raumlufttechnik</li><li>KG 440 Elektrische Anlagen</li><li>KG 450 Kommunikations-/Sicherheitstechnik</li><li>KG 460 Förderanlagen (Aufzüge)</li></ul>' },
+  { topic: 'sockel', front: 'Sockelbetrag - Die zwei Werte', back: '<ul><li>Qₚ > 40% → <strong>1,20 kg CO₂/(m²NRF·a)</strong></li><li>Qₚ ≤ 40% (EH 40+) → <strong>1,30 kg CO₂/(m²NRF·a)</strong></li><li>Pauschal enthalten: Rohre, Sanitär, Kabel, Durchlauferhitzer</li><li>Nicht enthalten: Wärmeerzeuger, PV, Aufzug (Einzelerfassung)</li></ul>' },
+  { topic: 'einzel', front: 'Dimensionierungsregel', back: '<ul><li>Typgleiche Geräte mit abweichender Dimensionierung:</li><li>→ <strong>Nächstgelegene verfügbare</strong> Dimensionierung</li><li>Beispiel: 6 kW LW-WP → Datensatz 7 kW (10.27)</li><li>Pufferspeicher-Masse: IMMER Leerzustand!</li></ul>' },
+  { topic: 'einzel', front: 'Wichtige Datensätze KG 421', back: '<ul><li>10.1 Gas-Brennwert &lt; 20 kW (a=2)</li><li>10.27 LW-WP 7 kW (a=2)</li><li>10.25 LW-WP 10 kW (a=2)</li><li>10.34 WW-WP 10 kW (a=2)</li><li>10.23 Solar Flachkollektor (a=2)</li><li>10.24 Solar Vakuumröhren (a=2)</li><li>10.69/70 Pufferspeicher Edelstahl/Stahl (a=2)</li></ul>' },
+  { topic: 'pv_batt', front: 'PV & Batterie - Datensätze', back: '<ul><li>10.48 PV-System 1000 kWh/m²·a (a=1)</li><li>10.49 PV-System 1200 kWh/m²·a (a=1)</li><li>→ <strong>Identische Werte</strong>, Wahl egal</li><li>10.50 LFP-Batterie pro 1 kWh (a=2)</li><li>Batterie IMMER 100% im Installationsgebäude</li></ul>' },
+  { topic: 'aufzug', front: 'Aufzug - Grundkomponenten vs. stockwerkabhängig', back: '<ul><li><strong>10.51 Grundkomponenten</strong> (stockwerkunabhängig)</li><li>Einmalig pro Anlage: Kabine, Tür, Antrieb</li><li><strong>10.52 Stockwerkabhängig</strong></li><li>z.B. Schachttüren pro Stockwerk</li><li>Austauschzyklus beide = 1</li><li><strong>Energieaufwand wird NICHT berücksichtigt</strong> (Wohngebäude)</li></ul>' },
+  { topic: 'fgase', front: 'Natürliche Kältemittel', back: '<ul><li><strong>Keine Sonderberechnung nötig:</strong></li><li>R290 Propan (GWP 4) - Wärmepumpe</li><li>R600a Isobutan (GWP 4) - Kühlschrank</li><li>R717 Ammoniak (GWP 0) - Großwärmepumpe</li><li>R718 Wasser (GWP 0)</li><li>R744 CO₂ (GWP 1)</li><li>Ab 01.01.2027 PFLICHT in EH</li></ul>' },
+  { topic: 'fgase', front: 'F-Gase - Sonderberechnung nötig', back: '<ul><li>R32: GWP 675 - "eventuell zukunftssicher"</li><li>R410A: GWP 2088 - nicht zukunftssicher</li><li>R134a: GWP 1430 - nicht zukunftssicher</li><li>R454B: GWP 467 - "eventuell"</li><li>Formel: BG = [(Lr/100×Δt)+(Er/100×Az)] × Fm × GWP / Δt</li><li>Δt = 50 a</li></ul>' },
+  { topic: 'fgase', front: 'Anlagentyp-Zuordnung (KfW-O-Ton)', back: '<ul><li>"Luft-Wasser-, Sole-Wasser- und Wasser-Wasser-WP ist in der Regel eine klassische Wärmepumpe" (KfW)</li><li>NICHT als Splitgerät klassifizieren!</li><li>Leckageraten 50 a:</li><li>- Wärmepumpe: 2,50% (Az=2)</li><li>- Splitgerät: 5,00% (Az=4)</li><li>- Chiller: 3,76% (Az=3)</li></ul>' },
+  { topic: 'nutzung', front: 'Gemeinsame Nutzung', back: '<ul><li>Grundsatz: Anteilig am <strong>Eigennutzungsanteil</strong></li><li>Beispiel: WP versorgt A (30%) + B (70%)</li><li>→ Nur 30% in LCA von A</li><li><strong>Ausnahme Batteriespeicher:</strong></li><li>IMMER 100% im Installationsgebäude</li><li>"Das muss man nicht verstehen, nur akzeptieren."</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>

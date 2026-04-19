@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 3 - PV-Berechnung im Detail</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 3: PV-Berechnung im Detail</h1>
+  <p>Standort, DIN 18599-9, Eigenverbrauch, Batterie, Peakleistungskoeffizient</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen PV-Berechnung</h3>
+      <div class="trap">Die PV-Berechnung aus GEG/BEG (Effizienzhaus) darf <strong>NICHT</strong> für die LCA verwendet werden! Andere Regeln, andere Ergebnisse.</div>
+      <div class="trap">In der LCA MUSS der konkrete Projektstandort verwendet werden - NICHT Referenzort Potsdam wie in GEG.</div>
+      <div class="trap">Je nach Region: PV-Ertrag weicht um <strong>±10%</strong> von Potsdam ab - das kann einen halben kg CO₂ ausmachen und über Förderfähigkeit entscheiden.</div>
+      <div class="trap">Nutzerstrom: 20 kWh/m² beheizte NRF, MONATLICH gleichmäßig verteilt. Jahreswerte sind NICHT zulässig.</div>
+      <div class="trap">Peakleistungskoeffizient: Wenn Hersteller-Modul BESSER als Norm (z.B. 22%), rechnet Software damit - bei Modul-Wechsel auf 20% fällt die LCA auseinander. Empfehlung: ca. 18-18,5% wählen.</div>
+      <div class="trap">Volleinspeiseanlagen sind für LCA <strong>AUSGESCHLOSSEN</strong>! Nur Überschusseinspeise-Anlagen dürfen angerechnet werden.</div>
+      <div class="trap">Batteriespeicher DARF in LCA berücksichtigt werden - in GEG/BEG NICHT. Nicht vertauschen!</div>
+      <div class="trap">Eigenverbrauch: GWP-Abzug in B6.1. Einspeisung: NUR Modul D2 - KEIN GWP-Abzug!</div>
+      <div class="trap">Abschaltzeiten der WP (6+ Stunden) müssen im Energieberater-Modul eingestellt werden (Hottgenroth), NICHT in ECO-CAD.</div>
+      <div class="trap">Simulationen zur Eigenverbrauchsberechnung sind NICHT zulässig - nur DIN V 18599-9 Abschnitt 7.4.2.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die 5 Berechnungsschritte</h3>
+      <ol style="padding-left: 1.5rem; font-size: 0.92rem; line-height: 1.9;">
+        <li><strong>Monatlicher Endenergiebedarf</strong> aus GEG-Berechnung (heizwertbezogen)</li>
+        <li><strong>Nutzerstrom</strong>: 20 kWh/m² × beheizte NRF, auf 12 Monate verteilen</li>
+        <li><strong>Stromertrag</strong> nach DIN V 18599-9 (Standort, Peakleistung, Verschattung)</li>
+        <li><strong>Eigenverbrauch/Einspeisung</strong> nach Abschnitt 7.4.2 (+ ggf. fBatt)</li>
+        <li><strong>GWP/PENRT aufteilen</strong>: Eigenverbrauch → B6, Einspeisung → nur D2</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">PV-LCA ≠ PV-GEG/BEG - drei verschiedene Berechnungen!</div>
+      <div class="merksatz">Standort konkret, nicht Potsdam</div>
+      <div class="merksatz">Nutzerstrom 20 kWh/m² beheizte NRF - monatlich</div>
+      <div class="merksatz">Eigenverbrauch → B6-Abzug. Einspeisung → nur D2</div>
+      <div class="merksatz">Batterie in LCA ✅, in GEG/BEG ❌</div>
+      <div class="merksatz">Peakleistung bei ~18-18,5% wählen - sichere Seite</div>
+      <div class="merksatz">Nur Überschusseinspeisung anrechenbar - keine Volleinspeisung</div>
+      <div class="merksatz">5 m² Solar schlägt 15 m² PV - Mischung ist oft besser</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k3-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'unterschied', name: 'LCA vs. GEG/BEG', icon: '🔄' },
+  { id: 'schritte', name: '5 Berechnungsschritte', icon: '📋' },
+  { id: 'standort', name: 'Standort / Klimazone', icon: '📍' },
+  { id: 'peak', name: 'Peakleistungskoeffizient', icon: '⚡' },
+  { id: 'belueftung', name: 'Belüftung / Abschaltzeiten', icon: '🌬️' },
+  { id: 'batterie', name: 'Eigenverbrauch / Batterie', icon: '🔋' },
+  { id: 'kfw', name: 'KfW-Eigenstromnutzung', icon: '🏦' },
+  { id: 'solar_pv', name: 'Solar vs. PV', icon: '☀️' },
+  { id: 'nutzerstrom', name: 'Nutzerstrom', icon: '🔌' },
+];
+
+const questions = [
+  { topic: 'unterschied', type: 'sc',
+    q: 'Darf die PV-Berechnung aus der GEG/BEG-Bilanz für die LCA verwendet werden?',
+    options: ['Ja, immer', 'Nein, eigene Berechnung nötig', 'Nur wenn der Standort identisch ist', 'Nur bei kleinen Anlagen'],
+    correct: 1,
+    explanation: 'Die PV-Berechnung aus GEG/BEG darf NICHT für die LCA übernommen werden. GEG nutzt Potsdam als Einheitsstandort, LCA nutzt den konkreten Projektstandort. Andere Regeln, andere Ergebnisse.' },
+  { topic: 'unterschied', type: 'mc',
+    q: 'Welche Aussagen zu LCA vs. GEG/BEG sind korrekt?',
+    options: ['LCA: konkreter Standort, GEG: Potsdam', 'LCA: Batteriespeicher berücksichtigbar, GEG: nicht', 'LCA: Nutzerstrom pauschal, GEG: nicht', 'Alle drei Berechnungen (LCA/GEG/BEG) basieren auf DIN 18599', 'Simulationen sind in der LCA erlaubt'],
+    correct: [0, 1, 2, 3],
+    explanation: 'Simulationen sind in der LCA NICHT zulässig - nur DIN V 18599-9 Abschnitt 7.4.2. Alle anderen Aussagen stimmen.' },
+
+  { topic: 'schritte', type: 'mc',
+    q: 'Welche sind die 5 Berechnungsschritte der PV-Berechnung in der LCA?',
+    options: ['Monatlicher Endenergiebedarf aus GEG', 'Nutzerstrom (20 kWh/m²) berechnen und aufteilen', 'Stromertrag nach DIN V 18599-9', 'Eigenverbrauch/Einspeisung (Abschnitt 7.4.2)', 'Simulation mit PVSOL', 'GWP/PENRT aufteilen'],
+    correct: [0, 1, 2, 3, 5],
+    explanation: 'Keine Simulation! 5 Schritte: Endenergiebedarf, Nutzerstrom, Stromertrag, Eigenverbrauch/Einspeisung, GWP/PENRT-Aufteilung.' },
+  { topic: 'schritte', type: 'sc',
+    q: 'Wie wird der Endenergiebedarf für die PV-LCA-Berechnung aufgeteilt?',
+    options: ['Jahreswert verwendbar', 'Muss monatlich vorliegen', 'Nur Heizperiode relevant', 'Nach Wahl des Beraters'],
+    correct: 1,
+    explanation: 'Der Endenergiebedarf muss MONATLICH vorliegen (nicht als Jahreswert) und muss heizwertbezogen sein.' },
+
+  { topic: 'standort', type: 'sc',
+    q: 'Welcher Standort ist für die LCA-PV-Berechnung zu verwenden?',
+    options: ['Potsdam (Standard)', 'Berlin', 'Konkreter Projektstandort - 1 von 15 Klimazonen', 'Frei wählbar'],
+    correct: 2,
+    explanation: '15 Klimazonen in Deutschland nach DIN V 18599 Teil 10. Potsdam (Zone 4) ist für LCA NICHT zulässig.' },
+  { topic: 'standort', type: 'sc',
+    q: 'Bei unklarer Zuordnung zwischen zwei Klimazonen: welche wird gewählt?',
+    options: ['Die mit dem besseren PV-Ertrag', 'Die mit dem schlechteren PV-Ertrag (sichere Seite)', 'Der Mittelwert beider', 'Die nördlichere'],
+    correct: 1,
+    explanation: 'Bei Grenzgebieten: Zone mit dem SCHLECHTEREN PV-Ertrag wählen → sichere Seite für Nachweis.' },
+
+  { topic: 'peak', type: 'sc',
+    q: 'Norm-Wert Peakleistungskoeffizient monokristallin ab 2017?',
+    options: ['0,125 kW/m²', '0,135 kW/m²', '0,166 kW/m²', '0,182 kW/m²'],
+    correct: 3,
+    explanation: 'Monokristallin ab 2017: 0,182 kW/m² (= 18,2% Effizienz). Polykristallin ab 2017: 0,166 kW/m².' },
+  { topic: 'peak', type: 'mc',
+    q: 'Was ist problematisch, wenn ein Hersteller-Modul BESSER als Norm ist (z.B. 22%)?',
+    options: ['Software rechnet mit der besseren Effizienz', 'Bessere LCA kann errechnet werden', 'Wenn am Ende 20%-Module verbaut werden → LCA-Nachweis falsch', 'Empfehlung: Module mit ~18-18,5% wählen', 'Das ist völlig unproblematisch'],
+    correct: [0, 1, 2, 3],
+    explanation: 'Risiko: Ausgangsberechnung zu optimistisch. Nach Verbau anderer Module fällt die LCA auseinander → Förderungsverlust. Empfehlung: Module mit ca. 18-18,5% wählen (Norm-Niveau).' },
+  { topic: 'peak', type: 'ft',
+    q: 'Erkläre: Warum ist ein Hersteller-Modul mit 17% Effizienz unproblematisch, aber eines mit 22% ein Risiko?',
+    keywords: ['norm', '18,2', '18.2', 'wechsel', 'schlechter', 'besser', 'verbaut', 'nachweis', 'förderung'],
+    sampleAnswer: 'Bei Hersteller SCHLECHTER als Norm (17%): Software rechnet mit 17%, man könnte jederzeit auf Norm 18,2% wechseln - der LCA-Nachweis wird nur besser. Bei Hersteller BESSER als Norm (22%): Software rechnet mit 22% = bessere LCA. Falls am Ende Module mit nur 20% verbaut werden, wird die LCA im Ist-Zustand schlechter als berechnet → Förderung kann verloren gehen. Deshalb: Module ~18-18,5% wählen, dann bist du unabhängig.' },
+
+  { topic: 'belueftung', type: 'sc',
+    q: 'Aufdach-Montage ist in DIN 18599 typischerweise welcher Belüftungsklasse zugeordnet?',
+    options: ['Stark belüftet/freistehend', 'Mäßig belüftet', 'Unbelüftet', 'Egal, gleicher Wert'],
+    correct: 1,
+    explanation: 'Aufdach-Montage → mäßig belüftet (Hottgenroth: "mittlere Hinterlüftung"). Aufgeständert = stark belüftet. In-Dach-Module = unbelüftet.' },
+  { topic: 'belueftung', type: 'sc',
+    q: 'Welche Abschaltzeiten-Option ist der Standardfall für Wärmepumpen?',
+    options: ['Ohne Abschaltzeiten', 'Mit Abschaltzeiten ohne PV-Kopplung (6+ Stunden, unabhängig)', 'Smart Grid Ready mit PV-Kopplung', 'Komplett abgeschaltet'],
+    correct: 1,
+    explanation: 'Standardfall: "Mit Abschaltzeiten ohne Kopplung an PV" - 6+ Stunden Abschaltzeit, unabhängig von PV-Verfügbarkeit.' },
+
+  { topic: 'batterie', type: 'sc',
+    q: 'Wie wird die Einspeisung in die GWP-Bilanz aufgenommen?',
+    options: ['Als Abzug in Modul B6 wie Eigenverbrauch', 'Nur als Ausweisung in Modul D2 - kein GWP-Abzug!', 'Mit 50% Anrechnung in B6', 'Gar nicht'],
+    correct: 1,
+    explanation: 'Wichtig: Einspeisung wird NUR im Modul D2 (exportierte Energie) ausgewiesen - KEIN GWP-Abzug! Nur Eigenverbrauch wird in B6 abgezogen.' },
+  { topic: 'batterie', type: 'mc',
+    q: 'Was gilt für Batteriespeicher in der LCA?',
+    options: ['Erhöhen den Eigenverbrauchsanteil (Batteriekorrekturfaktor fBatt)', 'Dürfen in der LCA berücksichtigt werden', 'Dürfen auch in GEG/BEG berücksichtigt werden', 'Ab bestimmter Größe kippt der positive Effekt', 'Können auch spät nachgerüstet werden'],
+    correct: [0, 1, 3, 4],
+    explanation: 'In GEG/BEG DÜRFEN Batteriespeicher NICHT berücksichtigt werden - nur in der LCA. Spätoptimierung ist möglich.' },
+  { topic: 'batterie', type: 'sc',
+    q: 'Übungshaus: ohne Batterie 56,3% Eigenverbrauch, mit 5 kWh Batterie 88%. Wie verändert sich die LCA?',
+    options: ['Verschlechtert sich (Batterie kostet GWP)', 'Meistens Verbesserung: höherer Eigenverbrauch minus Batterie-GWP', 'Bleibt gleich', 'Nur messbar ab 10 kWh Batterie'],
+    correct: 1,
+    explanation: 'Netto-Verbesserung: Zusätzlicher Eigenverbrauch spart ca. 2,66 kg, Batterie kostet 0,30 kg → Verbesserung. Aber: Ab einer bestimmten Batteriegröße kippt der Effekt.' },
+
+  { topic: 'kfw', type: 'mc',
+    q: 'Welche KfW-Anforderungen gelten für die Eigenstromnutzung?',
+    options: ['Volleinspeiseanlagen sind ausgeschlossen', 'Nur Überschusseinspeisung ist anrechenbar', 'Mieterstrommodelle sind zwingend nötig', 'Stromverbraucher müssen physikalisch angeschlossen sein', 'Gebäude muss für direkte Nutzung ausgerüstet sein'],
+    correct: [0, 1, 3, 4],
+    explanation: 'Mieterstrommodelle sind NICHT zwingend. Entscheidend ist die physikalische Nutzung im Gebäude - die Abrechnung ist der KfW egal.' },
+
+  { topic: 'solar_pv', type: 'sc',
+    q: 'Bei begrenzter Dachfläche: Was ist in der Regel besser?',
+    options: ['Nur PV', 'Nur Solarthermie (Warmwasser)', 'Mischung aus Solar + PV', 'Gar nichts, keine Energie zählt'],
+    correct: 2,
+    explanation: 'Beispiel: 20 m² nur PV → ca. 2,6-2,7 kg. Aber: 5 m² Solar + 15 m² PV → ca. 4 kg Einsparung - fast doppelt so viel. Bei begrenzten Flächen ist Mischung vorteilhaft.' },
+  { topic: 'solar_pv', type: 'sc',
+    q: 'Wie viel GWP spart eine 5 m² Vakuumröhren-Solaranlage im Übungshaus?',
+    options: ['ca. 0,5 kg', 'ca. 1,0 kg', 'ca. 1,95 kg', 'ca. 2,1 kg'],
+    correct: 3,
+    explanation: 'Überraschend: 5 m² Solar (2,1 kg) schlägt 15 m² PV (1,95 kg). Solar ist bei Warmwasser sehr effizient.' },
+
+  { topic: 'nutzerstrom', type: 'sc',
+    q: 'Wie viel Nutzerstrom wird pauschal angesetzt?',
+    options: ['10 kWh/m² beheizte NRF pro Jahr', '20 kWh/m² beheizte NRF pro Jahr', '30 kWh/m² beheizte NRF pro Jahr', '50 kWh/m² beheizte NRF pro Jahr'],
+    correct: 1,
+    explanation: '20 kWh/m² beheizte NRF pro Jahr - gleichmäßig auf 12 Monate verteilt. Beispiel 185,49 m² NRF × 20 = 3.709,8 kWh/a → 309,2 kWh/Monat.' },
+];
+
+const flashcards = [
+  { topic: 'unterschied', front: 'LCA vs. GEG/BEG - 5 Hauptunterschiede', back: '<ul><li><strong>Standort:</strong> LCA = konkret (15 Klimazonen), GEG = Potsdam</li><li><strong>Batterie:</strong> LCA ✅, GEG/BEG ❌</li><li><strong>Nutzerstrom:</strong> LCA pauschal ✅, GEG ❌</li><li><strong>Peakleistung:</strong> LCA: Norm ODER Hersteller, GEG: nur Norm</li><li><strong>Simulation:</strong> In LCA NICHT zulässig</li></ul>' },
+  { topic: 'schritte', front: 'Die 5 Berechnungsschritte', back: '<ul><li>1. Monatlicher Endenergiebedarf (aus GEG, heizwertbezogen)</li><li>2. Nutzerstrom (20 kWh/m² × beheizte NRF / 12 Monate)</li><li>3. Stromertrag nach DIN V 18599-9 (Standort, Peakleistung)</li><li>4. Eigenverbrauch/Einspeisung (Abschnitt 7.4.2, ggf. fBatt)</li><li>5. GWP/PENRT aufteilen: EV → B6, Einspeisung → D2</li></ul>' },
+  { topic: 'standort', front: 'Standort / Klimazone', back: '<ul><li>15 Klimazonen nach DIN V 18599 Teil 10</li><li>Potsdam (Zone 4) NICHT zulässig für LCA</li><li>Je Region: ±10% Abweichung vom Potsdamer Ertrag</li><li>Zuordnung über PLZ (Hottgenroth automatisch)</li><li>Grenzgebiet: schlechtere Zone wählen</li></ul>' },
+  { topic: 'peak', front: 'Peakleistungskoeffizient - Norm-Werte', back: '<ul><li>Monokristallin bis 2016: 0,135 kW/m² (13,5%)</li><li><strong>Monokristallin ab 2017: 0,182 (18,2%)</strong></li><li>Polykristallin bis 2016: 0,125 (12,5%)</li><li>Polykristallin ab 2017: 0,166 (16,6%)</li><li>LCA: Norm ODER Hersteller erlaubt</li><li>GEG/EH: NUR Norm</li><li>Empfehlung IWPro: Module mit ~18-18,5%</li></ul>' },
+  { topic: 'belueftung', front: 'Belüftung PV-Module', back: '<ul><li><strong>Stark belüftet/freistehend:</strong> Aufgeständert, Freiflächen</li><li><strong>Mäßig belüftet (Standard):</strong> Aufdach-Montage</li><li><strong>Unbelüftet:</strong> In-Dach-Module, BIPV-Dachziegel</li><li>Hottgenroth: "gute/mittlere/schlechte Hinterlüftung"</li></ul>' },
+  { topic: 'belueftung', front: 'Abschaltzeiten Wärmepumpe', back: '<ul><li>Option 1: Ohne Abschaltzeiten</li><li><strong>Option 2 (Standard):</strong> Mit Abschaltzeiten ohne PV-Kopplung (6+ h)</li><li>Option 3: Smart Grid Ready (PV-gekoppelt, 6+ h)</li><li>Hottgenroth: Einstellung im Energieberater, NICHT in ECO-CAD</li></ul>' },
+  { topic: 'batterie', front: 'Eigenverbrauch / Einspeisung', back: '<ul><li><strong>Eigenverbrauch:</strong> GWP-Abzug in <strong>Modul B6.1</strong></li><li><strong>Einspeisung:</strong> NUR Ausweisung in <strong>Modul D2</strong> - KEIN Abzug!</li><li>Batterie erhöht Eigenverbrauch via fBatt</li><li>Batteriekorrekturfaktor Beispiel: 1,56</li><li>Ohne Batterie: 56% EV → mit 5 kWh: 88%</li></ul>' },
+  { topic: 'batterie', front: 'Batterie - wann kippt der Vorteil?', back: '<ul><li>Klein bis mittel: Verbesserung</li><li>Übungshaus 5 kWh: +1293 kWh EV, -2,66 kg GWP, +0,30 kg Batterie → netto Verbesserung</li><li>Ab bestimmter Größe: EV bereits bei 90% → größere Batterie bringt kaum mehr</li><li>Batterie-GWP steigt aber weiter → kippt</li><li>Praxis: Trial and Error in Software</li></ul>' },
+  { topic: 'kfw', front: 'KfW-Anforderungen Eigenstromnutzung', back: '<ul><li>Volleinspeiseanlagen ❌ für LCA ausgeschlossen</li><li>Nur Überschusseinspeisung ✅ anrechenbar</li><li>Stromverbraucher müssen physikalisch angeschlossen sein</li><li>Mieterstrommodelle NICHT zwingend nötig</li><li>Nur physikalische Nutzung im Gebäude zählt</li><li>Solarpaket 2 hat Möglichkeiten erweitert</li></ul>' },
+  { topic: 'solar_pv', front: 'Solar vs. PV - der überraschende Vergleich', back: '<ul><li>5 m² Vakuumröhren-Solar: 2,10 kg GWP</li><li>15 m² PV (Süd): 1,95 kg GWP</li><li>→ 5 m² Solar &gt; 15 m² PV!</li><li>Mischung schlägt reine PV:</li><li>20 m² nur PV → 2,6-2,7 kg</li><li>5 m² Solar + 15 m² PV → <strong>4,0 kg!</strong></li><li>Fast doppelt so viel</li></ul>' },
+  { topic: 'nutzerstrom', front: 'Nutzerstrom - pauschaler Ansatz', back: '<ul><li><strong>20 kWh/m² beheizte NRF pro Jahr</strong></li><li>Gleichmäßig auf 12 Monate verteilen</li><li>Beispiel 185,49 m² beheizt × 20 = 3.709,8 kWh/a</li><li>→ 309,2 kWh pro Monat</li><li>Nur in LCA (nicht in GEG/BEG)</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>

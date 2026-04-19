@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 6 - Förderung & EEE-Experte</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 6: Förderung & EEE-Experte</h1>
+  <p>KFN/WEF/KNN, QNG vs. LCA, NH- vs. EE-Klasse, Nachweise</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen Förderung & EEE</h3>
+      <div class="trap">KNN hat abweichend <strong>EH 55</strong> (nicht EH 40!) als Effizienzstandard - dafür aber zusätzlich LCC + Flächennachweis.</div>
+      <div class="trap">Der EEE-Experte trägt die <strong>GESAMTVERANTWORTUNG</strong> - auch für Teilleistungen Dritter (z.B. LCA durch externen Ersteller).</div>
+      <div class="trap">QNG-Siegel ist bei kleinen Wohngebäuden (bis 3-5 WE) wirtschaftlich UNSINNIG: +15.000€ Kosten gegen +50.000€ Kredit pro WE.</div>
+      <div class="trap">Versteckte QNG-Kosten: Jede Änderung erfordert Prüfung von Schadstoffen, Lichtqualität etc. Zertifiziertes Holz +20-30% teurer.</div>
+      <div class="trap">NH-Klasse vs. EE-Klasse bei BEG-Sanierung: NH kostet ~15-25k€, EE ~6-8k€. Beide 5% Tilgungszuschuss. <strong>NH ist praktisch NIE wirtschaftlich</strong>.</div>
+      <div class="trap">HAFTUNGSFALLE: Wer nur NH empfiehlt ohne EE-Alternative zu zeigen, riskiert Regressforderungen vom Kunden.</div>
+      <div class="trap">LCA-Systemgrenze WEICHT AB von Effizienzhaus-Systemgrenze! In LCA: auch unbeheizte Bereiche (Garage, Keller) zum Bilanzraum. Im EH nur thermische Hülle.</div>
+      <div class="trap">BzA (VOR Baubeginn) ≠ BnD (NACH Fertigstellung). Beides unterschreibt der EEE-Experte.</div>
+      <div class="trap">Wirtschaftlichkeit IMMER vor Projektbeginn rechnen: Förderung vs. Bau nach Gesetz. Oft ist Gesetz günstiger - Haftungsrisiko sonst!</div>
+      <div class="trap">Analogie QNG: "Lüftung für 8.000€ arbeitet täglich. QNG-Zertifikat für 25.000€ liegt in der Schublade."</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die 3 Förderprogramme im Vergleich</h3>
+      <table style="width:100%; border-collapse: collapse; font-size: 0.88rem;">
+        <tr style="background: #e8f5f5;"><th style="text-align:left; padding: 0.4rem;">Programm</th><th style="text-align:left; padding: 0.4rem;">Effizienzhaus</th><th style="text-align:left; padding: 0.4rem;">LCA</th><th style="text-align:left; padding: 0.4rem;">Sonder</th></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>KFN</strong></td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">EH 40</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">≤ 24 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Optional QNG</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>WEF</strong></td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">EH 40</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">≤ 24 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Optional QNG</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>KNN</strong></td><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>EH 55</strong></td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">≤ 24 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>LCC + Flächennachweis</strong></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">KFN/WEF = EH 40, KNN = EH 55 (Achtung!)</div>
+      <div class="merksatz">LCA-Grenzwert IMMER: GWP ≤ 24 kg CO₂/(m²NRF·a)</div>
+      <div class="merksatz">QNG rentiert sich bei MFH erst ab ~5-10 WE, oft gar nicht</div>
+      <div class="merksatz">NH-Klasse = "Papier in der Schublade" - EE-Klasse empfehlen</div>
+      <div class="merksatz">BzA vor Baubeginn, BnD nach Fertigstellung</div>
+      <div class="merksatz">LCA-Systemgrenze ≠ EH-Systemgrenze (LCA umfasst auch unbeheizt)</div>
+      <div class="merksatz">IMMER beide Optionen zeigen → Haftung!</div>
+      <div class="merksatz">Wirtschaftlichkeit vor Projektstart rechnen</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k6-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'programme', name: 'KFN / WEF / KNN', icon: '💰' },
+  { id: 'leistungen', name: 'Mindestleistungen EEE', icon: '📝' },
+  { id: 'qng_lca', name: 'QNG vs. LCA', icon: '⚖️' },
+  { id: 'nh_ee', name: 'NH- vs. EE-Klasse', icon: '🔄' },
+  { id: 'knn_spezial', name: 'KNN-Besonderheiten', icon: '🏠' },
+  { id: 'nachweise', name: 'Nachweise', icon: '📄' },
+  { id: 'wirtschaft', name: 'Wirtschaftlichkeit', icon: '📊' },
+];
+
+const questions = [
+  { topic: 'programme', type: 'sc',
+    q: 'Welchen Effizienzhaus-Standard verlangt das KNN-Programm?',
+    options: ['EH 40', 'EH 45', 'EH 55', 'EH 70'],
+    correct: 2,
+    explanation: 'KNN (Klimafreundlicher Neubau im Niedrigpreissegment) verlangt NUR EH 55 (abweichend von KFN/WEF mit EH 40). Dafür zusätzlich: LCC + Flächennachweis.' },
+  { topic: 'programme', type: 'mc',
+    q: 'Welche Anforderungen gelten gleich für alle drei Programme (KFN/WEF/KNN)?',
+    options: ['LCA: GWP ≤ 24 kg CO₂/(m²NRF·a)', 'Effizienzhaus-Standard EH 40', 'LCC-Berechnung', 'Verpflichtendes QNG-Siegel', 'BzA + BnD'],
+    correct: [0, 4],
+    explanation: 'Alle drei Programme: LCA ≤ 24 kg + BzA/BnD. EH 40 gilt NICHT für KNN (EH 55). LCC NUR bei KNN. QNG überall OPTIONAL.' },
+  { topic: 'programme', type: 'sc',
+    q: 'Welchen Förderbonus bringt das QNG-Siegel im KFN/WEF?',
+    options: ['+10.000€ Kredit pro WE', '+25.000€ Kredit pro WE', '+50.000€ Kredit pro WE', '+100.000€ Kredit pro WE'],
+    correct: 2,
+    explanation: 'QNG-Siegel bringt +50.000€ zusätzliches Kreditvolumen pro Wohneinheit. Aber: Kostet 15.000-20.000€ Mehraufwand + versteckte Planungs- und Baukosten.' },
+
+  { topic: 'leistungen', type: 'mc',
+    q: 'Welche Mindestleistungen muss der EEE-Experte erbringen?',
+    options: ['BzA + ggf. Siegelvariante', 'Effizienzhausberechnung', 'Lebenszyklusanalyse (LCA)', 'BnD + QNG-Werte', 'QNG-Nachhaltigkeitszertifizierung (wenn Siegel)', 'Versicherungsantrag'],
+    correct: [0, 1, 2, 3, 4],
+    explanation: 'Mindestleistungen: BzA, generelle Leistungen (Baustellenbegehungen, Info), EH-Berechnung, LCA, (LCC + Flächennachweis bei KNN), (QNG bei Siegel), BnD + QNG-Werte.' },
+  { topic: 'leistungen', type: 'sc',
+    q: 'Wer trägt die Gesamtverantwortung, wenn die LCA durch einen externen Ersteller erstellt wird?',
+    options: ['Der externe LCA-Ersteller', 'Der Bauherr', 'Der unterzeichnende EEE-Experte', 'Die KfW'],
+    correct: 2,
+    explanation: 'Der EEE-Experte, der am Ende unterschreibt, trägt die GESAMTVERANTWORTUNG - auch für Teilleistungen Dritter.' },
+
+  { topic: 'qng_lca', type: 'sc',
+    q: 'Typische Kosten des EEE-Experten bei reiner LCA (EFH)?',
+    options: ['1.000-2.000 €', '4.000-6.000 €', '10.000-12.000 €', '20.000-30.000 €'],
+    correct: 1,
+    explanation: 'Reine LCA: 4.000-6.000€. QNG-Siegel: 15.000-20.000€. Zusätzlich versteckte Planungskosten (~1% vs. 2-4%) und Baukosten (~1% bei QNG).' },
+  { topic: 'qng_lca', type: 'mc',
+    q: 'Versteckte Kosten eines QNG-Siegels (die kaum jemand thematisiert)?',
+    options: ['Zusätzliche Planungskosten (Schadstoffe, Lichtqualität)', 'Zertifiziertes Holz 20-30% teurer', '40+ Kriterien zu koordinieren', 'Niedrigere Baukosten durch Standards', 'Jede Änderung erfordert Neuberechnung'],
+    correct: [0, 1, 2, 4],
+    explanation: 'QNG hat massive versteckte Kosten: Planungsaufschläge durch 40+ Kriterien, zertifiziertes Holz, Schadstoff-Lichtqualitäts-Prüfung und Neuberechnung bei jeder Änderung.' },
+  { topic: 'qng_lca', type: 'ft',
+    q: 'Erkläre die Empfehlung: Für welche Projekte lohnt sich das QNG-Siegel wirtschaftlich selten?',
+    keywords: ['klein', '3', '5', 'we', 'einfamilien', 'kosten', 'nutzen', 'kredit', 'zweifelhaft'],
+    sampleAnswer: 'Bei kleineren Wohngebäuden (bis 3-5 WE) lohnt sich das QNG-Siegel kaum. Kosten 15-20k€ + versteckte Mehrkosten vs. +50k€ Kreditvolumen pro WE. Bei EFH praktisch nie wirtschaftlich. Selbst bei großen Projekten (100 WE) bleiben viele Bauträger bei der LCA - Aufwand und Unsicherheit bei QNG sind zu hoch. Praxis-Bild: "Lüftungsanlage arbeitet täglich für 8.000€, QNG-Zertifikat liegt für 25.000€ in der Schublade."' },
+
+  { topic: 'nh_ee', type: 'sc',
+    q: 'Ist die NH-Klasse in der BEG-Sanierung wirtschaftlich sinnvoll?',
+    options: ['Ja, immer', 'Ja, bei großen Sanierungen', 'Nein, EE-Klasse ist praktisch immer besser', 'Nur bei Denkmälern'],
+    correct: 2,
+    explanation: 'NH kostet 15-25k€, EE nur 6-8k€. Beide bringen 5% Tilgungszuschuss. EE-Klasse hat zusätzlich WPB-Bonus 10%. NH liefert nur "Papier in der Schublade".' },
+  { topic: 'nh_ee', type: 'mc',
+    q: 'Was ist wichtig, wenn man einem Kunden die Klassen vorstellt?',
+    options: ['IMMER BEIDE Optionen zeigen (NH + EE)', 'Nur die teuerste empfehlen', 'Haftungsrisiko bei einseitiger Empfehlung', 'Wirtschaftlichkeit gegenüberstellen', 'Die NH-Klasse ist wirtschaftlich unterlegen'],
+    correct: [0, 2, 3, 4],
+    explanation: 'IMMER beide Optionen aufzeigen! Haftungsrisiko: Kunde kann nach 6 Monaten Regress fordern, wenn nur die teurere NH empfohlen wurde. NH ist meistens wirtschaftlich unterlegen.' },
+  { topic: 'nh_ee', type: 'sc',
+    q: 'Sind NH- und EE-Klasse kumulierbar?',
+    options: ['Ja, ergibt 10% Tilgungszuschuss', 'Ja, zusätzlich zum WPB-Bonus', 'Nein, nicht kumulierbar', 'Nur bei Denkmälern'],
+    correct: 2,
+    explanation: 'NH und EE sind NICHT kumulierbar. Man muss sich für eine Klasse entscheiden. In der Praxis fast immer EE-Klasse (deutlich günstiger + WPB-Bonus 10%).' },
+
+  { topic: 'knn_spezial', type: 'mc',
+    q: 'Welche Besonderheiten hat das KNN-Programm?',
+    options: ['EH 55 (statt EH 40)', 'LCC - Lebenszykluskostenanalyse', 'Flächennachweis (Wohnfläche gem. WoFIV)', 'Aufenthaltsraum ≥ 10 m²', 'Kein LCA-Nachweis nötig'],
+    correct: [0, 1, 2, 3],
+    explanation: 'KNN: EH 55 + LCC + Flächennachweis + Mindestflächen für Aufenthaltsräume. Der LCA-Grenzwert 24 kg gilt trotzdem.' },
+  { topic: 'knn_spezial', type: 'sc',
+    q: 'Wohnküchen zählen im KNN ab welchem Datum als Aufenthaltsraum?',
+    options: ['01.01.2025', '01.06.2025', '01.09.2025', 'Schon immer'],
+    correct: 2,
+    explanation: 'Ab 01.09.2025: Wohnküchen zählen als Aufenthaltsraum (Vereinfachung). Davor mussten separate Aufenthaltsräume zusätzlich vorhanden sein.' },
+
+  { topic: 'nachweise', type: 'sc',
+    q: 'Weicht die LCA-Systemgrenze von der Effizienzhaus-Systemgrenze ab?',
+    options: ['Nein, beide identisch', 'Ja, LCA umfasst auch unbeheizte Bereiche', 'Ja, EH umfasst mehr', 'Nur bei MFH'],
+    correct: 1,
+    explanation: 'LCA-Systemgrenze weicht ab! In LCA gehören auch unbeheizte Bereiche (Garage, Keller, Dachboden) zum Bilanzraum. Im EH nur die thermische Hülle.' },
+  { topic: 'nachweise', type: 'mc',
+    q: 'Was muss im LCA-Nachweis enthalten sein?',
+    options: ['Berechnungsergebnisse gem. QNG Anhang 3.1.1', 'Materialinventar + Stückliste', 'Nutzungsdauern mit Begründung', 'Pläne mit eingezeichneter LCA-Systemgrenze', 'Nachweise der tatsächlich verwendeten Materialien', 'Marketingkonzept'],
+    correct: [0, 1, 2, 3, 4],
+    explanation: 'Alle fachlichen Inhalte sind nötig. Die LCA-Systemgrenze weicht von der EH-Systemgrenze ab - das muss in den Plänen separat eingezeichnet werden.' },
+
+  { topic: 'wirtschaft', type: 'sc',
+    q: 'Ist eine KfW-Förderung immer wirtschaftlich besser als Bau nach Gesetz?',
+    options: ['Ja, IMMER', 'In vielen Fällen ist Bau nach Gesetz günstiger', 'Nur für KMU', 'Nur bei Sanierung'],
+    correct: 1,
+    explanation: 'Paradoxe Situation: Zusätzliche Auflagen, Nachweise und Kosten der Förderung übersteigen oft den Vorteil. Ändert sich ab 2028/2030 wenn LCA durch EPBD Pflicht wird.' },
+  { topic: 'wirtschaft', type: 'sc',
+    q: 'Wann sollte die Wirtschaftlichkeitsberechnung Förderung vs. Gesetz durchgeführt werden?',
+    options: ['Nach Baubeginn', 'VOR Projektbeginn', 'Bei der BnD', 'Erst nach Fertigstellung'],
+    correct: 1,
+    explanation: 'IMMER vor Projektbeginn - sonst droht Haftungsrisiko. "Sie haben mir nur das Teurere empfohlen" - solche Vorwürfe kommen sicher, wenn beide Optionen nicht aufgezeigt wurden.' },
+];
+
+const flashcards = [
+  { topic: 'programme', front: 'KFN / WEF / KNN im Vergleich', back: '<ul><li><strong>KFN</strong> (Klimafreundlicher Neubau): EH 40 + LCA ≤ 24 kg + optional QNG</li><li><strong>WEF</strong> (Wohneigentum für Familien): EH 40 + LCA ≤ 24 kg + optional QNG</li><li><strong>KNN</strong> (Niedrigpreissegment): <strong>EH 55</strong> + LCA ≤ 24 kg + LCC + Flächennachweis</li><li>LCA-Grenzwert überall identisch: 24 kg</li></ul>' },
+  { topic: 'leistungen', front: 'Mindestleistungen EEE-Experte', back: '<ul><li>1. BzA + ggf. Siegelvariante</li><li>2. Generelle Leistungen (Baustellenbegehungen, Info)</li><li>3. Effizienzhausberechnung</li><li>4. Lebenszyklusanalyse (LCA)</li><li>5. LCC + Flächennachweis (nur KNN)</li><li>6. QNG-Nachhaltigkeitszertifizierung (wenn Siegel)</li><li>7. BnD + QNG-Werte</li><li><strong>Gesamtverantwortung beim Unterzeichner!</strong></li></ul>' },
+  { topic: 'qng_lca', front: 'QNG-Siegel vs. reine LCA (EFH)', back: '<ul><li><strong>Nur LCA:</strong></li><li>EEE-Kosten: 4.000-6.000 €</li><li>+1% Planung, keine Mehrbaukosten</li><li><strong>QNG-Siegel:</strong></li><li>EEE-Kosten: 15.000-20.000 €</li><li>+2-4% Planung (Schadstoffe, Licht)</li><li>+1% Baukosten (zert. Holz etc.)</li><li>+50.000€ Kredit pro WE</li><li>Oft unwirtschaftlich!</li></ul>' },
+  { topic: 'qng_lca', front: 'Versteckte QNG-Kosten', back: '<ul><li>40+ Kriterien koordinieren</li><li>Jede Änderung → Prüfung Schadstoffe, Lichtqualität</li><li>Zertifiziertes Holz +20-30% teurer</li><li>Keine Flexibilität bei Planungsänderungen</li><li>Rentiert sich selten unter 5-10 WE</li><li>Viele Bauträger bleiben bei reiner LCA</li></ul>' },
+  { topic: 'nh_ee', front: 'NH-Klasse vs. EE-Klasse (Sanierung)', back: '<ul><li>Beide: 5% Tilgungszuschuss + 150k€ Höchstbetrag</li><li><strong>EE-Klasse:</strong> ~6-8k€ (Lüftung mit WRG), +WPB-Bonus 10%</li><li><strong>NH-Klasse:</strong> ~15-25k€ (QNG-Siegel), kein WPB-Bonus</li><li><strong>Nicht kumulierbar!</strong></li><li>NH = "Papier in der Schublade"</li><li>EE = Lüftung arbeitet täglich</li></ul>' },
+  { topic: 'nh_ee', front: 'NH-Klasse - Haftungsfalle', back: '<ul><li>NH ist wirtschaftlich praktisch NIE sinnvoll</li><li>EE-Klasse ist fast immer besser</li><li>HAFTUNG: Wer nur NH empfiehlt riskiert Regress</li><li><strong>IMMER BEIDE Optionen aufzeigen!</strong></li><li>Dokumentation wichtig</li></ul>' },
+  { topic: 'knn_spezial', front: 'KNN - Besonderheiten', back: '<ul><li><strong>EH 55</strong> statt EH 40</li><li>LCC (Lebenszykluskostenanalyse)</li><li>→ Baukosten KG 300/400/550 + jährliche Energiekosten über 50a</li><li>→ KNN-Exceltool der KfW</li><li>Flächennachweis (WoFIV)</li><li>Aufenthaltsraum ≥ 10 m²</li><li>Ab 01.09.2025: Wohnküchen zählen</li><li>MFH ≥ 12 WE: max. 25% mit ≤ 40 m²</li></ul>' },
+  { topic: 'nachweise', front: 'Systemgrenzen - EH vs. LCA', back: '<ul><li><strong>EH-Systemgrenze:</strong> Nur thermische Hülle</li><li><strong>LCA-Systemgrenze:</strong> Auch unbeheizte Bereiche:</li><li>- Garage (integriert)</li><li>- Keller (auch unbeheizt)</li><li>- Dachboden</li><li>→ In Plänen SEPARAT einzeichnen</li><li>Unterschiedliche Flächen!</li></ul>' },
+  { topic: 'nachweise', front: 'BzA vs. BnD', back: '<ul><li><strong>BzA</strong> = Bestätigung zum Antrag</li><li>→ VOR Baubeginn</li><li>→ ggf. Siegelvariante angeben (PLUS/PREMIUM)</li><li><strong>BnD</strong> = Bestätigung nach Durchführung</li><li>→ NACH Fertigstellung</li><li>→ QNG-Werte mit einreichen (falls Siegel)</li><li>Beide vom EEE-Experten unterschrieben</li></ul>' },
+  { topic: 'wirtschaft', front: 'Lohnt sich Förderung?', back: '<ul><li>Paradox: In vielen Fällen ist Bau nach Gesetz GÜNSTIGER</li><li>Zusätzliche Auflagen + Nachweise + Kosten &gt; Fördervorteil</li><li>Ändert sich ab 2028/2030 (LCA Pflicht durch EPBD)</li><li>Neues EH55-Programm könnte entschärfen</li><li><strong>IMMER vor Projektbeginn rechnen!</strong></li><li>Sonst Haftungsrisiko</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 5 - Optimierung: Nutzungsdauern & Dämmung</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 5: Optimierung - Nutzungsdauern & Dämmung</h1>
+  <p>Anpassung 40→50 Jahre, Sandwich-Konstellationen, Überdämmung, Grenz-GWP</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen Nutzungsdauer/Dämmung</h3>
+      <div class="trap"><strong>WDVS darf NICHT</strong> auf 50 Jahre gesetzt werden. Bleibt immer bei 40 Jahren (Standard-Nutzungsdauer).</div>
+      <div class="trap">Nutzungsdauer-Anpassung 40→50 Jahre halbiert den GWP: Austauschzyklus wechselt von 1 auf 0 → Material wird 2× statt 1× bilanziert.</div>
+      <div class="trap">Alle Anpassungen MÜSSEN dokumentiert und in <strong>prüffähiger Form</strong> vorgelegt werden.</div>
+      <div class="trap">Tatsächliche Austauschzyklen in der Praxis spielen KEINE Rolle - wichtig sind NUR die in der LCA festgelegten Nutzungsdauern.</div>
+      <div class="trap">Umkehrregel: Putz auf WDVS (40a) muss auf 40 Jahre REDUZIERT werden - obwohl Putz an sich 50 hätte.</div>
+      <div class="trap">Fenster: Verglasung und Beschläge werden NICHT an die Rahmen-Nutzungsdauer angepasst - unabhängig austauschbar.</div>
+      <div class="trap"><strong>PENRT wird in MJ berechnet!</strong> Umrechnung auf kWh: 3,6 MJ = 1 kWh. Häufigster Fehler: Umrechnung vergessen.</div>
+      <div class="trap">Überdämmung nur sinnvoll, wenn eingesparte kWh mehr GWP abziehen, als die zusätzliche Dämmung an GWP kostet (Grenz-GWP).</div>
+      <div class="trap">KfW musste mehrfach angeschrieben werden, bis die richtige Antwort zur Nutzungsdauer-Anpassung kam. Erste Antwort war falsch!</div>
+      <div class="trap">Calciumsilikat hat Grenz-GWP von 41,51 kWh/a - lohnt sich selten. EPS bei 10,13 kWh/a - lohnt sich schnell.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Erlaubte Nutzungsdauer-Anpassungen auf 50 Jahre</h3>
+      <ul style="padding-left: 1.5rem; font-size: 0.9rem; line-height: 1.8;">
+        <li>✅ Perimeterdämmung (XPS)</li>
+        <li>✅ Unter-/Zwischen-/Aufdachsparrendämmung (XPS, EPS, PU, MiWo, naturnahe)</li>
+        <li>✅ Dämmung Oberste Geschossdecke</li>
+        <li>✅ Dämmung Kellerdecke</li>
+        <li>✅ Innendämmung</li>
+        <li>✅ Bodenplattendämmung (unter Estrich)</li>
+        <li>❌ <strong>WDVS → bleibt bei 40 Jahren</strong></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">PENRT-Umrechnung</h3>
+      <div class="formula-box"><strong>3,6 MJ = 1 kWh</strong><br>Ohne Umrechnung rechnet man mit Faktor 3,6 zu hoch!</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Nutzungsdauer 40→50 halbiert den GWP (a=1 → a=0)</div>
+      <div class="merksatz">WDVS bleibt IMMER bei 40 Jahren - keine Ausnahme</div>
+      <div class="merksatz">Sandwich: Schicht zwischen zwei 50a-Schichten darf ebenfalls auf 50a</div>
+      <div class="merksatz">Umkehrregel: Putz auf WDVS muss auf 40a reduziert werden</div>
+      <div class="merksatz">Fensterverglasung/Beschläge separat - keine Anpassung</div>
+      <div class="merksatz">3,6 MJ = 1 kWh - IMMER umrechnen bei PENRT</div>
+      <div class="merksatz">Überdämmung lohnt sich, wenn eingesparte kWh &gt; Grenz-GWP</div>
+      <div class="merksatz">EH 35/30 statt nur EH 40 - LCA profitiert massiv</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k5-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'nutzung40_50', name: 'Nutzungsdauer 40 → 50', icon: '🔄' },
+  { id: 'erlaubt', name: 'Erlaubte Anpassungen', icon: '✅' },
+  { id: 'sandwich', name: 'Sandwich-Konstellationen', icon: '🥪' },
+  { id: 'ueberdaemmung', name: 'Überdämmung / EH 30', icon: '🧱' },
+  { id: 'umrechnung', name: 'PENRT / MJ / kWh', icon: '🧮' },
+];
+
+const questions = [
+  { topic: 'nutzung40_50', type: 'sc',
+    q: 'Was passiert mit dem GWP einer Dämmung, wenn die Nutzungsdauer von 40 auf 50 Jahre angepasst wird?',
+    options: ['Bleibt gleich', 'Halbiert sich (GWP ÷ 2)', 'Verdoppelt sich', 'Reduziert sich um 10%'],
+    correct: 1,
+    explanation: '40 Jahre = 1 Austauschzyklus = Material wird 2× bilanziert. 50 Jahre = 0 Austauschzyklen = Material wird 1× bilanziert. → Halbierung!' },
+  { topic: 'nutzung40_50', type: 'sc',
+    q: 'Woher stammt die offizielle Erlaubnis zur Nutzungsdauer-Anpassung?',
+    options: ['Kostenlose Energieberater-Tradition', 'KfW Technische FAQ 19.06 und BNB-Datenblatt', 'DIN 18599', 'Herstellerangaben'],
+    correct: 1,
+    explanation: 'KfW Technische FAQ 19.06: "Bei Dämmstoffen darf die rechnerisch anzusetzende Nutzungsdauer im Einzelfall an die Nutzungsdauer des umgebenden Bauteils angepasst werden, wenn die Einbausituation dies erfordert."' },
+  { topic: 'nutzung40_50', type: 'ft',
+    q: 'Erkläre, warum die Halbierung des GWP durch Nutzungsdauer-Anpassung "kostenlos" ist.',
+    keywords: ['cent', 'kosten', 'bilanz', 'bilanziell', 'kunde', 'nicht teurer', 'rechnung', 'automatisch'],
+    sampleAnswer: 'Die Anpassung kostet den Kunden keinen Cent: Es ist eine reine Bilanzseiten-Optimierung. Man implementiert sie automatisch bei jedem Gebäude auf der Bilanzierungsseite - der Kunde muss es nicht einmal wissen. Kein zusätzliches Material, keine zusätzlichen Baukosten. Die Anpassung ist legal, solange dokumentiert und die Einbausituation passt.' },
+
+  { topic: 'erlaubt', type: 'mc',
+    q: 'Welche Dämmungen dürfen laut BNB-Datenblatt auf ≥ 50 Jahre angesetzt werden?',
+    options: ['Perimeterdämmung (XPS)', 'Aufdachsparrendämmung', 'WDVS', 'Bodenplattendämmung (unter Estrich)', 'Innendämmung', 'Dämmung Oberste Geschossdecke'],
+    correct: [0, 1, 3, 4, 5],
+    explanation: 'WDVS bleibt bei 40 Jahren Standard - NICHT anpassbar! Alle anderen (Perimeter, Auf-/Zwischen-/Untersparren, OGD, Kellerdecke, Innendämmung, Bodenplatte) dürfen auf 50 Jahre.' },
+  { topic: 'erlaubt', type: 'sc',
+    q: 'Welche Dämmung darf NICHT auf 50 Jahre gesetzt werden?',
+    options: ['Perimeterdämmung', 'Dachdämmung', 'WDVS', 'Innendämmung'],
+    correct: 2,
+    explanation: 'WDVS (Wärmedämmverbundsystem) ist ausdrücklich ausgeschlossen - bleibt bei 40 Jahren Standard-Nutzungsdauer.' },
+  { topic: 'erlaubt', type: 'sc',
+    q: 'Rechenbeispiel Übungshaus: Wie viel GWP spart die Nutzungsdauer-Anpassung insgesamt?',
+    options: ['ca. 0,3 kg', 'ca. 1,07 kg (Halbierung von 2,14 kg)', 'ca. 2 kg', 'ca. 4 kg'],
+    correct: 1,
+    explanation: 'Summe GWP Dämmung vor Anpassung: 2,14 kg. Nach Anpassung auf 50 Jahre: 1,07 kg (Halbierung). Einsparung 4,5% des 24-kg-GWP-Kontingents.' },
+
+  { topic: 'sandwich', type: 'sc',
+    q: 'Eine Dämmschicht liegt zwischen Betondecke (50a) und Estrich (50a). Welche Nutzungsdauer darf sie bekommen?',
+    options: ['Ihre eigene (z.B. 40)', '50 Jahre (Sandwich-Regel)', 'Der Mittelwert 45 Jahre', '60 Jahre'],
+    correct: 1,
+    explanation: 'Sandwich-Konstellation: Eine Schicht, die von Schichten mit längerer Nutzungsdauer überdeckt wird, darf auf deren Nutzungsdauer angepasst werden. Hier: 50 Jahre.' },
+  { topic: 'sandwich', type: 'mc',
+    q: 'Welche Regeln gelten für Sandwich-Konstellationen (KfW-O-Ton)?',
+    options: ['Anpassung nach Einbausituation', 'Schicht zwischen zwei längeren → angepasst auf längere', 'Putz auf WDVS (40a) muss auf 40a REDUZIERT werden', 'Verglasung + Beschläge eines Fensters unabhängig', 'Tatsächliche Austauschzyklen in Praxis entscheiden'],
+    correct: [0, 1, 2, 3],
+    explanation: 'Die tatsächlichen Austauschzyklen in der Praxis spielen KEINE Rolle - nur die in der LCA festgelegten Nutzungsdauern. Alle anderen Aussagen stimmen.' },
+  { topic: 'sandwich', type: 'sc',
+    q: 'Umkehrregel: Putzschicht sitzt auf WDVS (Nutzungsdauer 40 Jahre). Welche Nutzungsdauer bekommt der Putz?',
+    options: ['50 Jahre (Putz-Standard)', '40 Jahre (an WDVS angepasst)', '45 Jahre (Mittelwert)', 'Der Putz muss weggelassen werden'],
+    correct: 1,
+    explanation: 'Umkehrregel: Fest verbundene Schichten müssen an die KÜRZERE Nutzungsdauer angepasst werden. Putz auf WDVS = 40 Jahre (nicht 50).' },
+
+  { topic: 'ueberdaemmung', type: 'sc',
+    q: 'Was bedeutet "Überdämmung" in der LCA-Optimierung?',
+    options: ['Zu viel Dämmung - nicht erlaubt', 'Dämmung über EH 40 hinaus zur Reduzierung des Heizwärmebedarfs', 'Dämmung auf allen Bauteilen', 'Außendämmung + Innendämmung'],
+    correct: 1,
+    explanation: 'Überdämmung = Dämmung über das für EH 40 nötige Maß hinaus. Nur sinnvoll, wenn eingesparte kWh mehr GWP reduzieren als das zusätzliche Dämmmaterial GWP erzeugt.' },
+  { topic: 'ueberdaemmung', type: 'sc',
+    q: 'Grenz-GWP EPS liegt bei 10,13 kWh/a. Was bedeutet das?',
+    options: ['EPS darf nur bis 10 kWh eingesetzt werden', 'Sobald mehr als 10,13 kWh/a eingespart werden, lohnt sich zusätzliches EPS', 'Die EPS-Herstellung verbraucht 10,13 kWh', 'EPS ist ab 10 kWh verboten'],
+    correct: 1,
+    explanation: 'Grenz-GWP = Schwellenwert. Sobald eingesparte kWh > Grenz-GWP, lohnt sich zusätzliche Dämmung. EPS (10,13) lohnt sich fast immer. Calciumsilikat (41,51) selten.' },
+  { topic: 'ueberdaemmung', type: 'mc',
+    q: 'Warum ist Überdämmung (z.B. auf EH 30-Niveau) eine unterschätzte LCA-Optimierung?',
+    options: ['Jede eingesparte kWh Endenergie wirkt in B6', 'Dämmmaterial kostet wenig GWP', 'Kosten beschränkt (2 cm mehr Dämmung)', 'B6 ist der größte Hebel', '"Offizielle" Förderstufen gibt es dafür nicht, lohnt sich aber'],
+    correct: [0, 1, 2, 3, 4],
+    explanation: 'Alle Aussagen stimmen. Meisten Berater hören bei EH 40 auf und optimieren nur noch auf LCA-Seite. Aber: Energiebilanz ist immer noch ein riesiger Hebel. Empfehlung: EH 35 oder EH 30 anpeilen.' },
+
+  { topic: 'umrechnung', type: 'sc',
+    q: 'Wie wird PENRT von MJ in kWh umgerechnet?',
+    options: ['1 MJ = 1 kWh', '3,6 MJ = 1 kWh', '1 MJ = 3,6 kWh', '10 MJ = 1 kWh'],
+    correct: 1,
+    explanation: '3,6 MJ = 1 kWh. Häufigster Fehler: Umrechnung vergessen → rechnet mit 3,6-fach zu hohen Werten → denkt, man könne kaum etwas vernachlässigen.' },
+  { topic: 'umrechnung', type: 'sc',
+    q: 'Grenz-GWP Konzept - wofür wird es in Zukunft wichtig?',
+    options: ['Um kleine Fehler auszugleichen', 'Für herstellerspezifische EPDs (30-60 Ziegel statt 1)', 'Für die Steuerberechnung', 'Um Förderhöhen zu bestimmen'],
+    correct: 1,
+    explanation: 'Wenn herstellerspezifische EPDs zugelassen werden: Nicht mehr 1 Ziegel, sondern 30-60 verschiedene. Mit dem Grenz-GWP kann man schnell Tabellen erstellen und Kunden qualifiziert beraten.' },
+  { topic: 'umrechnung', type: 'ft',
+    q: 'Warum ist die Umrechnung 3,6 MJ = 1 kWh der häufigste Fehler bei PENRT-Vernachlässigung?',
+    keywords: ['3,6', '3.6', 'mj', 'kwh', 'vernachlässig', 'zu hoch', 'prozent', 'penrt'],
+    sampleAnswer: 'Ohne Umrechnung rechnet man mit Werten, die 3,6-fach zu hoch sind. Das führt dazu, dass fast nichts unter der 1%-Schwelle liegt - man denkt, gar nichts vernachlässigen zu können. Mit korrekter Umrechnung (PENRT in kWh) ergeben sich realistische Prozentsätze, und Vernachlässigungen werden möglich. Deshalb: Umrechnung 3,6 MJ = 1 kWh IMMER konsequent anwenden.' },
+];
+
+const flashcards = [
+  { topic: 'nutzung40_50', front: 'Nutzungsdauer 40 → 50 Jahre', back: '<ul><li>40 Jahre → 1 Austauschzyklus → <strong>2× bilanziert</strong></li><li>50 Jahre → 0 Austauschzyklen → <strong>1× bilanziert</strong></li><li><strong>GWP halbiert sich!</strong></li><li>Quelle: KfW Technische FAQ 19.06 + BNB-Datenblatt</li><li>Kostenlos für den Kunden</li></ul>' },
+  { topic: 'erlaubt', front: 'Erlaubte Anpassungen auf ≥ 50 Jahre', back: '<ul><li>✅ Perimeterdämmung (XPS)</li><li>✅ Unter-/Zwischen-/Aufdachsparrendämmung</li><li>✅ Oberste Geschossdecke</li><li>✅ Kellerdecke</li><li>✅ Innendämmung</li><li>✅ Bodenplattendämmung</li><li><strong>❌ WDVS → bleibt bei 40!</strong></li></ul>' },
+  { topic: 'erlaubt', front: 'Rechenbeispiel Übungshaus', back: '<ul><li>Summe GWP Dämmung (40a): <strong>2,14 kg</strong></li><li>Nach Anpassung auf 50a: <strong>1,07 kg</strong></li><li>Einsparung: <strong>-50% bzw. 4,5% des 24-kg-GWP</strong></li><li>NICHT anpassbar: WDVS EPS 27,17 m³ = 0,57 kg</li><li>Alle Anpassungen dokumentieren + prüffähig</li></ul>' },
+  { topic: 'sandwich', front: 'Sandwich-Regel (KfW-O-Ton)', back: '<ul><li>"Bauteilschichten mit unterschiedlichen Nutzungsdauern können auf Basis der jeweiligen Einbausituation angepasst werden."</li><li>Schicht zwischen zwei längeren → angepasst auf die längere</li><li>Beispiel: Folie/Dämmung zwischen Betondecke (50a) und Estrich (50a) → alle auf 50a</li><li>Praxis-Austauschzyklen spielen KEINE Rolle</li></ul>' },
+  { topic: 'sandwich', front: 'Umkehrregel + Fenster-Ausnahme', back: '<ul><li><strong>Umkehrregel:</strong> Fest verbunden mit kürzerer Lebensdauer → früher ersetzen</li><li>Beispiel: Putz auf WDVS (40a) → Putz auf 40a reduzieren</li><li><strong>Fenster-Ausnahme:</strong></li><li>Verglasung + Beschläge sind unabhängig austauschbar</li><li>→ KEINE Anpassung an Rahmen-Nutzungsdauer</li></ul>' },
+  { topic: 'ueberdaemmung', front: 'Überdämmung - das unterschätzte Prinzip', back: '<ul><li>Dämmung ÜBER EH 40 hinaus</li><li>Sinnvoll wenn: eingesparte kWh > Grenz-GWP</li><li>Nicht bei EH 40 aufhören - EH 35 oder 30 anpeilen</li><li>LCA profitiert massiv</li><li>Kosten beschränkt (z.B. 2 cm mehr Dämmung)</li><li>Offizielle Förderstufen gibt es dafür nicht</li></ul>' },
+  { topic: 'ueberdaemmung', front: 'Grenz-GWP verschiedener Dämmstoffe', back: '<ul><li><strong>EPS:</strong> GWP 5,39 - Grenz-GWP <strong>10,13 kWh/a</strong> → lohnt sich schnell</li><li><strong>Zellulose ED:</strong> GWP 1,03 - Grenz <strong>1,93 kWh/a</strong> → fast immer lohnend</li><li><strong>Calciumsilikat:</strong> GWP 22,08 - Grenz <strong>41,51 kWh/a</strong> → selten lohnend</li></ul>' },
+  { topic: 'umrechnung', front: 'PENRT-Umrechnung', back: '<ul><li><strong>3,6 MJ = 1 kWh</strong></li><li>Häufigster Fehler: Umrechnung vergessen</li><li>→ Werte sind 3,6× zu hoch</li><li>→ kaum etwas unter 1%-Schwelle</li><li>Konsequenz: Vernachlässigung unmöglich</li><li>Formel BG₅₀ = f × m × (a+1) / (NRF × 50)</li></ul>' },
+  { topic: 'umrechnung', front: 'Grenz-GWP Konzept (Zukunft)', back: '<ul><li>Aktuell: 1 Ziegel in Tabelle</li><li>Zukunft: 30-60 verschiedene Ziegel (EPD-Marktreife)</li><li>Grenz-GWP als Vergleichsmaßstab</li><li>Schnell-Tabelle: besser/schlechter/besser</li><li>Qualifizierte Kundenberatung</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>

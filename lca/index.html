@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA - Ökobilanzierung - Lernplattform</title>
+<style>
+  :root {
+    --primary: #035357;
+    --accent: #50D2CA;
+    --gold: #C59B00;
+    --bg: #f5f5f0;
+    --card: #fff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --border: #e0e0e0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--primary) 0%, #04696e 50%, #035357 100%);
+    color: white;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+  }
+  header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem; }
+  header p { font-size: 1rem; opacity: 0.85; max-width: 560px; margin: 0 auto; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .intro { text-align: center; margin-bottom: 2rem; }
+  .intro h2 { font-size: 1.3rem; color: var(--primary); margin-bottom: 0.4rem; }
+  .intro p { font-size: 0.95rem; color: var(--muted); }
+
+  .blocks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+  .block-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 1.8rem;
+    border: 2px solid var(--border);
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+  }
+  .block-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(3,83,87,0.12);
+  }
+
+  .block-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .block-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .block-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .block-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.2rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .block-meta { font-size: 0.78rem; color: var(--muted); }
+
+  .block-status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: #e0f7f5;
+    color: var(--primary);
+  }
+
+  .block-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.8rem; }
+  footer a { color: var(--primary); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    header { padding: 2rem 1.2rem 1.8rem; }
+    header h1 { font-size: 1.5rem; }
+    header p { font-size: 0.88rem; }
+    main { padding: 1.25rem 0.75rem; }
+    .blocks { grid-template-columns: 1fr; gap: 0.75rem; }
+    .block-card { padding: 1.3rem; }
+    .block-title { font-size: 1.05rem; }
+    .block-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .intro { margin-bottom: 1.5rem; }
+    .intro h2 { font-size: 1.15rem; }
+  }
+
+  @media (max-width: 360px) {
+    header h1 { font-size: 1.3rem; }
+    .block-card { padding: 1rem; }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .block-card:hover { transform: none; box-shadow: none; }
+    .block-card:active { transform: scale(0.98); }
+  }
+
+  @supports (padding: env(safe-area-inset-bottom)) {
+    footer { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Interaktives Lernen</div>
+  <h1>LCA - Ökobilanzierung</h1>
+  <p>Lebenszyklusanalyse für KFN / WEF / KNN - Prüfungsvorbereitung mit Quiz, Karteikarten und Prüfungssimulation</p>
+</header>
+
+<main>
+  <a href="../index.html" class="back-link">&larr; Zurück zur Übersicht</a>
+  <div class="intro">
+    <h2>6 Lernkategorien - Experten-geprüft</h2>
+    <p>Wählen Sie eine Kategorie, um mit dem interaktiven Lernen zu beginnen.</p>
+  </div>
+
+  <div class="blocks">
+
+    <a href="kategorie1/kategorie1.html" class="block-card">
+      <div class="block-icon">🏗️</div>
+      <div class="block-number">Kategorie 1</div>
+      <div class="block-title">KG 300 - Baukonstruktion</div>
+      <div class="block-desc">
+        Systemgrenzen, Berechnungsformel BG₅₀, Austauschzyklen, Garage integriert, Laubengang, Rechenwerttabelle, 1%-/5%-Regel.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">7 Themen &middot; Folien 96-114</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="kategorie2/kategorie2.html" class="block-card">
+      <div class="block-icon">⚙️</div>
+      <div class="block-number">Kategorie 2</div>
+      <div class="block-title">KG 400 - Technische Anlagen & F-Gase</div>
+      <div class="block-desc">
+        Sockelbetrag, Wärmeerzeuger, Lüftung, PV, Batteriespeicher, Aufzüge, F-Gase Sonderberechnung, natürliche Kältemittel.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">6 Themen &middot; Folien 115-140</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="kategorie3/kategorie3.html" class="block-card">
+      <div class="block-icon">☀️</div>
+      <div class="block-number">Kategorie 3</div>
+      <div class="block-title">PV-Berechnung im Detail</div>
+      <div class="block-desc">
+        Standort/Klimazone, DIN 18599-9 Abschnitt 7.4.2, Eigenverbrauch, Batteriespeicher, Peakleistungskoeffizient, Solar vs. PV.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">9 Themen &middot; Folien 246-273</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="kategorie4/kategorie4.html" class="block-card">
+      <div class="block-icon">🔄</div>
+      <div class="block-number">Kategorie 4</div>
+      <div class="block-title">Optimierung: Bauteile & Raumaufteilung</div>
+      <div class="block-desc">
+        Fußbodenbeläge, Innenwände, beheizte vs. unbeheizte Flächen, Strompauschale, B6-Einfluss, Neuschwanstein-Prinzip.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">5 Themen &middot; Folien 280-296</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="kategorie5/kategorie5.html" class="block-card">
+      <div class="block-icon">🧱</div>
+      <div class="block-number">Kategorie 5</div>
+      <div class="block-title">Optimierung: Nutzungsdauern & Dämmung</div>
+      <div class="block-desc">
+        Nutzungsdauer-Anpassung 40→50 Jahre, Sandwich-Konstellationen, WDVS-Ausnahme, Überdämmung, Grenz-GWP, PENRT-Umrechnung.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">5 Themen &middot; Folien 306-317</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+    <a href="kategorie6/kategorie6.html" class="block-card">
+      <div class="block-icon">💰</div>
+      <div class="block-number">Kategorie 6</div>
+      <div class="block-title">Förderung & EEE-Experte</div>
+      <div class="block-desc">
+        KFN, WEF, KNN, BzA/BnD, QNG-Siegel vs. LCA, NH-Klasse vs. EE-Klasse, Nachweise, versteckte Kosten, LCC.
+      </div>
+      <div class="block-footer">
+        <span class="block-meta">7 Themen &middot; Folien 343-361</span>
+        <span class="block-status">Verfügbar</span>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<footer>
+  <p>LCA - Ökobilanzierung &middot; Experten-geprüft V1.0 &middot; <a href="https://campus-ew.de">Campus-EW</a></p>
+</footer>
+
+</body>
+</html>

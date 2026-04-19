@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 1 - KG 300 Baukonstruktion</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 1: KG 300 - Baukonstruktion</h1>
+  <p>Systemgrenzen, Formel BG₅₀, Austauschzyklen, Rechenwerttabelle</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen KG 300</h3>
+      <div class="trap">Die Kiesschicht unter dem Fundament und Dränagen werden oft vergessen. Beides gehört in KG 320!</div>
+      <div class="trap">KG 310 (Baugrube, Böschungssicherung) wird NICHT bilanziert. Nur KG 320 (Gründung) ab Fundament.</div>
+      <div class="trap">Im letzten Jahr (Jahr 50) wird KEIN Austausch mehr angesetzt - auch wenn die Lebensdauer bei 48-49 Jahren liegt.</div>
+      <div class="trap">Software setzt Nutzungsdauern NICHT automatisch korrekt. Jeden Baustoff MANUELL prüfen - sowohl Datensatz als auch BBSR-Nutzungsdauer.</div>
+      <div class="trap">Freistehende Garagen und Parkhäuser werden NICHT bilanziert - auch wenn sie ans Gebäude angebaut sind. Nur "integrierte" Tiefgaragen zählen.</div>
+      <div class="trap">Bei Balkon/Loggia/Dachterrasse: Schichtaufbau MUSS bilanziert werden, Fläche zählt aber NICHT zur NRF(R).</div>
+      <div class="trap">Laubengang: Nur bauordnungsrechtliche Mindestbreite nach LBO zählt zur NRF(R). Jeder cm darüber zählt NICHT.</div>
+      <div class="trap">1%-Regel: Alle DREI Größen (Masse, PENRT, GWP) müssen unter 1% liegen. Häufig wird nur Masse + GWP geprüft, PENRT vergessen.</div>
+      <div class="trap">Rechenwerttabelle an Kunden schicken ist sinnlos: Sie zeigt nur A1-A3 + C3-C4, NICHT die Austauschzyklen (B4). Teppich sieht "günstig" aus, ist aber durch 4× Austausch katastrophal.</div>
+      <div class="trap">Pufferspeicher-Masse immer im LEERZUSTAND angeben, nicht mit Wasser gefüllt.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die zentrale Berechnungsformel</h3>
+      <div class="formula-box">BG₅₀ = f × m × (a + 1)<br>Ergebnis = BG₅₀ / (m² NRF × 50 Jahre)</div>
+      <p style="font-size: 0.9rem; color: var(--muted); margin-top: 0.5rem;">
+        <strong>f</strong> = spez. GWP oder PENRT (A1-A3 + C3-C4) aus Rechenwerttabelle<br>
+        <strong>m</strong> = Menge des Materials (m³, m², kg)<br>
+        <strong>a</strong> = Austauschzyklus aus BBSR-Tabelle
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">BG₅₀ = f × m × (a+1) - die "eierlegende Wollmilchsau" für ALLES</div>
+      <div class="merksatz">Im letzten Jahr KEIN Austausch mehr - unabhängig von Restnutzungsdauer</div>
+      <div class="merksatz">Integriert = wenn man es auseinanderreißt, fällt es zusammen</div>
+      <div class="merksatz">Jede Bauteilschicht EINZELN bilanzieren - keine Durchschnittswerte</div>
+      <div class="merksatz">Balkon: Material JA, Fläche NEIN</div>
+      <div class="merksatz">Laubengang-Fläche nur nach LBO-Mindestbreite</div>
+      <div class="merksatz">1%-Regel nur wenn ALLE DREI Größen unter 1% (Masse + PENRT + GWP)</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k1-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'sysgrenzen', name: 'Systemgrenzen KG 300', icon: '📐' },
+  { id: 'formel', name: 'Berechnungsformel BG₅₀', icon: '🧮' },
+  { id: 'austausch', name: 'Austauschzyklen (B4)', icon: '🔁' },
+  { id: 'garage', name: 'Garage / Tiefgarage', icon: '🚗' },
+  { id: 'flaechen', name: 'Balkon / Laubengang', icon: '🏠' },
+  { id: 'rwt', name: 'Rechenwerttabelle', icon: '📊' },
+  { id: 'vernachl', name: '1%- / 5%-Regel', icon: '⚠️' },
+];
+
+const questions = [
+  { topic: 'sysgrenzen', type: 'sc',
+    q: 'Welche Kostengruppe nach DIN 276 muss NICHT bilanziert werden?',
+    options: ['KG 310 Baugrube', 'KG 320 Gründung', 'KG 330 Außenwände', 'KG 360 Dächer'],
+    correct: 0,
+    explanation: 'KG 310 (Baugrube, Böschungssicherung, Injektionsverbau) wird NICHT bilanziert. Erst ab KG 320 (Fundamente, Sauberkeitsschichten) geht es los.' },
+  { topic: 'sysgrenzen', type: 'mc',
+    q: 'Welche Bauteile gehören in die KG 300?',
+    options: ['Fundamente und Dränagen', 'Einbauküchen', 'Innenwände inkl. Putz', 'Treppen und Handläufe', 'Nachträglich verlegte Teppiche', 'Dachstühle und Rinnen'],
+    correct: [0, 2, 3, 5],
+    explanation: 'Einbauküchen, Möbel und nachträglich verlegte Teppiche/Läufer gehören NICHT zu KG 300. Alles fest verbaute an Konstruktion, Decken, Dächern dagegen schon.' },
+  { topic: 'sysgrenzen', type: 'sc',
+    q: 'Die Kiesschicht unter dem Fundament wird...',
+    options: ['...ignoriert, da sie unbedeutend ist', '...in KG 310 bilanziert', '...in KG 320 bilanziert und häufig vergessen', '...unter KG 400 erfasst'],
+    correct: 2,
+    explanation: 'Typischer Fehler: Kiesschicht und Dränagen gehören in KG 320 (Gründung) und werden oft vergessen.' },
+
+  { topic: 'formel', type: 'sc',
+    q: 'Wie lautet die zentrale Berechnungsformel für BG₅₀?',
+    options: ['BG₅₀ = f × m × a', 'BG₅₀ = f × m × (a + 1)', 'BG₅₀ = f + m + a', 'BG₅₀ = f × (m + a)'],
+    correct: 1,
+    explanation: 'BG₅₀ = f × m × (a + 1). Das +1 kommt daher, dass neben den Austauschen auch die erste Herstellung bilanziert werden muss.' },
+  { topic: 'formel', type: 'mc',
+    q: 'Was ist richtig über den Faktor f in der Formel BG₅₀ = f × m × (a+1)?',
+    options: ['f enthält A1-A3 (Herstellung) und C3-C4 (Entsorgung)', 'f entspricht dem Austauschzyklus', 'f wird aus der Rechenwerttabelle übernommen', 'f gilt sowohl für GWP als auch für PENRT', 'f wird pro m² NRF berechnet'],
+    correct: [0, 2, 3],
+    explanation: 'f = spez. GWP oder PENRT = A1-A3 + C3-C4 aus der Rechenwerttabelle. Die Formel funktioniert universell.' },
+  { topic: 'formel', type: 'ft',
+    q: 'Berechne BG₅₀ für 155 m² Teppichboden: A1-A3 = 9,88; C3-C4 = 2,77; Austauschzyklus = 4. Wie lautet das Zwischenergebnis (BG₅₀ in kg CO₂)?',
+    keywords: ['12,65', '12.65', '9803', '9.803', '775', '9800'],
+    sampleAnswer: 'f = 9,88 + 2,77 = 12,65. BG₅₀ = 12,65 × 155 × (4+1) = 9.803,75 kg CO₂. Bei 259 m² NRF ergibt das 0,757 kg CO₂/(m²NRF·a) - rund 3% des 24-kg-Kontingents nur für den Teppichboden.' },
+  { topic: 'formel', type: 'sc',
+    q: 'Wird im letzten Jahr (Jahr 50) noch ein Austausch berücksichtigt, wenn die Restlebensdauer nur noch 1-2 Jahre beträgt?',
+    options: ['Ja, anteilig linear berechnet', 'Ja, voller Austausch wird bilanziert', 'Nein, im letzten Jahr wird KEIN Austausch mehr angesetzt', 'Es kommt auf den Baustoff an'],
+    correct: 2,
+    explanation: 'Im letzten Jahr (Jahr 50) wird KEIN Austausch mehr angesetzt - unabhängig davon, wie weit die Lebensdauer noch gereicht hätte.' },
+
+  { topic: 'austausch', type: 'sc',
+    q: 'Ein Teppichboden hat Austauschzyklus 4. Wie oft wird er innerhalb von 50 Jahren bilanziert?',
+    options: ['4× Herstellung', '5× Herstellung (Errichtung + 4 Austausche)', '6× Herstellung', '1× Herstellung + 4× Entsorgung'],
+    correct: 1,
+    explanation: 'Bei Austauschzyklus 4: Errichtung (1×) + 4 Austausche = 5× Herstellung. Plus End-of-Life-Entsorgung des letzten Teppichs.' },
+  { topic: 'austausch', type: 'mc',
+    q: 'Woher kommen die Austauschzyklen?',
+    options: ['Anlagentechnik: Anhang 3.1.1 Bilanzierungsregeln QNG', 'Baustoffe: BBSR-Tabelle Stand 24.02.2017', 'Rechenwerttabelle', 'Automatisch durch die Software ohne Kontrolle', 'ÖKOBAUDAT'],
+    correct: [0, 1],
+    explanation: 'Anlagentechnik: QNG Anhang 3.1.1. Baustoffe: BBSR-Tabelle "Nutzungsdauern von Bauteilen für Lebenszyklusanalysen nach BNB". Software setzt Werte NICHT automatisch korrekt!' },
+  { topic: 'austausch', type: 'sc',
+    q: 'Ein Bauteil hat eine Lebensdauer von 48 Jahren. Wie wird bilanziert?',
+    options: ['Linear auf 50 Jahre hochgerechnet', 'Voller Austausch für die letzten 2 Jahre wird angesetzt', 'Der Austausch entfällt - zu nahe am Ende', 'Nach Ermessen des Beraters'],
+    correct: 1,
+    explanation: 'Bauteile mit LD 48-49 Jahren müssen trotzdem für die verbleibenden Jahre komplett ausgetauscht werden. KEINE lineare Berechnung.' },
+
+  { topic: 'garage', type: 'sc',
+    q: 'Wann muss eine Tiefgarage in der LCA bilanziert werden?',
+    options: ['Immer', 'Nur wenn sie beheizt ist', 'Wenn sie in das Gebäude integriert ist', 'Nie, Parkflächen zählen nicht'],
+    correct: 2,
+    explanation: 'Eine in das Gebäude integrierte Tiefgarage muss bilanziert werden. Freistehende Garagen und Parkhäuser (auch angebaut) werden NICHT bilanziert. Carports nie.' },
+  { topic: 'garage', type: 'mc',
+    q: 'Welche Aussagen zur "integrierten" Garage sind korrekt?',
+    options: ['Definition: Bauteile werden geteilt, ohne die ein Bauwerk nicht funktionsfähig wäre', 'Faustregel: Garage fiktiv auseinanderreißen - fällt sie zusammen → integriert', 'Eine integrierte Garage verschlechtert die LCA immer', 'Bei mehreren Gebäuden: Aufteilung nach Stellplatzschlüssel', 'Carports zählen als integriert'],
+    correct: [0, 1, 3],
+    explanation: 'Eine integrierte Garage VERBESSERT oft die LCA, weil die unbeheizte Fläche die Gesamt-NRF erhöht. Carports werden NIE berücksichtigt (keine allseitige Umschließung).' },
+
+  { topic: 'flaechen', type: 'sc',
+    q: 'Was gilt für den Balkon in der LCA?',
+    options: ['Schichtaufbau NICHT bilanzieren, Fläche NICHT anrechnen', 'Schichtaufbau BILANZIEREN, Fläche NICHT anrechnen', 'Schichtaufbau BILANZIEREN, Fläche voll anrechnen', 'Nur wenn größer 10 m² bilanzieren'],
+    correct: 1,
+    explanation: 'Balkon, Loggia, Dachterrasse: Material muss bilanziert werden, aber Fläche zählt NICHT zur NRF(R) - das verschlechtert die LCA. Keine allseitige Umschließung.' },
+  { topic: 'flaechen', type: 'sc',
+    q: 'Wie wird die Fläche eines Laubengangs in der NRF(R) berücksichtigt?',
+    options: ['Komplett, so wie gebaut', 'Nur bauordnungsrechtliche Mindestbreite nach LBO', 'Nur 50% der tatsächlichen Fläche', 'Gar nicht'],
+    correct: 1,
+    explanation: 'Beim Laubengang und Außentreppen darf nur die LBO-Mindestbreite angerechnet werden. Jeder cm darüber NICHT.' },
+
+  { topic: 'rwt', type: 'sc',
+    q: 'Ein Bauprodukt ist NICHT in der Rechenwerttabelle enthalten. Was tun?',
+    options: ['Baustoff weglassen', 'Eigenen EPD-Datensatz erstellen', 'Mit einem passenden Datensatz verknüpfen (Produktgruppe, Gewicht, Einsatzort)', 'Durchschnitt aller Baustoffe ansetzen'],
+    correct: 2,
+    explanation: 'Hilfsmittel: Begleitdokument "Zuordnungsempfehlungen". Dann eigene Zuordnung nach bestem Wissen zum nächstpassenden Datensatz. NIE weglassen!' },
+  { topic: 'rwt', type: 'mc',
+    q: 'Was passiert, wenn die reale Maßeinheit (z.B. Dicke) nicht mit der Rechenwerttabelle übereinstimmt?',
+    options: ['Lineare Anpassung des Wertes', 'Baustoff darf nicht verwendet werden', 'Beispiel: Gipsfaserplatte 1,25 cm statt 1,0 cm → Faktor 1,25', 'Die Software macht das automatisch sicher', 'Muss dokumentiert werden'],
+    correct: [0, 2, 4],
+    explanation: 'Lineare Anpassung nötig. Die Software prüft das NICHT - manuelle Kontrolle ist Pflicht. Dokumentation ist erforderlich.' },
+
+  { topic: 'vernachl', type: 'sc',
+    q: 'Ein Bauteil darf nach 1%-Regel nur vernachlässigt werden, wenn...',
+    options: ['...nur die Masse unter 1% liegt', '...nur der GWP unter 1% liegt', '...Masse UND PENRT UND GWP jeweils unter 1% liegen', '...mindestens eine der drei Größen unter 1% liegt'],
+    correct: 2,
+    explanation: 'Alle drei Größen müssen unter 1% liegen - häufigster Fehler: PENRT wird vergessen. GWP kann bei 0,9% liegen, PENRT aber bei 1,2% → NICHT vernachlässigbar.' },
+  { topic: 'vernachl', type: 'sc',
+    q: 'Wie hoch ist die Obergrenze der Gesamtvernachlässigung?',
+    options: ['1%', '5% Masse, 5% PENRT, 5% GWP₁₀₀', '10%', 'Es gibt keine Obergrenze'],
+    correct: 1,
+    explanation: 'Die Gesamtvernachlässigung darf 5% Masse, 5% PENRT bzw. 5% GWP₁₀₀ NICHT übersteigen.' },
+  { topic: 'vernachl', type: 'mc',
+    q: 'Was darf generell vernachlässigt werden (unabhängig von 1%-Prüfung)?',
+    options: ['Vor-Ort verarbeitete Kleinstteile (Nägel, Dübel, Schrauben)', 'Produktspezifische Kleinstmengen ≤ 1 kg', 'Fensterbänke', 'Handläufe', 'Werksseitig verarbeitete Kleinstteile'],
+    correct: [0, 1, 4],
+    explanation: 'Nägel, Dübel, Schrauben und ≤ 1 kg Kleinstmengen dürfen generell weggelassen werden. Fensterbänke und Handläufe gehören dagegen in KG 350/330 und MÜSSEN bilanziert werden.' },
+  { topic: 'vernachl', type: 'ft',
+    q: 'Warum ist das "Vernachlässigen" in der Praxis oft mehr Aufwand als das Bilanzieren?',
+    keywords: ['berechnen', 'vorher', 'masse', 'penrt', 'gwp', 'dokumentieren', 'aufwand'],
+    sampleAnswer: 'Paradoxon: Um etwas nach 1%-Regel zu vernachlässigen, muss man es erst komplett berechnen (Masse + PENRT + GWP) und dokumentieren. Das ist in der Praxis oft mehr Aufwand als direkt zu bilanzieren. Empfehlung: Alles so detailliert wie möglich erfassen und Sicherheitspuffer bei der 5%-Regel lassen.' },
+];
+
+const flashcards = [
+  { topic: 'sysgrenzen', front: 'Systemgrenzen KG 300', back: '<ul><li><strong>KG 320</strong> Gründung (Fundamente, Sauberkeitsschichten, Abdichtungen, Dränagen)</li><li><strong>KG 330</strong> Außenwände (Fenster, Putz, Dämmung)</li><li><strong>KG 340</strong> Innenwände</li><li><strong>KG 350</strong> Decken (Treppen, Balkone, Estrich, Handläufe)</li><li><strong>KG 360</strong> Dächer (Dachstühle, Rinnen, Fallrohre)</li><li><strong>NICHT:</strong> Möbel, Einbauküchen, nachträgliche Teppiche, KG 310</li></ul>' },
+  { topic: 'formel', front: 'Die zentrale Berechnungsformel', back: '<ul><li><strong>BG₅₀ = f × m × (a + 1)</strong></li><li>f = spez. GWP oder PENRT (A1-A3 + C3-C4) aus Rechenwerttabelle</li><li>m = Materialmenge (m³, m², kg)</li><li>a = Austauschzyklus aus BBSR-Tabelle</li><li>Ergebnis ÷ (m² NRF × 50 Jahre)</li><li>Funktioniert für ALLES: Baustoffe + Anlagentechnik</li></ul>' },
+  { topic: 'formel', front: 'Rechenbeispiel Teppichboden (155 m²)', back: '<ul><li>A1-A3: 9,88 / C3-C4: 2,77 → f = 12,65</li><li>Austausch a = 4</li><li>BG₅₀ = 12,65 × 155 × 5 = 9.803,75 kg CO₂</li><li>Bei 259 m² NRF: <strong>0,757 kg CO₂/(m²NRF·a)</strong></li><li>= 3% des 24-kg-Kontingents - nur Teppich!</li></ul>' },
+  { topic: 'austausch', front: 'Austauschzyklen - Datenquellen', back: '<ul><li><strong>Anlagentechnik:</strong> Anhang 3.1.1 Bilanzierungsregeln QNG</li><li><strong>Baustoffe:</strong> BBSR-Tabelle "Nutzungsdauern von Bauteilen nach BNB" (Stand 24.02.2017)</li><li>Jede Schicht EINZELN bilanzieren</li><li>Software setzt NICHT automatisch korrekt!</li><li>Im Jahr 50 KEIN Austausch mehr</li></ul>' },
+  { topic: 'garage', front: 'Garage / Tiefgarage - bilanzieren?', back: '<ul><li><strong>Integrierte Tiefgarage</strong> → bilanzieren</li><li><strong>Freistehende Garage</strong> → NICHT bilanzieren</li><li><strong>Parkhaus (auch angebaut)</strong> → NICHT bilanzieren</li><li><strong>Carport</strong> → NIE (nicht allseitig umschlossen)</li><li>Definition integriert: Ohne Teilung funktioniert kein Bauwerk mehr</li><li>Aufteilung bei mehreren Gebäuden: Stellplatzschlüssel</li></ul>' },
+  { topic: 'garage', front: 'Warum verbessert eine integrierte Garage die LCA?', back: '<ul><li>Unbeheizte Garagenfläche erhöht die Gesamt-NRF</li><li>Beheizte Fläche bleibt gleich</li><li>GWP pro m² sinkt</li><li>Aufteilung bei Mehrfamilienhaus: <strong>Stellplatzschlüssel</strong></li><li>Neuschwanstein-Prinzip: Gesamt groß, beheizt klein</li></ul>' },
+  { topic: 'flaechen', front: 'Balkon / Loggia / Dachterrasse', back: '<ul><li><strong>Schichtaufbau:</strong> MUSS bilanziert werden</li><li><strong>Fläche:</strong> zählt NICHT zur NRF(R)</li><li>Grund: nicht allseitig umschlossen</li><li>Konsequenz: verschlechtert LCA tendenziell</li><li>Flucht-/Rettungswege über Balkon: auch NICHT angerechnet</li></ul>' },
+  { topic: 'flaechen', front: 'Laubengang - Sonderregel', back: '<ul><li>Schichtaufbau: MUSS bilanziert werden</li><li>Fläche: NUR bauordnungsrechtliche Mindestbreite nach LBO</li><li>Jeder cm darüber NICHT anrechenbar</li><li>Gleiche Regel: Außentreppen</li><li>Treppenfläche = Grundriss von oben (Vogelperspektive)</li></ul>' },
+  { topic: 'rwt', front: 'Rechenwerttabelle - Workflow', back: '<ul><li>1. In <strong>Excel-Rechenwerttabelle</strong> suchen (~400 Baustoffe)</li><li>2. Nicht gefunden → <strong>Zuordnungsempfehlungen</strong> PDF</li><li>3. Immer noch nicht → <strong>eigene Zuordnung</strong> (Produktgruppe, Gewicht, Einsatzort)</li><li>NIE weglassen!</li><li>Reale Dicke ≠ Tabellen-Dicke → <strong>lineare Anpassung</strong></li><li>Tabelle zeigt NUR A1-A3 + C3-C4, NICHT B4!</li></ul>' },
+  { topic: 'vernachl', front: '1%-Regel - Voraussetzungen', back: '<ul><li>Vernachlässigung erlaubt wenn <strong>GLEICHZEITIG</strong>:</li><li>✅ Masse < 1% UND</li><li>✅ PENRT < 1% UND</li><li>✅ GWP₁₀₀ < 1%</li><li>Häufigster Fehler: PENRT vergessen!</li><li>Gesamtobergrenze: 5% pro Größe</li><li>Generell erlaubt: Nägel, Dübel, Schrauben, ≤ 1 kg Mengen</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>

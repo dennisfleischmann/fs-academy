@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LCA Kategorie 4 - Optimierung: Bauteile & Raumaufteilung</title>
+<link rel="stylesheet" href="../shared/lca-learn.css">
+</head>
+<body>
+
+<header>
+  <a href="../index.html" class="back">&larr; Zurück zu Kategorien</a>
+  <h1>LCA Kategorie 4: Optimierung - Bauteile & Raumaufteilung</h1>
+  <p>Fußboden, Innenwand, beheizte Fläche, Strompauschale, B6-Einfluss</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+  <button onclick="showSection('quiz')">Quiz</button>
+  <button onclick="showSection('flashcards')">Karteikarten</button>
+  <button onclick="showSection('exam')">Prüfung</button>
+  <button onclick="showSection('traps')">Fallen</button>
+</nav>
+
+<main>
+
+  <div id="dashboard" class="section active">
+    <div class="stats">
+      <div class="stat"><div class="num" id="stat-answered">0</div><div class="label">Beantwortet</div></div>
+      <div class="stat"><div class="num" id="stat-correct">0</div><div class="label">Richtig</div></div>
+      <div class="stat"><div class="num" id="stat-rate">--</div><div class="label">Quote</div></div>
+      <div class="stat"><div class="num" id="stat-streak">0</div><div class="label">Serie</div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Themenübersicht</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke auf ein Thema, um gezielt zu üben</p><div class="topic-grid" id="topic-grid"></div></div>
+    <div class="card"><h3 style="margin-bottom: 0.75rem;">Schnellstart</h3><div class="btn-row"><button class="btn btn-primary" onclick="startQuiz('all')">Alle Themen</button><button class="btn btn-accent" onclick="startQuiz('weak')">Schwächen üben</button><button class="btn btn-gold" onclick="showSection('exam')">Prüfungssimulation</button></div></div>
+  </div>
+
+  <div id="quiz" class="section">
+    <div class="card" id="quiz-filter-card"><h3 style="margin-bottom: 0.75rem;">Thema wählen</h3><div class="topic-filter" id="quiz-topic-filter"></div><div class="btn-row"><button class="btn btn-primary" onclick="startQuizFromFilter()">Quiz starten</button></div></div>
+    <div id="quiz-area" style="display:none;"><div class="progress-bar"><div class="fill" id="quiz-progress"></div></div><div class="card" id="quiz-card"></div><div class="btn-row" id="quiz-buttons"></div></div>
+    <div class="card" id="quiz-results" style="display:none;"></div>
+  </div>
+
+  <div id="flashcards" class="section">
+    <div class="card"><h3 style="margin-bottom: 0.5rem;">Karteikarten</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">Klicke zum Umdrehen.</p></div>
+    <div class="flashcard-container"><div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-face flashcard-front" id="fc-front"><h3 id="fc-question">Lade...</h3><div class="hint">Klicken zum Umdrehen</div></div><div class="flashcard-face flashcard-back" id="fc-back"><h4 id="fc-answer-title">Antwort</h4><div id="fc-answer"></div></div></div></div>
+    <div class="fc-nav"><button class="btn btn-outline" onclick="prevCard()">Zurück</button><span class="fc-counter" id="fc-counter">1 / 1</span><button class="btn btn-outline" onclick="nextCard()">Weiter</button></div>
+    <div class="btn-row" style="justify-content: center; margin-top: 0.5rem;"><button class="btn btn-accent" onclick="markCardKnown()">Gewusst</button><button class="btn btn-outline" style="border-color: var(--warn); color: var(--warn);" onclick="markCardUnknown()">Nochmal</button></div>
+  </div>
+
+  <div id="exam" class="section">
+    <div class="card" id="exam-setup"><h3 style="margin-bottom: 0.5rem;">Prüfungssimulation</h3><p style="font-size: 0.9rem; color: var(--muted); margin-bottom: 1rem;">12 Fragen, 25 Minuten, gemischte Formate. Bestanden ab 70%.</p><div class="btn-row"><button class="btn btn-gold" onclick="startExam()">Prüfung starten</button></div></div>
+    <div id="exam-area" style="display:none;"><div class="card" style="text-align:center;"><div class="exam-timer" id="exam-timer">25:00</div><div class="progress-bar"><div class="fill" id="exam-progress"></div></div></div><div class="card" id="exam-card"></div><div class="btn-row" id="exam-buttons"></div></div>
+    <div class="card" id="exam-results" style="display:none;"></div>
+  </div>
+
+  <div id="traps" class="section">
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Typische Prüfungsfallen Optimierung</h3>
+      <div class="trap">Teppichboden sieht in der Rechenwerttabelle <strong>"günstig"</strong> aus (niedrige A1-A3), ist aber durch 4 Austauschzyklen fast 80% SCHLECHTER als Fliesen.</div>
+      <div class="trap">Parkett hat <strong>negative</strong> A1-A3 (-12,63) durch CO₂-Bindung im Holz. Trotz höherer C3-C4 insgesamt bester Bodenbelag (-89% vs. Teppich).</div>
+      <div class="trap">Fläche im Effizienzhausnachweis = Fläche in der LCA. Will man einen Keller in der LCA unbeheizt haben, muss er auch im EH unbeheizt sein (Innendämmung + Flankendämmung).</div>
+      <div class="trap">KfW TFAQ 2.15: Ein nicht direkt beheizter aber außen gedämmter Keller gilt durch "Raumverbund" als beheizt. Will man unbeheizt → Innendämmung zw. beheizt/unbeheizt UND Kellerdeckendämmung.</div>
+      <div class="trap">Die Werte im Übungshaus sind SPEZIFISCH. Man kann NICHT "bei jedem Gebäude spare ich 2 kg durch X" ansetzen. Jedes Gebäude individuell berechnen.</div>
+      <div class="trap">Strompauschale (B6.3): 20 kWh Endenergie × beheizte NRF × Jahr. Nicht verwechseln mit Gesamt-NRF!</div>
+      <div class="trap">Baustoffe werden IMMER komplett bilanziert - egal ob Raum beheizt oder unbeheizt. Nur B6 hängt von beheizter Fläche ab.</div>
+      <div class="trap">B6 macht mehr als die Hälfte des GWP aus - deshalb ist PV der mit Abstand größte Hebel (Stromabzug).</div>
+      <div class="trap">Frühzeitige Beratung: Wandbaustoff + Innenwände müssen früh festgelegt werden. Batteriespeicher/PV können spät nachgerüstet werden.</div>
+      <div class="trap">"Wir kriegen JEDES Gebäude nachhaltig" - aber der Kunde muss Optimierungen zulassen und ggf. bezahlen.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Übersicht Optimierungen (Übungshaus 259 m²)</h3>
+      <table style="width:100%; border-collapse: collapse; font-size: 0.88rem;">
+        <tr style="background: #e8f5f5;"><th style="text-align:left; padding: 0.4rem;">Optimierung</th><th style="text-align:right; padding: 0.4rem;">GWP-Einsparung</th><th style="text-align:left; padding: 0.4rem;">Kosten</th></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Fußboden (Teppich → Parkett)</td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);">0,67 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">mittel</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Innenwand (KS → Ziegel)</td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);">0,22 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">gering</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>Raumaufteilung (beheizt → teilbeheizt)</strong></td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);"><strong>1,52 kg</strong></td><td style="padding: 0.4rem; border-top: 1px solid var(--border);"><strong>~0 €</strong></td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Solaranlage (5 m² Vakuumröhren)</td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);">2,10 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">hoch</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);">PV-Anlage (15 m²)</td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);">1,95 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">hoch</td></tr>
+        <tr><td style="padding: 0.4rem; border-top: 1px solid var(--border);">Vernachlässigung</td><td style="text-align:right; padding: 0.4rem; border-top: 1px solid var(--border);">bis 1,20 kg</td><td style="padding: 0.4rem; border-top: 1px solid var(--border);">0 €</td></tr>
+        <tr style="background: #fff9e6;"><td style="padding: 0.4rem; border-top: 2px solid var(--gold);"><strong>Summe max.</strong></td><td style="text-align:right; padding: 0.4rem; border-top: 2px solid var(--gold);"><strong>~9-10 kg</strong></td><td style="padding: 0.4rem; border-top: 2px solid var(--gold);">-</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom: 1rem;">Die goldenen Merksätze</h3>
+      <div class="merksatz">Wir kriegen JEDES Gebäude nachhaltig</div>
+      <div class="merksatz">B6 &gt; 50% des GWP - PV ist der größte Hebel</div>
+      <div class="merksatz">Teppich sieht günstig aus - ist aber katastrophal (4× Austausch)</div>
+      <div class="merksatz">Parkett schlägt Fliesen: A1-A3 negativ dank CO₂-Bindung</div>
+      <div class="merksatz">Kostenlos: Raumaufteilung + Nutzungsdauer-Anpassung</div>
+      <div class="merksatz">Neuschwanstein-Prinzip: beheizt klein, gesamt groß</div>
+      <div class="merksatz">LCA-Fläche = Effizienzhaus-Fläche (Konsistenz!)</div>
+      <div class="merksatz">Bauart (A1-A3/B4) ist NICHT der große Hebel - B6 ist es</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="../shared/lca-learn.js"></script>
+<script>
+const STORAGE_KEY = 'lca-k4-learn-state';
+const EXAM_MINUTES = 25;
+
+const topics = [
+  { id: 'uebersicht', name: 'Gesamtübersicht Optimierungen', icon: '📊' },
+  { id: 'fussboden', name: 'Fußbodenbelag', icon: '🏠' },
+  { id: 'innenwand', name: 'Innenwand', icon: '🧱' },
+  { id: 'raum', name: 'Raumaufteilung beheizt/unbeheizt', icon: '🌡️' },
+  { id: 'b6', name: 'B6 & Strompauschale', icon: '⚡' },
+];
+
+const questions = [
+  { topic: 'uebersicht', type: 'sc',
+    q: 'Welche Optimierung ist "kostenlos" und bringt die größte Einsparung im Übungshaus?',
+    options: ['PV-Anlage', 'Solaranlage', 'Raumaufteilung (beheizt → teilbeheizt)', 'Innenwand-Wechsel'],
+    correct: 2,
+    explanation: 'Raumaufteilung (beheizt → teilbeheizt) spart 1,52 kg GWP bei praktisch 0 € Kosten. Nutzungsdauer-Anpassung und Vernachlässigung sind ebenfalls kostenlos.' },
+  { topic: 'uebersicht', type: 'mc',
+    q: 'Welche Optimierungen kosten den Kunden praktisch KEIN Geld?',
+    options: ['Raumaufteilung (beheizt/unbeheizt)', 'Solaranlage', 'Nutzungsdauer-Anpassung', 'Vernachlässigung', 'PV-Anlage', 'Garagen-Fläche integrieren'],
+    correct: [0, 2, 3],
+    explanation: 'Raumaufteilung, Nutzungsdauer-Anpassung und Vernachlässigung sind kostenlos. Solar, PV, Garage kosten Geld.' },
+  { topic: 'uebersicht', type: 'sc',
+    q: 'Welche Optimierungen müssen FRÜH in der Planung entschieden werden?',
+    options: ['Wandbaustoff, Innenwände', 'Batteriespeicher, PV-Anlage', 'Bodenbelag, Fensterglas', 'Egal, alles jederzeit möglich'],
+    correct: 0,
+    explanation: 'Wandbaustoff und Innenwände früh festlegen. Batteriespeicher/PV können spät nachgerüstet werden (nur Technikraum + Anschlüsse nötig).' },
+
+  { topic: 'fussboden', type: 'sc',
+    q: 'Welcher Bodenbelag hat den besten LCA-Wert?',
+    options: ['Teppich', 'Fliesen', 'Parkett', 'Laminat'],
+    correct: 2,
+    explanation: 'Parkett (0,087 kg/m²NRF·a) ist 89% besser als Teppich. Grund: Negative A1-A3 durch CO₂-Bindung im Holz, 0 Austauschzyklen. Fliesen: -79%.' },
+  { topic: 'fussboden', type: 'mc',
+    q: 'Warum ist Teppich LCA-katastrophal, obwohl die A1-A3-Werte niedrig aussehen?',
+    options: ['4 Austauschzyklen innerhalb 50 Jahre', 'Hoher End-of-Life-Aufwand', 'Jeder Austausch = volle Herstellung + Entsorgung', 'Trotz niedriger Einzelwerte: 5× bilanziert', 'Teppich ist eigentlich gut'],
+    correct: [0, 2, 3],
+    explanation: 'Teppich: Austauschzyklus 4 → 5× Herstellung + 5× Entsorgung in 50 Jahren. Niedrige A1-A3-Werte täuschen. Fliesen mit Austausch 0 sind fast 80% besser.' },
+  { topic: 'fussboden', type: 'sc',
+    q: 'Warum hat Parkett einen negativen A1-A3-Wert (-12,63)?',
+    options: ['Rechenfehler in der Tabelle', 'CO₂-Bindung im Holz während des Wachstums', 'Parkett absorbiert CO₂ im Einsatz', 'Nachhaltigkeits-Bonus der EU'],
+    correct: 1,
+    explanation: 'Holz bindet CO₂ während des Baumwachstums. Das wird in A1-A3 als Negativ-Wert berücksichtigt. C3-C4 (Entsorgung) ist dagegen hoch.' },
+
+  { topic: 'innenwand', type: 'sc',
+    q: 'Welche Innenwand-Konstruktion hat den besten LCA-Wert?',
+    options: ['Kalksandstein', 'Ziegel', 'Trockenbau (Ständerwand)', 'Beton'],
+    correct: 2,
+    explanation: 'Trockenbau: 0,084 kg/(m²NRF·a) - 77% besser als Kalksandstein (0,368). Ziegel liegt in der Mitte (-60%).' },
+  { topic: 'innenwand', type: 'mc',
+    q: 'Was muss neben LCA bei der Innenwand-Wahl berücksichtigt werden?',
+    options: ['Statik', 'Brandschutz', 'Schallschutz', 'Wärmeschutz', 'Nichts - nur LCA zählt'],
+    correct: [0, 1, 2, 3],
+    explanation: 'LCA ist ein Mosaikstein. Statik, Brand-, Schall-, Wärmeschutz müssen IMMER auch berücksichtigt werden. Nicht alles, was LCA-günstig ist, ist bauphysikalisch sinnvoll.' },
+
+  { topic: 'raum', type: 'sc',
+    q: 'Wie verändert sich die LCA, wenn der Keller unbeheizt deklariert wird?',
+    options: ['Verschlechtert sich um 3,04 kg', 'Verbessert sich um ca. 3,04 kg', 'Bleibt gleich', 'Nur bei Altbau relevant'],
+    correct: 1,
+    explanation: 'Beheizter Keller 222 m² → Unbeheizt 148 m². Strompauschale fällt von 9,12 auf 6,08 kg → 3,04 kg Einsparung (33%). Baustoffe werden weiterhin komplett bilanziert.' },
+  { topic: 'raum', type: 'sc',
+    q: 'Was ist das "Neuschwanstein-Prinzip" in der LCA?',
+    options: ['Historische Gebäude sind besser', 'Beheizte Fläche klein, Gesamt-NRF groß', 'Möglichst viel Fläche beheizen', 'Keller und Dach nicht bilanzieren'],
+    correct: 1,
+    explanation: 'So groß wie möglich die Gesamt-NRF, so klein wie möglich die beheizte Fläche - das ist perfekt für die LCA. B6 wird kleiner, Gesamt-Nenner größer.' },
+  { topic: 'raum', type: 'mc',
+    q: 'Was ist bei der Deklaration "unbeheizt" zu beachten?',
+    options: ['Fläche muss auch im Effizienzhaus-Nachweis unbeheizt sein', 'Innendämmung zwischen beheizt/unbeheizt nötig', 'Kellerdeckendämmung im unbeheizten Bereich', 'Kostenlos ohne bauliche Maßnahmen möglich', 'KfW TFAQ 2.15 beachten: Raumverbund!'],
+    correct: [0, 1, 2, 4],
+    explanation: 'Fläche im EH = Fläche in LCA (Konsistenzregel). Raumverbund-Problem: Ein außen gedämmter Keller gilt automatisch als beheizt, solange nicht zusätzliche Innendämmung eingebaut ist.' },
+  { topic: 'raum', type: 'ft',
+    q: 'Erkläre, warum baustoffbezogene Bilanzierung UNABHÄNGIG von beheizt/unbeheizt ist, die B6-Strompauschale aber nicht.',
+    keywords: ['baustoff', 'komplett', 'beheizt', 'strompauschale', 'b6', '20 kwh', 'nrf', 'nenner', 'gesamt'],
+    sampleAnswer: 'Baustoffe werden IMMER komplett bilanziert, egal ob der Raum beheizt oder unbeheizt ist - die Herstellung/Entsorgung/Austausche sind material-, nicht nutzungsabhängig. Die B6-Strompauschale dagegen ist 20 kWh/m² × BEHEIZTE NRF × Jahr. Deklariere ich einen Raum als unbeheizt, reduziert sich die Strompauschale sofort - die Baustoffe bleiben in der Bilanz, aber der Energieverbrauch sinkt. Gleichzeitig geteilt durch Gesamt-NRF (die konstant bleibt) ergibt das einen niedrigeren GWP pro m².' },
+
+  { topic: 'b6', type: 'sc',
+    q: 'Wie hoch ist der Anteil von B6 am gesamten GWP im typischen Fall (Übungshaus 22,51 kg)?',
+    options: ['ca. 20%', 'ca. 35%', 'ca. 50-60%', 'ca. 90%'],
+    correct: 2,
+    explanation: 'B6 (12,95 kg von 22,51 kg) macht ca. 58% aus - mehr als die Hälfte. Deshalb ist PV (Stromabzug in B6) der mit Abstand größte Hebel.' },
+  { topic: 'b6', type: 'mc',
+    q: 'Wovon hängt B6 (Nutzungsphase) ab?',
+    options: ['Strompauschale B6.3 (beheizte NRF)', 'Endenergiebedarf B6.1 (beheizte NRF)', 'Gesamt-NRF (Nenner)', 'PV-Eigenverbrauch (Abzug)', 'Anzahl Innenwände'],
+    correct: [0, 1, 2, 3],
+    explanation: 'B6 wird getrieben von Strompauschale + Endenergiebedarf (beide abhängig von beheizter NRF). Die Division durch Gesamt-NRF wirkt wie ein Hebel. PV-Eigenverbrauch zieht direkt ab.' },
+  { topic: 'b6', type: 'sc',
+    q: 'Strompauschale B6.3: Wie viel kWh/m² pro Jahr?',
+    options: ['10 kWh × beheizte NRF', '20 kWh × beheizte NRF', '30 kWh × beheizte NRF', '20 kWh × Gesamt-NRF'],
+    correct: 1,
+    explanation: '20 kWh Endenergie × m² BEHEIZTE NRF × Jahr für den Nutzerstrom. Auf Gesamt-NRF wird nicht umgelegt.' },
+];
+
+const flashcards = [
+  { topic: 'uebersicht', front: 'Optimierungs-Toolbox - die 8 Hebel', back: '<ul><li>1. Fußbodenbelag (0,67 kg)</li><li>2. Innenwand (0,22 kg)</li><li>3. <strong>Raumaufteilung (1,52 kg, kostenlos!)</strong></li><li>4. Solaranlage (2,10 kg)</li><li>5. PV-Anlage (1,95 kg)</li><li>6. Vernachlässigung (bis 1,20 kg, kostenlos)</li><li>7. Nutzungsdauer-Anpassung (1,07 kg, kostenlos)</li><li>8. Garage-Fläche (0,82 kg)</li><li><strong>Summe ~9-10 kg möglich</strong></li></ul>' },
+  { topic: 'uebersicht', front: 'Frühe vs. späte Entscheidungen', back: '<ul><li><strong>FRÜH festlegen:</strong></li><li>Wandbaustoff (Außen + Innen)</li><li>Innenwand-Konstruktion</li><li>Raumaufteilung</li><li><strong>SPÄT möglich (nachrüstbar):</strong></li><li>Batteriespeicher (nur Technikraum/Anschlüsse nötig)</li><li>PV-Anlage</li><li>Bodenbeläge</li></ul>' },
+  { topic: 'fussboden', front: 'Bodenbeläge im LCA-Vergleich (155 m²)', back: '<ul><li><strong>Teppich:</strong> 0,757 (Austausch 4) - Basis</li><li><strong>Fliesen:</strong> 0,158 (Austausch 0) - <strong>-79%</strong></li><li><strong>Parkett:</strong> 0,087 (A1-A3 = -12,63) - <strong>-89%</strong></li><li>Teppich trotz "günstiger" A1-A3 katastrophal durch 4 Austausche</li><li>Parkett: CO₂-Bindung im Holz → negative A1-A3</li></ul>' },
+  { topic: 'innenwand', front: 'Innenwand-Konstruktion im Vergleich', back: '<ul><li><strong>Kalksandstein (Basis):</strong> 0,368 kg/(m²NRF·a)</li><li><strong>Ziegel:</strong> 0,148 (<strong>-60%</strong>)</li><li><strong>Trockenbau:</strong> 0,084 (<strong>-77%</strong>)</li><li>Beachten: Statik + Brand- + Schall- + Wärmeschutz</li><li>LCA ist nur ein Mosaikstein</li></ul>' },
+  { topic: 'raum', front: 'Keller - die Flächenentscheidung', back: '<ul><li>Beheizter Keller 222 m² → 9,12 kg Strompauschale</li><li>Teilbeheizt 185 m² → 7,60 (<strong>-1,52 kg</strong>)</li><li>Unbeheizt 148 m² → 6,08 (<strong>-3,04 kg</strong>)</li><li>Kostenlos, aber bauliche Voraussetzungen:</li><li>Innendämmung zw. beheizt/unbeheizt</li><li>Kellerdeckendämmung</li><li>KfW TFAQ 2.15 Raumverbund beachten</li></ul>' },
+  { topic: 'raum', front: 'Neuschwanstein-Prinzip', back: '<ul><li>So <strong>groß wie möglich</strong> die Gesamt-NRF</li><li>So <strong>klein wie möglich</strong> die beheizte Fläche</li><li>→ B6 sinkt (Strompauschale + Endenergie)</li><li>→ Nenner wächst (Gesamt-NRF)</li><li>Doppelter Effekt</li><li>Garage integrieren trägt dazu bei</li></ul>' },
+  { topic: 'raum', front: 'Konsistenzregel EH ↔ LCA', back: '<ul><li>Fläche beheizt im EH = beheizt in LCA</li><li>Will man Fläche in LCA unbeheizt → muss auch in EH unbeheizt sein</li><li>Dafür nötig:</li><li>- Innendämmung zwischen beheizt/unbeheizt</li><li>- Flankendämmung</li><li>- Ggf. Kellerdeckendämmung</li><li>KfW TFAQ 2.15: Raumverbund-Problem</li></ul>' },
+  { topic: 'b6', front: 'B6 - der Elefant im Raum', back: '<ul><li>B6 &gt; 50% des gesamten GWP (Übungshaus: 12,95 von 22,51 kg ≈ 58%)</li><li><strong>Abhängig von beheizter NRF:</strong></li><li>- Strompauschale B6.3 (20 kWh/m²·a)</li><li>- Endenergiebedarf B6.1 (WP, Hilfsenergie, Lüftung)</li><li><strong>Abhängig von Gesamt-NRF:</strong></li><li>- Division am Ende</li><li><strong>PV zieht direkt ab</strong> → größter Hebel</li></ul>' },
+  { topic: 'b6', front: 'GWP-Zusammensetzung Übungshaus (22,51 kg)', back: '<ul><li>A1-A3 Herstellung: 4,35 kg</li><li>B4 Austausch: 2,05 kg</li><li><strong>B6 Nutzung: 12,95 kg (&gt; 50%!)</strong></li><li>C3-C4 Entsorgung: 1,86 kg</li><li>Sockelbetrag: 1,30 kg</li><li>D1 Recycling: -1,61 (nur Info)</li><li>D2 Export: -3,79 (nur Info)</li></ul>' },
+];
+
+let state = {
+  answered: 0, correct: 0, streak: 0, maxStreak: 0,
+  topicScores: {}, currentQuiz: [], quizIndex: 0, quizAnswers: [],
+  currentFC: [], fcIndex: 0, fcFlipped: false,
+  examActive: false, examTimer: null, examTimeLeft: EXAM_MINUTES*60,
+  selectedOptions: new Set(),
+};
+topics.forEach(t => { state.topicScores[t.id] = { answered: 0, correct: 0 }; });
+try { const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); Object.assign(state, { answered: s.answered||0, correct: s.correct||0, streak: s.streak||0, maxStreak: s.maxStreak||0 }); if (s.topicScores) state.topicScores = {...state.topicScores, ...s.topicScores}; } catch(e) {}
+
+initLearnApp({ topics, questions, flashcards, state, storageKey: STORAGE_KEY, examMinutes: EXAM_MINUTES });
+</script>
+
+</body>
+</html>
